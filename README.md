@@ -16,4 +16,4 @@ The banner holds the title, the three tabs and the four imports. Each import box
 
 Everything is read in the browser. No workbook data is saved; only display preferences (theme, open tab, open filter panels) are remembered. There is no export.
 
-Pushing to `main` publishes the site to the Cloudflare Worker `target-escalations-dashboard`, through Cloudflare's Git integration (Workers Builds) on this repo. It serves `index.html`, `visits.html` and `xlsx.full.min.js`; `.assetsignore` keeps the other repo files off the site.
+Every push to `main` publishes the site to the Cloudflare Worker `target-escalations-dashboard` through GitHub Actions (`.github/workflows/deploy.yml`). It needs two repository secrets under Settings > Secrets and variables > Actions: `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`. You can also rerun it from the Actions tab. The Worker serves `index.html`, `visits.html` and `xlsx.full.min.js`; `.assetsignore` keeps the other repo files off the site. Cloudflare's own Git integration (Workers Builds) on this Worker must be disconnected so only one thing deploys.
