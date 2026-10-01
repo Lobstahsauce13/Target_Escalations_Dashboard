@@ -39,4 +39,6 @@ Every push to `main` publishes the site to the Cloudflare Worker `target-escalat
 
 ## Store overview
 
+Searching a store number on Escalations shows the same overview in the detail pane, with the store's display compliance in its header; each work order in it opens, and an open work order's **Store Overview** link goes back. A work order number still opens that work order.
+
 Picking a store on Store Visits (search its number, or click it in the list) shows its display compliance counts in the header and, above its assignments: Rep's Answers, Rep & Visits, the store's escalations (each opens on Escalations), every tracker row for the store, and its parts orders with tracking links.

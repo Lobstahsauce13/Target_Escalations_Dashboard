@@ -2863,6 +2863,87 @@ header .tsave:not([hidden]) + .fpill {
   margin: 4px 0 6px;
   white-space: pre-line;
 }
+/* The store overview on Escalations: compliance counts in the header, work orders, tracker rows. */
+.comp {
+  flex: none;
+  margin-left: auto;
+}
+.comp h2 {
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--mut);
+  margin: 0 0 4px;
+}
+.comp .m {
+  font-size: 12.5px;
+  max-width: 260px;
+  margin: 0;
+}
+.ctiles {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(92px, auto));
+  gap: 6px;
+}
+.ctiles div {
+  background: var(--pan);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 5px 10px;
+}
+.ctiles b {
+  display: block;
+  font-size: 18px;
+  line-height: 1.2;
+}
+.ctiles span {
+  font-size: 12px;
+  color: var(--mut);
+}
+.ctiles .ok b {
+  color: var(--ok);
+}
+.ctiles .bad b {
+  color: var(--bad);
+}
+.olist {
+  display: grid;
+  gap: 4px;
+}
+.esclink {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  width: 100%;
+  text-align: left;
+  background: var(--pan2);
+  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font: inherit;
+  color: var(--ink);
+  cursor: pointer;
+  min-width: 0;
+}
+.esclink:hover {
+  border-color: var(--acc);
+}
+.esclink .m {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tdet {
+  margin: 4px 0;
+}
+.tdet > summary {
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+  padding: 4px 0;
+}
 </style></head><body>
 <header><h1><svg class="logo" viewBox="0 0 28 28" role="img" aria-label="Target"><circle cx="14" cy="14" r="11.5" fill="none" stroke="#fff" stroke-width="4"/><circle cx="14" cy="14" r="4.5" fill="#fff"/></svg>Target Escalation Dashboard</h1>
 <nav id="apptabs" role="tablist"><button role="tab" data-app="esc" aria-selected="true">Escalations</button><button role="tab" data-app="ns" aria-selected="false">No Show</button><button role="tab" data-app="vis" aria-selected="false">Store Visits</button><button role="tab" data-app="dir" aria-selected="false">Directory</button></nav>
@@ -2992,6 +3073,8 @@ const esc = s =>
 let headers = [],
   rows = [],
   current = null,
+  // The store whose overview fills the detail pane, when a store number is searched and no work order is open.
+  shownStore = '',
   fileName = '',
   openCards = {};
 const now = () => new Date();
@@ -3653,6 +3736,7 @@ const SUMMARY_TABLES = [
 
 function summaryView() {
   current = null;
+  shownStore = '';
   const late = r => dueState(r) === 'late',
     tbl = SUMMARY_TABLES.map(([t, f, id]) => {
       const m = {};
@@ -3867,6 +3951,7 @@ const mapsLink = where =>
 
 function showEscalation(r, keep) {
   current = r;
+  shownStore = '';
   const s = dueState(r),
     sc = keep ? $('d').scrollTop : 0,
     store = storeKey(r.site),
@@ -3881,7 +3966,7 @@ function showEscalation(r, keep) {
       .join('');
   $('d').innerHTML = `<div class="top"><div class="hd">
  <div class="chips">${statusTag(r)}${r.manual ? '<span class="tag hand" title="Typed in on this page; not in the export file yet">Added by Hand</span>' : ''}${r.problem ? `<span class="tag pcode" title="Problem Code">${esc(r.problem)}</span>` : ''}<span class="due ${s}">${esc(dueText(r))}</span></div>${r.los ? `<div class="m dln">LOS Finish ${esc(r.los.shown)}</div>` : ''}
- <h2 class="vn">Store ${esc(r.site)}</h2>${where ? `<div class="sid">${mapsLink(where)}</div>` : ''}<div class="m ids">Work Order #${esc(r.id)}</div></div>
+ <h2 class="vn">Store ${esc(r.site)}</h2>${where ? `<div class="sid">${mapsLink(where)}</div>` : ''}<div class="m ids">Work Order #${esc(r.id)} · <button class="lnk" data-storeview="${esc(store)}">Store Overview</button></div></div>
  <div class="side"><div class="reply"><button id="reply" class="p" aria-haspopup="menu" aria-expanded="false">${ICONS.mail}Reply</button><div id="replymenu" role="menu" hidden><button role="menuitem" data-to="dm">To DM</button><button role="menuitem" data-to="pml">To PML</button></div></div>${org ? `<div class="team">${org}</div>` : ''}</div></div>
  <div class="panel solo">${glance(r)}</div>
  ${card('Rep & Visits', visitsCard(store), 'Last four weeks, from the data file')}
@@ -3949,6 +4034,18 @@ function storeOverview(store) {
       : card('Presence & Functionality', pfCard(), 'Nationwide and by region, from the Presence and Functionality file'))
   );
 }
+// The store overview on Escalations: the store's display compliance in the header, then the same cards as Store Visits.
+function storeView(store) {
+  current = null;
+  shownStore = store;
+  const r = rows.find(x => storeKey(x.site) === store),
+    where = r ? storeAddress(r) : '',
+    n = rows.filter(x => storeKey(x.site) === store).length;
+  $('d').innerHTML = `<div class="top"><div class="hd"><h2 class="vn">Store ${esc(r ? r.site : store)}</h2>${where ? `<div class="sid">${mapsLink(where)}</div>` : ''}<div class="m ids">${n.toLocaleString()} work order${n === 1 ? '' : 's'} in the export file</div></div><div class="comp">${complianceTiles(store)}</div></div>
+ ${storeOverview(store)}`;
+  $('d').scrollTop = 0;
+  draw();
+}
 // A work order picked on the store overview opens on Escalations.
 function openWorkOrder(id) {
   const r = rows.find(x => x.id === id);
@@ -3960,6 +4057,7 @@ function openWorkOrder(id) {
 // After a file loads, the open escalation and the Store Visits store are drawn again with it.
 function refreshViews() {
   if (current) showEscalation(current, true);
+  else if (shownStore) storeView(shownStore);
   if (!$('nsView').hidden) nsDraw(true);
   visFrame().renderWork();
 }
@@ -4357,6 +4455,10 @@ document.addEventListener('keydown', e => {
 });
 $('d').addEventListener('click', e => {
   if (e.target.id === 'openimp') openImports("Let's Get Started");
+  const sv = e.target.closest('[data-storeview]');
+  if (sv) storeView(sv.dataset.storeview);
+  const wo = e.target.closest('.esclink');
+  if (wo) openWorkOrder(wo.dataset.wo);
 });
 // Skeleton lines: widths are percentages.
 const skLines = (...w) => w.map(x => `<div class="sk" style="width:${x}%"></div>`).join('');
@@ -4514,9 +4616,12 @@ $('clr').onclick = () => {
 ['s', 'so', ...FILTERS.map(f => f[0])].forEach(i => $(i).addEventListener('input', draw));
 // A work order number opens that work order, and its store is the one followed.
 $('s').addEventListener('input', () => {
-  const wo = searchedOrder();
+  const wo = searchedOrder(),
+    q = storeKey($('s').value);
   follow(wo ? storeKey(wo.site) : $('s').value);
   if (wo) showEscalation(wo);
+  else if (/^\d{1,5}$/.test(q)) storeView(q);
+  else if (!q && !current) summaryView();
 });
 // How long the data file can take to read, shown while it is read. A 150,000-row export took 11–14 s in testing; this leaves room for a slower laptop.
 const DATA_SECONDS = 30;
@@ -4687,9 +4792,7 @@ function openFollowedOnEscalations() {
   $('s').value = followed;
   draw();
   if (!followed || (current && matches(current, new Set()))) return;
-  const it = $('list').querySelector('.it');
-  if (it) showEscalation(rows[+it.dataset.i]);
-  else toast(`No work orders for store ${followed}.`);
+  storeView(storeKey(followed));
 }
 // Store Visits and Directory send their counts here as [label, count, tone, pill id, on]; they show in the bar
 // where Escalations shows its own. A pill with an id filters that tab's table.
