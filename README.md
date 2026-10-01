@@ -11,4 +11,4 @@ The banner holds the title, the three tabs and every import: Data, Current visit
 
 Everything is read in the browser. No workbook data is saved; only display preferences (theme, open tab, open filter panels, visit column mapping) are remembered. There is no export.
 
-Pushing to `main` publishes the site to Cloudflare Pages (`target-escalations`) through `.github/workflows/deploy.yml`. It needs a Pages project named `target-escalations` and the repo secrets `CLOUDFLARE_API_TOKEN` (permission Account > Cloudflare Pages > Edit) and `CLOUDFLARE_ACCOUNT_ID`.
+Pushing to `main` publishes the site to the Cloudflare Worker `target-escalations` through `.github/workflows/deploy.yml`. It needs the repo secrets `CLOUDFLARE_API_TOKEN` (a token made from Cloudflare's "Edit Cloudflare Workers" template) and `CLOUDFLARE_ACCOUNT_ID`.
