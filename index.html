@@ -1,0 +1,4791 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Escalation Dashboard v4</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root {
+  --ink: #0d161e;
+  --mut: #3e4a55;
+  --line: #e3e7eb;
+  --bg: #e9ecef;
+  --pan: #fff;
+  --pan2: #f5f6f7;
+  --sel: #e6f1f8;
+  --acc: #0275b2;
+  --acch: #015a8a;
+  --gold: #c0a16b;
+  --s-bad: #d32f2f;
+  --s-warn: #b86400;
+  --s-ok: #23964f;
+  --s-mut: #56626e;
+  --hdr: #015a8a;
+  --hbg: #dce2e8;
+  --zebra: #f1f3f5;
+  --onacc: #fff;
+  --bad: #b3261e;
+  --badbg: #fde3e1;
+  --warn: #8f5200;
+  --warnbg: #fff0d4;
+  --ok: #1b7a43;
+  --okbg: #dff1e6;
+  --chip: #eaedf0;
+  --chg: #fff4d6;
+  --chgb: #e0b64a;
+  --inp: #ffffff;
+  --c-csm: #0e7490;
+  --c-dm: #6d28d9;
+  --c-patti: #b45309;
+  --c-rep: #15803d;
+  --c-bby: #0b57a4;
+  --p3: #5b3fc4;
+  --p3bg: #ebe6fc;
+  --p4: #0e6674;
+  --p4bg: #dcf1f4;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+    --ink: #e9edf1;
+    --mut: #9aa7b4;
+    --line: #2b3845;
+    --bg: #0d161e;
+    --pan: #1b2733;
+    --pan2: #223140;
+    --sel: #0f3350;
+    --acc: #4daee3;
+    --acch: #7cc4ec;
+    --onacc: #0d161e;
+    --s-bad: var(--bad);
+    --s-warn: var(--warn);
+    --s-ok: var(--ok);
+    --s-mut: var(--mut);
+    --hdr: #0b3552;
+    --hbg: #16212b;
+    --zebra: #1f2b37;
+    --bad: #ff8a80;
+    --badbg: #4a1f1c;
+    --warn: #f0b35a;
+    --warnbg: #3d2e12;
+    --ok: #6fd49a;
+    --okbg: #173a26;
+    --chip: #27343f;
+    --chg: #3a3218;
+    --chgb: #8a7030;
+    --inp: #14202a;
+    --c-csm: #5ec8dc;
+    --c-dm: #b69cff;
+    --c-patti: #f0b35a;
+    --c-rep: #6fd49a;
+    --c-bby: #6aa8ea;
+    --p3: #b69cff;
+    --p3bg: #2e2650;
+    --p4: #5ec8dc;
+    --p4bg: #163a40;
+  }
+}
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --ink: #e9edf1;
+  --mut: #9aa7b4;
+  --line: #2b3845;
+  --bg: #0d161e;
+  --pan: #1b2733;
+  --pan2: #223140;
+  --sel: #0f3350;
+  --acc: #4daee3;
+  --acch: #7cc4ec;
+  --onacc: #0d161e;
+  --s-bad: var(--bad);
+  --s-warn: var(--warn);
+  --s-ok: var(--ok);
+  --s-mut: var(--mut);
+  --hdr: #0b3552;
+  --hbg: #16212b;
+  --zebra: #1f2b37;
+  --bad: #ff8a80;
+  --badbg: #4a1f1c;
+  --warn: #f0b35a;
+  --warnbg: #3d2e12;
+  --ok: #6fd49a;
+  --okbg: #173a26;
+  --chip: #27343f;
+  --chg: #3a3218;
+  --chgb: #8a7030;
+  --inp: #14202a;
+  --c-csm: #5ec8dc;
+  --c-dm: #b69cff;
+  --c-patti: #f0b35a;
+  --c-rep: #6fd49a;
+  --c-bby: #6aa8ea;
+  --p3: #b69cff;
+  --p3bg: #2e2650;
+  --p4: #5ec8dc;
+  --p4bg: #163a40;
+}
+* {
+  box-sizing: border-box;
+}
+html {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font:
+    14px/1.45 'Segoe UI',
+    system-ui,
+    sans-serif;
+  color: var(--ink);
+  background: var(--bg);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+button,
+select,
+input,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+a {
+  color: var(--acc);
+}
+button {
+  border: 1px solid var(--line);
+  background: var(--pan);
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+button.p {
+  background: var(--acc);
+  border-color: var(--acc);
+  color: var(--onacc);
+}
+button.p:hover:not(:disabled) {
+  background: var(--acch);
+  border-color: var(--acch);
+}
+button:disabled,
+button[aria-disabled='true'] {
+  opacity: 0.45;
+  cursor: default;
+}
+button.lnk {
+  border: 0;
+  background: none;
+  padding: 0;
+  color: var(--acc);
+  text-decoration: underline;
+}
+select,
+input,
+textarea {
+  background: var(--inp);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+}
+header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  align-items: center;
+  padding: 10px 16px;
+  background: var(--hdr);
+  color: #fff;
+  border-bottom: 3px solid #fff;
+}
+header button {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.55);
+  color: #fff;
+}
+header button:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.12);
+}
+header button.p {
+  background: #fff;
+  border-color: #fff;
+  color: var(--hdr);
+}
+header button.p:hover:not(:disabled) {
+  background: #e6f1f8;
+  border-color: #e6f1f8;
+}
+header .spin.on,
+header .spin {
+  border-color: rgba(1, 90, 138, 0.25);
+  border-top-color: #015a8a;
+}
+header .ver {
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+}
+h1 {
+  font-size: 17px;
+  margin: 0;
+  font-weight: 650;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+/* Best Buy tag logo before the title. */
+.bblogo {
+  width: 46px;
+  height: 28px;
+  flex: none;
+}
+/* Full text of anything cut off with "…", on hover (hoverTip). */
+#tip {
+  position: fixed;
+  z-index: 50;
+  max-width: 420px;
+  padding: 6px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--pan);
+  color: var(--ink);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+  font-size: 12.5px;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  pointer-events: none;
+}
+#tip[hidden] {
+  display: none;
+}
+.sp {
+  flex: 1;
+}
+.m {
+  color: var(--mut);
+}
+#sumbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  padding: 8px 16px;
+  background: var(--pan);
+  border-bottom: 1px solid var(--line);
+}
+/* Tight enough that the pills and both buttons fit one row at 1280px. */
+#sum,
+#vsum {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+#sum:empty,
+#vsum:empty {
+  display: none;
+}
+#sum button,
+#vsum .pl {
+  display: flex;
+  gap: 6px;
+  align-items: baseline;
+  border-radius: 8px;
+  padding: 5px 12px;
+  background: var(--chip);
+  border: 1px solid transparent;
+  color: var(--mut);
+  font-weight: 500;
+}
+#sum button b,
+#vsum .pl b {
+  font-size: 15px;
+  font-weight: 700;
+}
+#sum .bad,
+#vsum .bad {
+  background: var(--badbg);
+  color: var(--bad);
+}
+#sum .warn,
+#vsum .warn {
+  background: var(--warnbg);
+  color: var(--warn);
+}
+#sum .ok,
+#vsum .ok {
+  background: var(--okbg);
+  color: var(--ok);
+}
+#vsum .acc {
+  background: var(--sel);
+  color: var(--acc);
+}
+#vsum button.pl {
+  cursor: pointer;
+}
+#vsum button.pl:hover,
+#vsum button.act {
+  border-color: currentColor;
+}
+#vsum button.act {
+  box-shadow: inset 0 0 0 1px currentColor;
+}
+#follow:empty {
+  display: none;
+}
+main {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 370px 1fr;
+  min-height: 0;
+}
+#q {
+  border-right: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--pan);
+}
+#f {
+  padding: 10px 16px 8px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.srow {
+  display: flex;
+  gap: 6px;
+}
+/* The search hint is an overlay, not a placeholder, so part of it can be smaller and darker. */
+.sbox {
+  flex: 1;
+  min-width: 0;
+  position: relative;
+  display: flex;
+}
+.sph {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  white-space: nowrap;
+  color: var(--s-mut);
+  pointer-events: none;
+}
+.sph small {
+  font-size: 11px;
+  color: var(--ink);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .sph small {
+    color: #6f7c89;
+  }
+}
+:root[data-theme='dark'] .sph small {
+  color: #6f7c89;
+}
+#s:not(:placeholder-shown) + .sph {
+  display: none;
+}
+#f input[type='search'] {
+  flex: 1;
+  min-width: 0;
+  padding: 6px 9px;
+  background: var(--pan2);
+  border-color: transparent;
+  border-radius: 10px;
+}
+#f input[type='search']:focus {
+  background: var(--inp);
+  border-color: var(--acc);
+  outline: none;
+}
+#ftog {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border-radius: 10px;
+  background: var(--pan2);
+  border-color: transparent;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--mut);
+}
+#ftog svg {
+  width: 15px;
+  height: 15px;
+}
+#ftog[aria-expanded='true'],
+#ftog:has(#fcount:not(:empty)) {
+  color: var(--acc);
+  background: var(--sel);
+}
+#fcount:not(:empty) {
+  background: var(--acc);
+  color: var(--onacc);
+  border-radius: 10px;
+  font-size: 11px;
+  padding: 0 6px;
+  margin-left: 2px;
+}
+#fpanel .g2 select {
+  background: var(--pan2);
+  border-color: transparent;
+  border-radius: 6px;
+  font-size: 13px;
+  padding: 5px 6px;
+  color: var(--ink);
+}
+#fpanel .g2 select:hover {
+  border-color: var(--line);
+}
+#fpanel .g2 select.on {
+  background: var(--sel);
+  border-color: var(--acc);
+  color: var(--acc);
+  font-weight: 600;
+}
+#chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+#chips:empty {
+  display: none;
+}
+.fchip {
+  padding: 1px 9px;
+  border-radius: 999px;
+  font-size: 12px;
+  background: var(--sel);
+  border-color: transparent;
+  color: var(--acc);
+}
+.fchip:hover {
+  border-color: var(--acc);
+}
+#sum button.act {
+  border-color: currentColor;
+  box-shadow: inset 0 0 0 1px currentColor;
+}
+#sum button:hover {
+  border-color: currentColor;
+}
+.sfil {
+  font-size: 12px;
+  color: var(--mut);
+  align-self: center;
+}
+.g2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+.g2 > * {
+  min-width: 0;
+  width: 100%;
+  padding: 5px 6px;
+}
+.fbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 8px;
+  align-items: center;
+  font-size: 13px;
+  white-space: nowrap;
+}
+.fbar select {
+  padding: 3px 5px;
+}
+#list {
+  overflow: auto;
+  flex: 1;
+}
+.it {
+  padding: 9px 16px;
+  border-bottom: 1px solid var(--line);
+  cursor: pointer;
+  border-left: 4px solid transparent;
+}
+.it:hover {
+  background: var(--pan2);
+}
+.it.sel {
+  background: var(--sel);
+  border-left-color: var(--acc);
+}
+.it.late {
+  border-left-color: var(--bad);
+}
+.it.sel.late {
+  border-left-color: var(--bad);
+}
+.l1 {
+  display: flex;
+  gap: 6px;
+  align-items: baseline;
+}
+.l1 .due {
+  margin-left: auto;
+}
+.l1 .m {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.l2 {
+  font-size: 12.5px;
+  color: var(--mut);
+  margin-top: 3px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.l2 .txt {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.l2 .trk {
+  margin: 0 0 0 auto;
+  flex: none;
+}
+.due {
+  font-size: 12px;
+  white-space: nowrap;
+  padding: 0 7px;
+  border-radius: 10px;
+  background: var(--chip);
+}
+.due.late {
+  background: var(--badbg);
+  color: var(--bad);
+}
+.due.soon {
+  background: var(--warnbg);
+  color: var(--warn);
+}
+.due.done {
+  background: var(--okbg);
+  color: var(--ok);
+}
+.tag {
+  display: inline-block;
+  padding: 0 7px;
+  border-radius: 10px;
+  font-size: 12px;
+  background: var(--chip);
+  margin-right: 4px;
+}
+.tag.p1 {
+  background: var(--badbg);
+  color: var(--bad);
+}
+.tag.p2 {
+  background: var(--warnbg);
+  color: var(--warn);
+}
+.tag.p3 {
+  background: var(--p3bg);
+  color: var(--p3);
+}
+.tag.p4 {
+  background: var(--p4bg);
+  color: var(--p4);
+}
+.tag.ok {
+  background: var(--okbg);
+  color: var(--ok);
+}
+.leg {
+  padding: 8px 16px;
+  border-top: 1px solid var(--line);
+  font-size: 12.5px;
+  color: var(--mut);
+}
+.leg p {
+  margin: 4px 0;
+}
+.leg summary {
+  cursor: pointer;
+}
+#d {
+  overflow: auto;
+  padding: 16px 22px 60px;
+}
+#empty {
+  margin: 12vh auto;
+  text-align: center;
+  max-width: 440px;
+  padding: 36px;
+  border: 2px dashed var(--line);
+  border-radius: 10px;
+  background: var(--pan);
+}
+h2 {
+  margin: 0;
+  font-size: 20px;
+}
+.top {
+  display: flex;
+  gap: 10px 16px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  background: var(--hbg);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+.top > .hd {
+  flex: 1;
+  min-width: 240px;
+}
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+  margin-bottom: 8px;
+}
+.chips .due,
+.chips .tag {
+  font-size: 12.5px;
+  padding: 2px 10px;
+  margin: 0;
+}
+.chips .m {
+  font-size: 12.5px;
+}
+.tag.nx {
+  background: var(--sel);
+  color: var(--ink);
+}
+.card {
+  background: var(--pan);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  margin: 12px 0;
+  padding: 0 14px;
+}
+.card > summary {
+  padding: 10px 0;
+  font-weight: 650;
+  cursor: pointer;
+}
+.card .hint {
+  font-weight: 400;
+  color: var(--mut);
+  font-size: 12.5px;
+  margin-left: 6px;
+}
+.issue {
+  white-space: pre-line;
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  background: var(--pan2);
+  border-radius: 6px;
+}
+.kvg {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 8px 16px;
+  padding-bottom: 14px;
+}
+.kv span {
+  display: block;
+  font-size: 12px;
+  color: var(--mut);
+}
+.kv b {
+  font-weight: 550;
+  overflow-wrap: anywhere;
+}
+.gb {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 10px 14px;
+  padding: 0 0 14px;
+}
+.fl {
+  display: block;
+  min-width: 0;
+}
+.fl.w {
+  grid-column: 1/-1;
+}
+.fl span {
+  display: block;
+  font-size: 12.5px;
+  color: var(--mut);
+  margin-bottom: 2px;
+}
+.fl i {
+  font-style: normal;
+  margin-left: 6px;
+  opacity: 0.7;
+  font-size: 11px;
+}
+.fl textarea,
+.fl input,
+.fl select {
+  width: 100%;
+  padding: 6px 9px;
+  resize: vertical;
+  background: var(--inp);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: inherit;
+}
+.fl textarea:focus,
+.fl input:focus,
+.fl select:focus {
+  outline: none;
+  border-color: var(--acc);
+  box-shadow: 0 0 0 3px var(--sel);
+}
+input[type='datetime-local']::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  border-radius: 5px;
+  padding: 3px;
+  filter: opacity(0.6);
+}
+input[type='datetime-local']::-webkit-calendar-picker-indicator:hover {
+  background: var(--sel);
+  filter: opacity(1);
+}
+.fl.chg textarea,
+.fl.chg input,
+.fl.chg select {
+  background: var(--chg);
+  border-color: var(--chgb);
+}
+.fl.pend textarea,
+.fl.pend input,
+.fl.pend select {
+  border: 1px dashed var(--acc);
+  background: var(--sel);
+}
+.pbar {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  background: var(--pan);
+  border: 1px solid var(--acc);
+  border-radius: 10px;
+  padding: 8px 12px;
+  margin: 12px 0;
+  box-shadow: 0 -4px 14px rgba(10, 15, 20, 0.12);
+}
+.pbar .sp {
+  flex: 1;
+}
+.pchg {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.pchg th,
+.pchg td {
+  text-align: left;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+  white-space: pre-wrap;
+}
+.pchg th {
+  color: var(--mut);
+  font-weight: 600;
+}
+.pchg .was {
+  color: var(--mut);
+  text-decoration: line-through;
+}
+.tl {
+  list-style: none;
+  margin: 6px 0 14px;
+  padding: 0 0 0 18px;
+  border-left: 2px solid var(--line);
+}
+.tl li {
+  position: relative;
+  padding: 0 0 9px 10px;
+}
+.tl li:before {
+  content: '';
+  position: absolute;
+  left: -25px;
+  top: 6px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--acc);
+  border: 2px solid var(--pan);
+}
+.tl li.due:before {
+  background: var(--warn);
+}
+.tl li.late:before {
+  background: var(--bad);
+}
+.tl li.now {
+  color: var(--mut);
+}
+.tl li.now:before {
+  background: var(--mut);
+}
+table.vis {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  margin-bottom: 14px;
+}
+.vis th,
+.vis td {
+  text-align: left;
+  padding: 4px 8px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+.vis th {
+  color: var(--mut);
+  font-weight: 500;
+}
+#toast {
+  position: fixed;
+  left: 50%;
+  bottom: 40px;
+  transform: translateX(-50%);
+  background: var(--ink);
+  color: var(--pan);
+  padding: 8px 14px;
+  border-radius: 10px;
+  max-width: 90vw;
+  opacity: 0;
+  transition: opacity 0.2s;
+  pointer-events: none;
+}
+#toast.on {
+  opacity: 1;
+}
+.contact {
+  text-align: right;
+  font-size: 11.5px;
+  color: var(--mut);
+  padding: 5px 16px;
+  background: var(--pan);
+  border-top: 1px solid var(--line);
+}
+.contact .mail {
+  color: var(--acc);
+  text-decoration: underline;
+}
+.rroverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: rrpop 0.15s ease-out;
+}
+.rroverlay {
+  flex-direction: column;
+  gap: 14px;
+  cursor: pointer;
+}
+.rroverlay p {
+  color: #fff;
+  opacity: 0.75;
+  margin: 0;
+  font-size: 13px;
+}
+.rroverlay iframe {
+  width: min(92vw, 640px);
+  aspect-ratio: 16/9;
+  border: 0;
+  border-radius: 10px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+@keyframes rrpop {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+#lwarn {
+  padding: 8px 16px;
+  background: var(--warnbg);
+  color: var(--warn);
+  border-bottom: 1px solid var(--line);
+  font-size: 13px;
+}
+#lwarn b {
+  font-weight: 700;
+}
+.ic {
+  width: 1em;
+  height: 1em;
+  display: inline-block;
+  vertical-align: -0.15em;
+  flex: none;
+}
+.sti-i .ic {
+  width: 18px;
+  height: 18px;
+  vertical-align: middle;
+}
+.okc .ic {
+  width: 11px;
+  height: 11px;
+  vertical-align: 0;
+}
+.fchip .ic {
+  width: 10px;
+  height: 10px;
+  vertical-align: -1px;
+  margin-left: 2px;
+}
+.tag.trk.ip {
+  background: var(--sel);
+  color: var(--acc);
+}
+.tag.trk.ok {
+  background: var(--okbg);
+  color: var(--ok);
+}
+.vnote {
+  font-style: italic;
+  font-size: 11.5px;
+  color: var(--mut);
+  opacity: 0.8;
+  margin: -8px 0 0;
+}
+.vis tr:nth-child(odd):not(:first-child) td {
+  background: var(--zebra);
+}
+.vis tr.up:nth-child(n):not(:first-child) td {
+  background: var(--sel);
+}
+.vis td.sti {
+  text-align: center;
+  white-space: nowrap;
+}
+.sti-i {
+  display: block;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+.sti-l {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.vis th:last-child {
+  text-align: center;
+}
+.nxp {
+  --nf: var(--mut);
+  --nb: var(--chip);
+  background: var(--nb);
+  color: var(--nf);
+  font-weight: 600;
+  border: 1px solid transparent;
+}
+.nx-field {
+  --nf: #1d4ed8;
+  --nb: #dce8ff;
+}
+.nx-cs-parts {
+  --nf: #15803d;
+  --nb: #dcf5e3;
+}
+.nx-cs-cf {
+  --nf: #4d6b12;
+  --nb: #ebf3cf;
+}
+.nx-cs-qc {
+  --nf: #3f4f8a;
+  --nb: #e3e7f7;
+}
+.nx-cs-issue {
+  --nf: #7a5c12;
+  --nb: #f4ecd2;
+}
+.nx-dm {
+  --nf: #b0247e;
+  --nb: #fbe3f2;
+}
+.nx-damage {
+  --nf: #c2410c;
+  --nb: #ffe4cc;
+}
+.nx-admin {
+  --nf: #4b5563;
+  --nb: #e8eaee;
+}
+.nx-new {
+  --nf: #0f6f9c;
+  --nb: #dbf1fb;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .nx-field {
+    --nf: #8fb4ff;
+    --nb: #1a2a4d;
+  }
+}
+:root[data-theme='dark'] .nx-field {
+  --nf: #8fb4ff;
+  --nb: #1a2a4d;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .nx-cs-parts {
+    --nf: #6fd49a;
+    --nb: #173a26;
+  }
+}
+:root[data-theme='dark'] .nx-cs-parts {
+  --nf: #6fd49a;
+  --nb: #173a26;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .nx-cs-cf {
+    --nf: #b5d36a;
+    --nb: #2b3514;
+  }
+}
+:root[data-theme='dark'] .nx-cs-cf {
+  --nf: #b5d36a;
+  --nb: #2b3514;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .nx-cs-qc {
+    --nf: #a9b6ee;
+    --nb: #262c4a;
+  }
+}
+:root[data-theme='dark'] .nx-cs-qc {
+  --nf: #a9b6ee;
+  --nb: #262c4a;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .nx-cs-issue {
+    --nf: #e3c778;
+    --nb: #3a3016;
+  }
+}
+:root[data-theme='dark'] .nx-cs-issue {
+  --nf: #e3c778;
+  --nb: #3a3016;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .nx-dm {
+    --nf: #f08cc8;
+    --nb: #43182f;
+  }
+}
+:root[data-theme='dark'] .nx-dm {
+  --nf: #f08cc8;
+  --nb: #43182f;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .nx-damage {
+    --nf: #ff9a52;
+    --nb: #472110;
+  }
+}
+:root[data-theme='dark'] .nx-damage {
+  --nf: #ff9a52;
+  --nb: #472110;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .nx-admin {
+    --nf: #b8c0cc;
+    --nb: #2a2f37;
+  }
+}
+:root[data-theme='dark'] .nx-admin {
+  --nf: #b8c0cc;
+  --nb: #2a2f37;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .nx-new {
+    --nf: #7cc8ec;
+    --nb: #153445;
+  }
+}
+:root[data-theme='dark'] .nx-new {
+  --nf: #7cc8ec;
+  --nb: #153445;
+}
+.ovl {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 15, 20, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  z-index: 20;
+}
+.nbox {
+  background: var(--pan);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 16px 18px;
+  width: min(760px, 100%);
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.nbox h2 {
+  font-size: 18px;
+}
+.nbox.wide {
+  width: min(980px, 100%);
+}
+.mych {
+  overflow: auto;
+}
+.mych h3 {
+  margin: 14px 0 4px;
+  font-size: 15px;
+  color: var(--acc);
+}
+.mych section:first-child h3 {
+  margin-top: 0;
+}
+.mys {
+  font-weight: 600;
+  font-size: 13px;
+  margin: 10px 0 2px;
+}
+.nbox textarea {
+  flex: 1;
+  min-height: 320px;
+  width: 100%;
+  padding: 10px;
+  font:
+    12.5px/1.45 ui-monospace,
+    Consolas,
+    monospace;
+  resize: vertical;
+}
+.nbox .mbtn {
+  margin: 0;
+}
+.pvt {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.spin {
+  display: inline-block;
+  width: 28px;
+  height: 28px;
+  border: 3px solid var(--chip);
+  border-top-color: var(--acc);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  flex: none;
+  will-change: transform;
+}
+.spin.sm {
+  width: 14px;
+  height: 14px;
+  border-width: 2px;
+  margin-right: 6px;
+  vertical-align: -2px;
+}
+.spin.on {
+  border-color: rgba(255, 255, 255, 0.35);
+  border-top-color: var(--onacc);
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .spin {
+    animation-duration: 2.4s;
+  }
+}
+.lrow {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+.lrow h2 {
+  font-size: 18px;
+}
+.lrow p {
+  margin: 2px 0;
+}
+.okc {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--ok);
+  color: var(--pan);
+  font-size: 11px;
+  font-weight: 700;
+  margin-right: 6px;
+}
+.sidetop {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+}
+.gl {
+  display: grid;
+  grid-template-columns: 1fr minmax(230px, 300px);
+  gap: 16px;
+  align-items: start;
+}
+@media (max-width: 1000px) {
+  .gl {
+    grid-template-columns: 1fr;
+  }
+}
+.pside {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-top: 4px solid var(--mut);
+  border-radius: 10px;
+  background: var(--pan2);
+  font-size: 13px;
+}
+.pside h4 {
+  margin: 0 0 2px;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--mut);
+}
+.pside b {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14.5px;
+}
+.pside b svg {
+  width: 18px;
+  height: 18px;
+  flex: none;
+}
+.pside span {
+  color: var(--mut);
+}
+.pside.shipped {
+  border-top-color: var(--ok);
+}
+.pside.shipped > b {
+  color: var(--ok);
+}
+.pside.pending {
+  border-top-color: var(--warn);
+}
+.pside.pending > b {
+  color: var(--warn);
+}
+.pside .pnone {
+  color: var(--mut);
+  font-weight: 500;
+}
+.pnote {
+  margin: 4px 0 0;
+  color: var(--ink);
+}
+.pnote time {
+  color: var(--mut);
+  font-size: 12px;
+}
+.ptrk {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  margin: 4px 0 2px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  background: var(--sel);
+  border-left: 4px solid var(--acc);
+}
+.ptrk em {
+  font-style: normal;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--acc);
+}
+.ptrk strong {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  user-select: all;
+  word-break: break-all;
+}
+mark.trk {
+  background: var(--sel);
+  color: var(--acc);
+  font-weight: 700;
+  padding: 0 4px;
+  border-radius: 4px;
+  font-variant-numeric: tabular-nums;
+}
+.fl input.err {
+  border: 2px solid var(--bad);
+  background: var(--badbg);
+}
+.nerr {
+  margin: -4px 0 10px;
+  color: var(--bad);
+  font-size: 13px;
+  font-weight: 600;
+}
+.plv {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid var(--line);
+}
+.plv em {
+  font-style: normal;
+  font-size: 12px;
+  color: var(--mut);
+}
+.vis .vt {
+  font-size: 12px;
+  font-weight: 400;
+}
+.vis td.nw {
+  white-space: nowrap;
+  font-weight: 400;
+}
+.ok2 {
+  color: var(--ok);
+  font-weight: 600;
+}
+.no2 {
+  color: var(--bad);
+  font-weight: 600;
+}
+.fu2 {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  border: 1px dashed var(--line);
+  margin: -6px 0 14px;
+  font-size: 13px;
+}
+.fu2 span {
+  color: var(--mut);
+}
+.srcs {
+  font-size: 12.5px;
+  margin-top: 6px;
+}
+.mapv {
+  max-width: 760px;
+  background: var(--pan);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 18px 20px;
+}
+.mapv h2 {
+  font-size: 18px;
+}
+.mapv > p {
+  margin: 4px 0 12px;
+}
+.msh {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 10px;
+  font-size: 13px;
+}
+.mapt {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.mapt th {
+  text-align: left;
+  color: var(--mut);
+  font-weight: 500;
+  padding: 4px 8px;
+}
+.mapt td {
+  padding: 5px 8px;
+  border-top: 1px solid var(--line);
+}
+.mapt select {
+  width: 100%;
+  max-width: 260px;
+  padding: 4px 6px;
+}
+.mapt td:last-child {
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mbtn {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+#vprev .bad {
+  color: var(--bad);
+}
+@media (min-width: 900px) {
+  header button,
+  h1 {
+    white-space: nowrap;
+  }
+}
+/* Folder tabs sit on the banner's white bottom line; the open tab is a white panel that runs into it. */
+#apptabs {
+  display: flex;
+  align-self: flex-end;
+  margin-bottom: -13px;
+}
+#apptabs button {
+  border: 0;
+  border-radius: 8px 8px 0 0;
+  padding: 8px 18px 10px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.8);
+}
+#apptabs button:hover:not([aria-selected='true']) {
+  background: rgba(255, 255, 255, 0.12);
+}
+#apptabs button[aria-selected='true'] {
+  background: #fff;
+  color: var(--hdr);
+  font-weight: 600;
+}
+#escView,
+#visView {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+#escView[hidden],
+#visView[hidden] {
+  display: none;
+}
+/* The bar shows the escalation counts on Escalations and the visit counts on Store Visits. */
+.on-vis #sum,
+.on-dir #sum,
+body:not(.on-vis):not(.on-dir) #vsum {
+  display: none;
+}
+#visView {
+  width: 100%;
+  border: 0;
+  background: var(--bg);
+}
+.hrow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-left: auto;
+}
+/* .ovl sets display, which would override [hidden]. */
+#imports[hidden] {
+  display: none;
+}
+/* Import reports popup: one box per file. Missing files have a dashed border; loaded ones turn green with the file name. */
+.imgrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.ib {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 78px;
+  padding: 12px 14px;
+  border: 2px dashed var(--line);
+  border-radius: 10px;
+  background: var(--pan2);
+  text-align: left;
+  color: var(--ink);
+}
+.ib:hover:not(:disabled) {
+  border-color: var(--acc);
+}
+.ib.over {
+  border-style: solid;
+  border-color: var(--acc);
+  background: var(--sel);
+}
+.ib.done {
+  border-style: solid;
+  border-color: var(--ok);
+  background: var(--okbg);
+}
+.ib[aria-disabled='true'] {
+  opacity: 0.6;
+}
+.ibt {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.ibt span {
+  font-size: 12.5px;
+  color: var(--mut);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ib .okc,
+.ib .nd,
+.ib .spin.sm {
+  width: 22px;
+  height: 22px;
+  margin: 0;
+  flex: none;
+}
+.ib .nd {
+  box-sizing: border-box;
+  border: 2px dashed var(--warn);
+  border-radius: 50%;
+}
+.ib .okc .ic {
+  width: 14px;
+  height: 14px;
+}
+/* Files pill at the top right: how many of the four reports are loaded; opens the popup. */
+.fpill {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+header .fpill.miss {
+  border-style: dashed;
+  border-color: #ffd27a;
+  color: #ffe6b0;
+}
+header .fpill.done,
+header .fpill.done:hover {
+  background: var(--okbg);
+  border-color: var(--ok);
+  color: var(--ok);
+}
+.fpill .okc {
+  margin: 0;
+}
+.ver {
+  font-size: 11px;
+  font-weight: 600;
+  background: var(--sel);
+  color: var(--acc);
+  border-radius: 10px;
+  padding: 1px 7px;
+  vertical-align: middle;
+}
+.dln {
+  font-size: 12.5px;
+  margin: -4px 0 6px;
+}
+.fu {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--mut);
+  margin-bottom: 14px;
+  background: var(--pan2);
+}
+.fu b {
+  font-size: 15px;
+}
+.fu span {
+  font-size: 13px;
+  color: var(--mut);
+}
+.fu.ok {
+  border-left-color: var(--acc);
+}
+.fu.ok b {
+  color: var(--acc);
+}
+.fu.warn {
+  border-left-color: var(--warn);
+}
+.fu.warn b {
+  color: var(--warn);
+}
+.fu.done {
+  border-left-color: var(--ok);
+}
+.fu.done b {
+  color: var(--ok);
+}
+.fu.bad {
+  border-left-color: var(--bad);
+}
+.fu.bad b {
+  color: var(--bad);
+}
+.tw {
+  overflow-x: auto;
+}
+.vis tr.up:nth-child(n):not(:first-child) td {
+  background: var(--sel);
+}
+.tag.fut {
+  background: var(--sel);
+  color: var(--acc);
+  font-weight: 600;
+  font-size: 11px;
+}
+.pvh {
+  margin-bottom: 8px;
+}
+.pvh p {
+  margin: 4px 0 0;
+}
+.pvg {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 14px;
+  align-items: start;
+}
+.pv {
+  background: var(--pan);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 14px;
+}
+.pv > summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  list-style: revert;
+}
+.pv > summary h3 {
+  margin: 0;
+  font-size: 14.5px;
+  flex: 1;
+}
+.pv[open] > summary {
+  margin-bottom: 6px;
+}
+.pvt {
+  margin: 6px 0 0;
+  font-size: 13px;
+}
+.pvn {
+  margin: 0 0 6px;
+  font-size: 12px;
+  color: var(--mut);
+}
+.pv > p {
+  margin: 0 0 6px;
+  font-size: 12.5px;
+}
+.pv table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+.pv th {
+  font-weight: 500;
+  color: var(--mut);
+  text-align: right;
+  padding: 3px 6px;
+  font-size: 12px;
+}
+.pv td {
+  padding: 4px 6px;
+  border-top: 1px solid var(--line);
+  text-align: left;
+}
+.pv td.n,
+.pv tfoot td + td {
+  text-align: right;
+}
+.pv th {
+  text-align: left;
+}
+.pv th:last-child {
+  text-align: right;
+}
+.pv td:first-child,
+.pv th:first-child {
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+.pv tbody tr {
+  cursor: pointer;
+}
+.pv tbody tr:hover td,
+.pv tbody tr:focus td {
+  background: var(--pan2);
+}
+.pv tbody tr:focus {
+  outline: 2px solid var(--acc);
+  outline-offset: -2px;
+}
+.pv td.bad {
+  color: var(--bad);
+  font-weight: 600;
+}
+.pv tfoot td {
+  font-weight: 650;
+  border-top: 2px solid var(--line);
+}
+.schip {
+  padding: 0 8px;
+  border-radius: 10px;
+  font-size: 12px;
+  margin-left: 4px;
+  background: var(--sel);
+  border-color: var(--acc);
+}
+.tlh {
+  font-size: 14.5px;
+  margin: 16px 0 4px;
+}
+/* Skeleton placeholders shown where an importing file's data will appear. The shine moves with a
+   transform, so it keeps moving on the compositor while the file is parsed. */
+.sk {
+  position: relative;
+  overflow: hidden;
+  background: var(--chip);
+  border-radius: 6px;
+  height: 12px;
+  margin: 8px 0;
+}
+.sk::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, var(--pan), transparent);
+  opacity: 0.8;
+  animation: shine 1.3s ease-in-out infinite;
+  will-change: transform;
+}
+@keyframes shine {
+  to {
+    transform: translateX(100%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sk::after {
+    animation-duration: 3s;
+  }
+}
+.sk.h {
+  height: 20px;
+  width: 45%;
+}
+.skpill {
+  width: 120px;
+  height: 30px;
+  margin: 0;
+  border-radius: 8px;
+}
+.skit {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--line);
+}
+.skcard {
+  background: var(--pan);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin-top: 14px;
+}
+#loading .lst {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin: 0 0 12px;
+}
+#loading .top {
+  display: block;
+}
+.pb {
+  height: 8px;
+  border-radius: 6px;
+  background: var(--chip);
+  overflow: hidden;
+  margin: 16px 0 8px;
+}
+#pbar {
+  height: 100%;
+  background: var(--acc);
+  border-radius: 6px;
+  transform-origin: left;
+  transform: scaleX(0);
+  will-change: transform;
+}
+@keyframes creep {
+  to {
+    transform: scaleX(var(--to));
+  }
+}
+.foot {
+  position: relative;
+  border-top: 1px solid var(--line);
+}
+.foot .leg {
+  border-top: 0;
+  padding-top: 9px;
+}
+.foot .leg summary {
+  padding-right: 60px;
+}
+.foot #thm {
+  position: absolute;
+  right: 16px;
+  top: 8px;
+}
+#thm {
+  width: 40px;
+  height: 22px;
+  padding: 0;
+  border-radius: 999px;
+  background: var(--chip);
+  border-color: var(--line);
+  position: relative;
+}
+#thm[aria-checked='true'] {
+  background: var(--acc);
+  border-color: var(--acc);
+}
+#thm .knob {
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--pan);
+  color: var(--mut);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  transition: transform 0.15s;
+}
+#thm[aria-checked='true'] .knob {
+  transform: translateX(18px);
+  color: var(--acc);
+}
+#thm .knob svg {
+  width: 11px;
+  height: 11px;
+}
+@media (prefers-reduced-motion: reduce) {
+  #thm .knob {
+    transition: none;
+  }
+}
+.vn {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0;
+}
+.sid {
+  font-size: 14px;
+  margin-top: 3px;
+}
+.hd .ids {
+  margin-top: 2px;
+  font-size: 12.5px;
+}
+.side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  text-align: right;
+  margin-left: auto;
+}
+.side .tag.nx {
+  font-size: 13px;
+  padding: 5px 12px;
+  border-radius: 8px;
+  margin: 0;
+  border: 1px solid var(--nf);
+  background: var(--nb);
+  color: var(--nf);
+  font-weight: 600;
+}
+.side .tag.nx b {
+  font-weight: 700;
+}
+.side .tag.age {
+  font-size: 12px;
+  padding: 3px 10px;
+  border-radius: 8px;
+  margin: 0;
+  background: var(--chip);
+  color: var(--mut);
+  font-weight: 600;
+}
+.idr2 {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 8px 0;
+}
+.idr2 > * {
+  padding-right: 18px;
+}
+.idr2 > * + * {
+  padding-left: 18px;
+  border-left: 2px solid var(--line);
+}
+.addr {
+  font-size: 13.5px;
+  line-height: 1.35;
+}
+.addr .city {
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+.addr a {
+  font-size: 12.5px;
+  display: inline-block;
+  margin-top: 2px;
+}
+.tabrow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 8px;
+  border-bottom: 2px solid var(--line);
+  margin: 12px 0 0;
+}
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+}
+#copy {
+  margin: 0 0 4px auto;
+  height: 34px;
+  padding: 0 14px;
+  white-space: nowrap;
+  background: var(--hdr);
+  border-color: var(--hdr);
+  color: #fff;
+}
+#copy:hover {
+  background: #0275b2;
+  border-color: #0275b2;
+}
+.tabs button {
+  border: 0;
+  border-radius: 6px 6px 0 0;
+  background: none;
+  padding: 8px 16px;
+  margin-bottom: -2px;
+  border-bottom: 2px solid transparent;
+  color: var(--mut);
+  font-weight: 600;
+  white-space: nowrap;
+  position: relative;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+.tabs button + button:before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 25%;
+  height: 50%;
+  border-left: 1px solid var(--line);
+}
+.tabs button:hover {
+  background: var(--pan2);
+  color: var(--ink);
+}
+.tabs button[aria-selected='true'] {
+  background: var(--sel);
+  color: var(--acc);
+  border-bottom-color: var(--acc);
+}
+.tabs button[aria-selected='true']:before,
+.tabs button[aria-selected='true'] + button:before,
+.tabs button:hover:before,
+.tabs button:hover + button:before {
+  border-left-color: transparent;
+}
+.tabs button:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--acc);
+  outline-offset: -2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .tabs button {
+    transition: none;
+  }
+}
+.tabs .n {
+  font-size: 12px;
+  background: var(--chip);
+  border-radius: 10px;
+  padding: 0 6px;
+  margin-left: 4px;
+  font-weight: 500;
+}
+.panel {
+  background: var(--pan);
+  border: 1px solid var(--line);
+  border-top: 0;
+  border-radius: 0 0 10px 10px;
+  padding: 14px;
+  margin-bottom: 16px;
+}
+.issue.clamp {
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 6px;
+}
+.created {
+  margin: 0 0 14px;
+  font-size: 12.5px;
+}
+.issw {
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  background: var(--pan2);
+  border-radius: 6px;
+}
+.issw .issue {
+  margin: 0;
+  padding: 0;
+  background: none;
+  border-radius: 0;
+}
+.issw #more {
+  display: block;
+  margin: 4px 0 0 auto;
+}
+.vis th.pcol,
+.vis td.pcol {
+  text-align: center;
+}
+.pcol .pst,
+.pcol .pto {
+  display: block;
+}
+.pcol .pst {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 600;
+}
+.ck {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 11px 4px 6px;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 13px;
+  background: var(--chip);
+  color: var(--mut);
+}
+.ck svg {
+  width: 18px;
+  height: 18px;
+  flex: none;
+}
+.ck.yes {
+  background: var(--okbg);
+  color: var(--ok);
+}
+.ck.no {
+  background: var(--badbg);
+  color: var(--bad);
+}
+.ck.pl {
+  padding-left: 11px;
+  font-weight: 500;
+  color: var(--ink);
+}
+.facts {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 4px;
+  margin: 0;
+}
+.facts dt,
+.facts dd {
+  background: var(--pan2);
+  padding: 6px 10px;
+  border-radius: 6px;
+}
+.facts dt {
+  color: var(--mut);
+  font-size: 12.5px;
+  padding-top: 7px;
+}
+.facts dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+.team {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 16px;
+}
+.team em {
+  font-style: normal;
+  color: var(--mut);
+  font-size: 12px;
+  margin-right: 5px;
+}
+.ini {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0 12px;
+  font-size: 13px;
+  color: var(--mut);
+}
+.ini input {
+  width: 80px;
+  padding: 4px 8px;
+}
+.nc {
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--nc);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin: 0 0 12px;
+  background: var(--pan);
+}
+.nc h3 {
+  margin: 0 0 6px;
+  font-size: 14.5px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  color: var(--nc);
+}
+.nc h3 .ck {
+  font-size: 12px;
+  padding-block: 2px;
+}
+.nc.csm {
+  --nc: var(--c-csm);
+}
+.nc.dm {
+  --nc: var(--c-dm);
+}
+.nc.patti {
+  --nc: var(--c-patti);
+}
+.nc.rep {
+  --nc: var(--c-rep);
+}
+.nc.bby {
+  --nc: var(--c-bby);
+}
+.nc .q {
+  background: var(--pan2);
+  padding: 6px 10px;
+  border-radius: 6px;
+  margin: 0 0 6px;
+  font-size: 13px;
+}
+.nc .q b {
+  color: var(--mut);
+  font-weight: 600;
+}
+.nc h4 {
+  margin: 8px 0 2px;
+  font-size: 12.5px;
+  color: var(--mut);
+  font-weight: 600;
+}
+/* The date column widens for a full date (09/24/2026) instead of running into the note. */
+.ent {
+  display: grid;
+  grid-template-columns: minmax(52px, max-content) 1fr;
+  gap: 10px;
+  padding: 5px 0;
+  border-top: 1px solid var(--line);
+}
+.ent:first-of-type {
+  border-top: 0;
+}
+.ent time {
+  white-space: nowrap;
+  font-size: 12.5px;
+  color: var(--mut);
+  font-variant-numeric: tabular-nums;
+  padding-top: 1px;
+}
+.who {
+  font-size: 11px;
+  background: var(--chip);
+  border-radius: 10px;
+  padding: 0 6px;
+  margin-right: 6px;
+  font-weight: 600;
+}
+.none {
+  color: var(--mut);
+  font-size: 13px;
+  margin: 2px 0;
+}
+.notes {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 12px;
+  align-items: start;
+}
+.notes .nc {
+  margin: 0;
+}
+.ent.new {
+  background: var(--chg);
+  border-radius: 6px;
+}
+.who.cs {
+  background: var(--p4bg);
+  color: var(--p4);
+}
+.entry {
+  margin-top: 16px;
+  padding: 12px 14px;
+  border: 1px dashed var(--line);
+  border-radius: 10px;
+  background: var(--pan2);
+}
+.entry h3 {
+  margin: 0 0 8px;
+  font-size: 14.5px;
+}
+.roles {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+.roles button {
+  border-radius: 999px;
+  padding: 4px 12px;
+  font-size: 13px;
+}
+.roles button[aria-checked='true'] {
+  background: var(--acc);
+  border-color: var(--acc);
+  color: var(--onacc);
+}
+.erow {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+.erow .fl:first-child {
+  width: 90px;
+}
+.erow .grow {
+  flex: 1;
+  min-width: 220px;
+}
+.oth {
+  display: flex;
+  gap: 6px;
+}
+.oth input {
+  flex: 1;
+  min-width: 0;
+}
+#cpy {
+  width: 100%;
+  margin: 8px 0;
+  padding: 8px;
+  font:
+    13px/1.4 ui-monospace,
+    Consolas,
+    monospace;
+}
+@media (prefers-reduced-motion: reduce) {
+  #toast {
+    transition: none;
+  }
+}
+@media (max-width: 800px) {
+  body {
+    height: auto;
+    min-height: 100%;
+  }
+  main {
+    display: block;
+  }
+  #q {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+  #list {
+    max-height: 55vh;
+  }
+  #d {
+    overflow: visible;
+    padding: 12px 16px 60px;
+  }
+}
+</style></head><body>
+<header><h1><svg class="bblogo" viewBox="20 20 812 490" role="img" aria-label="Best Buy"><g fill="#fff" stroke="#fff" stroke-width="18" stroke-linejoin="round" font-family="Arial,'Liberation Sans',sans-serif" font-weight="700" font-size="290"><text x="22" y="252" textLength="694" lengthAdjust="spacingAndGlyphs">BEST</text><text x="78" y="476" textLength="562" lengthAdjust="spacingAndGlyphs">BUY</text></g><path d="M656 380H830V508H656L630 482V406Z" fill="#fff200"/><circle cx="654" cy="443" r="8" fill="#1d252c"/></svg>Escalation Dashboard <span class="ver">v4</span></h1>
+<nav id="apptabs" role="tablist"><button role="tab" data-app="esc" aria-selected="true">Escalations</button><button role="tab" data-app="vis" aria-selected="false">Store Visits</button><button role="tab" data-app="dir" aria-selected="false">Directory</button></nav>
+<button id="fpill" class="fpill miss" aria-haspopup="dialog" title="Import reports">0 of 4 files loaded</button>
+<input id="file" type="file" accept=".xlsx" hidden><input id="vfile" type="file" accept=".xlsx,.xls,.csv" hidden><input id="pfile" type="file" accept=".xlsx,.xls,.csv" hidden><input id="rfile" type="file" accept=".xlsx,.xls" hidden></header>
+<div id="sumbar"><div id="sum"></div><div id="vsum"></div><div id="follow"></div><div class="hrow"><button id="pvb" disabled>View Changes</button><button id="rst" disabled>Undo all my edits</button></div></div>
+<div id="escView">
+<main>
+<section id="q"><div id="f">
+<div class="srow"><label class="sbox"><input id="s" type="search" placeholder=" " aria-label="Search Store (BDS/Best Buy #)"><span class="sph" aria-hidden="true">Search Store <small>(BDS/Best Buy #)</small></span></label><button id="ftog" type="button" aria-expanded="false" aria-controls="fpanel"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 5h14M6 10h8M8.5 15h3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Filters<span id="fcount"></span></button></div>
+<div id="fpanel" hidden><div class="g2"><select id="fd"></select><select id="fo"></select><select id="fp"></select><select id="fv"></select><select id="fc"></select><select id="fs"></select><select id="fm"></select><select id="ft"></select><select id="fst"></select><select id="fr"></select></div></div>
+<div id="chips"></div>
+<div class="fbar"><span id="cnt" class="m"></span><span class="sp"></span><label class="m">Sort <select id="so">
+<option value="urg">Most urgent first</option><option value="new">Newest first</option><option value="old">Oldest first</option><option value="store">Store #</option></select></label>
+<button id="clr" class="lnk">Clear</button></div></div>
+<div id="list"></div>
+<div class="foot"><details class="leg"><summary>Status &amp; priority guide</summary>
+<p><b>Overdue:</b> the SLA deadline (column AI, or B if AI is empty) has passed and the escalation is not done.</p>
+<p><b>Done:</b> it has a Best Buy resolved date (AF), the tracker status (BM) is Completed, or the Best Buy status (AG) is CLOSED.</p>
+<p><b>Due soon:</b> the deadline is within the next 48 hours.</p>
+<p><b>P1–P4:</b> priority from column AB. P1 means immediate follow-up within 5 days, P2 follow-up in 7 days, P3 waiting on parts, P4 issue not provided.</p>
+<p><b>Next step:</b> who owns the next action (column A).</p></details><button id="thm" type="button"></button></div></section>
+<section id="d"><div id="empty"><h2>Import reports to begin</h2><p class="m">Files are read in your browser only. Edits stay on this computer.</p><button class="p" id="openimp">Import reports</button></div></section>
+</main></div>
+<iframe id="visView" src="visits.html" title="Store visits and directory" hidden></iframe>
+<footer class="contact" id="cta">Got problems? Email <a class="mail" href="mailto:kyle.didonato@channelpartners.com">kyle.didonato@channelpartners.com</a> or <a class="mail" href="https://teams.microsoft.com/l/chat/0/0?users=kyle.didonato@channelpartners.com" target="_blank" rel="noopener" id="ctalink">click here</a>.</footer>
+<div id="imports" class="ovl" hidden><div class="nbox imbox" role="dialog" aria-modal="true" aria-labelledby="imtitle"><h2 id="imtitle">Let's get started</h2>
+<p class="m">Drop each report on its box, or click a box to pick the file. Files are read in your browser only. Edits stay on this computer.</p>
+<div class="imgrid"><button id="imp" class="ib miss"></button><button id="vimp" class="ib miss"></button><button id="pimp" class="ib miss" aria-disabled="true"></button><button id="rimp" class="ib miss"></button></div>
+<div class="mbtn"><span id="imcount" class="m"></span><span class="sp" style="flex:1"></span><button id="imclose">Close</button></div></div></div>
+<datalist id="usl"></datalist><div id="toast"></div>
+<script>
+
+// v3: v2 with a visual consistency pass (corner radii and drawn icons). v2 and the generated v1 are unchanged.
+// One icon set, drawn at text size in the current text color.
+const drawIcon = d =>
+  `<svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path d="${d}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+const ICONS = {
+  check: drawIcon('M3 8.5l3.2 3.2L13 4.8'),
+  x: drawIcon('M4 4l8 8M12 4l-8 8'),
+  dash: drawIcon('M4 8h8'),
+  circle: drawIcon('M8 2.5a5.5 5.5 0 1 1 0 11a5.5 5.5 0 1 1 0-11z'),
+  ext: drawIcon('M6 3H3v10h10v-3M9 3h4v4M13 3L7 9')
+};
+const $ = id => document.getElementById(id),
+  colLetter = XLSX.utils.encode_col,
+  colIndex = XLSX.utils.decode_col;
+
+// ---- Workbook layout settings ------------------------------------------------------------------
+// The dashboard refers to each field by the column it had in the original workbook (the keys below).
+// `col` says where that field is in the workbook today. If columns are inserted or moved in Excel,
+// update `col` here and nothing else. `heading` is a word the column's heading should contain; on import
+// the dashboard checks it and warns if a column no longer looks right.
+const LAYOUT = {
+  sheet: 'FOMCS MASTER ESC',
+  cols: {
+    A: { col: 'A', heading: 'responsible' }, // Next step owner
+    B: { col: 'B', heading: 'deadline' }, // SLA deadline
+    C: { col: 'C', heading: 'sr dm' }, // Senior DM
+    D: { col: 'D', heading: 'dm' }, // District manager
+    E: { col: 'E', heading: 'cs manager' }, // CS manager
+    F: { col: 'F', heading: 'store' }, // Best Buy store #
+    G: { col: 'G', heading: 'vendor' }, // Vendor
+    H: { col: 'H', heading: 'bds' }, // BDS #
+    I: { col: 'I', heading: 'address' }, // Address
+    J: { col: 'J', heading: 'city' }, // City
+    K: { col: 'K', heading: 'state' }, // State
+    L: { col: 'L', heading: 'contact' }, // Best Buy contact
+    M: { col: 'M', heading: 'pog' }, // Planogram title
+    N: { col: 'N', heading: 'issue' }, // Issue reported
+    P: { col: 'P', heading: 'dm question' }, // Question for the DM
+    Q: { col: 'Q', heading: 'dm input' }, // DM notes
+    R: { col: 'R', heading: 'resolved' }, // DM: is it resolved?
+    S: { col: 'S', heading: 'csm question' }, // Question for the CSM
+    T: { col: 'T', heading: 'csm input' }, // CSM notes
+    U: { col: 'U', heading: 'call form' }, // Call form
+    V: { col: 'V', heading: 'expectation' }, // CSM expectation notes
+    W: { col: 'W', heading: 'resolved' }, // CSM: is it resolved?
+    X: { col: 'X', heading: 'feedback' }, // Patti's team feedback
+    Y: { col: 'Y', heading: 'feedback' }, // Patti's team feedback (2)
+    Z: { col: 'Z', heading: 'completion' }, // Anticipated completion
+    AA: { col: 'AA', heading: 'rep fix' }, // What the rep fixed
+    AB: { col: 'AB', heading: 'priority' }, // Priority
+    AC: { col: 'AC', heading: 'created' }, // Created at Best Buy
+    AD: { col: 'AD', heading: 'responded' }, // Last response
+    AE: { col: 'AE', heading: 'aging' }, // Days aging
+    AF: { col: 'AF', heading: 'resolved' }, // Resolved date (Best Buy)
+    AG: { col: 'AG', heading: 'status' }, // Best Buy status
+    AH: { col: 'AH', heading: 'type of escalation' }, // How it came in
+    AI: { col: 'AI', heading: 'deadline' }, // SLA deadline
+    AJ: { col: 'AJ', heading: 'action' }, // Best Buy action
+    AK: { col: 'AK', heading: 'reason' }, // Reason for escalation
+    AL: { col: 'AL', heading: 'id #' }, // Best Buy escalation ID
+    BM: { col: 'BM', heading: '' } // Tracker status (the column has no heading)
+  }
+};
+
+// Internal column ↔ workbook column. Workbook columns that aren't listed keep their own position,
+// unless a listed field now uses that position, in which case they move past the end.
+const INTERNAL_TO_SHEET = new Map(
+  Object.entries(LAYOUT.cols).map(([k, o]) => [XLSX.utils.decode_col(k), XLSX.utils.decode_col(o.col)])
+);
+const SHEET_TO_INTERNAL = new Map([...INTERNAL_TO_SHEET].map(([a, b]) => [b, a])),
+  SPARE_OFFSET = 1000;
+const toInternalCol = a =>
+  SHEET_TO_INTERNAL.has(a) ? SHEET_TO_INTERNAL.get(a) : INTERNAL_TO_SHEET.has(a) ? SPARE_OFFSET + a : a; // workbook column → internal
+const toSheetCol = c =>
+  INTERNAL_TO_SHEET.has(c) ? INTERNAL_TO_SHEET.get(c) : c >= SPARE_OFFSET ? c - SPARE_OFFSET : c; // internal column → workbook
+
+function toInternalRow(row) {
+  const out = [];
+  (row || []).forEach((x, j) => {
+    out[toInternalCol(j)] = x;
+  });
+  for (let i = 0; i < out.length; i++) if (!(i in out)) out[i] = null;
+  return out;
+}
+
+function layoutCheck(head) {
+  const bad = [];
+  for (const o of Object.values(LAYOUT.cols)) {
+    if (!o.heading) continue;
+    const h = String(head[colIndex(o.col)] ?? '')
+      .toLowerCase()
+      .replace(/\s+/g, ' ');
+    if (!h.includes(o.heading))
+      bad.push(`${o.col} (expected “${o.heading}”, found “${h.trim().slice(0, 40) || 'blank'}”)`);
+  }
+  return bad;
+}
+
+function layoutWarn(bad) {
+  let w = $('lwarn');
+  if (!bad.length) {
+    if (w) w.remove();
+    return;
+  }
+  if (!w) {
+    w = document.createElement('div');
+    w.id = 'lwarn';
+    w.setAttribute('role', 'alert');
+    $('sumbar').after(w);
+  }
+  w.innerHTML = `<b>Some columns don't match the layout settings.</b> Check these before editing: ${bad.map(esc).join('; ')}. <button class="lnk" id="lwx">Dismiss</button>`;
+  $('lwx').onclick = () => w.remove();
+}
+const esc = s =>
+  String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+const DATE_COLS = new Set(['B', 'Z', 'AC', 'AD', 'AF', 'AI'].map(colIndex));
+const FIELD_LABELS = {
+  A: 'Next step',
+  B: 'Backup SLA deadline',
+  C: 'Senior DM',
+  D: 'DM',
+  E: 'CS manager',
+  F: 'Store #',
+  G: 'Vendor',
+  H: 'BDS #',
+  I: 'Address',
+  J: 'City',
+  K: 'State',
+  L: 'Best Buy contact',
+  M: 'Planogram',
+  N: 'Issue',
+  O: 'Link or additional info',
+  P: 'DM question',
+  Q: 'DM updates',
+  R: 'DM resolved',
+  S: 'CSM question',
+  T: 'CSM updates',
+  U: 'Call form',
+  V: 'CSM revisit expectations',
+  W: 'CSM resolved',
+  X: "Patti's team feedback",
+  Y: "Patti's team feedback, continued",
+  Z: 'Anticipated completion',
+  AA: 'Rep fix',
+  AB: 'Priority',
+  AC: 'Created',
+  AD: 'Last response',
+  AE: 'Days aging',
+  AF: 'Resolved date',
+  AG: 'Best Buy status',
+  AH: 'Issued',
+  AI: 'SLA deadline',
+  AJ: 'Best Buy response',
+  AK: 'Escalation reason',
+  AL: 'Best Buy escalation ID',
+  BM: 'Tracker status'
+};
+const FIELD_GROUPS = [
+  ['Issue', 'AL AH AB AK N O'],
+  ['Ownership', 'A C D E'],
+  ['Store and vendor', 'G F H I J K L M U'],
+  ['Dates and SLA', 'AC AD AE AF B AI Z'],
+  ['District manager', 'P Q R'],
+  ['CS manager', 'S T V W'],
+  ['Feedback and resolution', 'X Y AA AG BM'],
+  ['Best Buy action', 'AJ']
+].map(([t, s]) => [t, s.split(' ').map(colIndex)]);
+const QUICK_EDIT_COLS = 'A BM AB AK R W AG AF U'.split(' ').map(colIndex);
+const PRIORITIES = [
+  '1 – IMMEDIATE FOLLOW UP within 5 days Needed',
+  '2 – FOLLOW UP in 7 days Needed',
+  '3 – TBD (Waiting Parts)',
+  '4 - ISSUE NOT PROVIDED - Have Requested'
+];
+const PRIORITY_LABELS = {
+  1: 'P1 · Urgent, follow up within 5 days',
+  2: 'P2 · Follow up within 7 days',
+  3: 'P3 · Waiting on parts',
+  4: 'P4 · Issue not provided, requested'
+};
+const YES_NO = ['Yes', 'No'];
+
+// Dropdown columns. fixed: standard choices; from: also offer values already used in that column.
+const DROPDOWNS = {
+  A: { fixed: ['Field', 'CS-Parts', 'CS-CF', 'CS-QC', 'CS-Issues', 'DM', 'Damage', 'Admin', 'New'], from: 1 },
+  C: { from: 1 },
+  D: { from: 1 },
+  E: { from: 1 },
+  G: { from: 1 },
+  K: { from: 1 },
+  R: { fixed: YES_NO },
+  W: { fixed: YES_NO },
+  AB: { fixed: PRIORITIES, lab: x => PRIORITY_LABELS[x[0]] || x },
+  AG: { fixed: ['OPEN', 'CLOSED'] },
+  AH: { fixed: ['Intake Form', '3rd Party Email', 'Direct Email'] },
+  AK: {
+    fixed: [
+      'Display Issue',
+      'Functionality',
+      'Quality of Work',
+      'HR Issue',
+      'People/Behavioral Issue',
+      'Past Due Work',
+      'Kits in Backroom',
+      'General Questions',
+      'Waiting Parts'
+    ],
+    from: 1
+  },
+  BM: { fixed: ['In-Progress', 'Completed'] },
+  U: { opts: callForms }
+};
+let wb,
+  ws,
+  headers,
+  fileBuffer,
+  rows = [],
+  current = null,
+  fileName = '',
+  edits = {},
+  maps = {},
+  openCards = {};
+
+// Quick edit and Full record changes wait here, per escalation id ({column index: value}), until confirmed.
+let pending = {};
+// The imported value of every edited cell, per escalation id ({column letter: value}), for View Changes.
+let originals = {};
+function keepOriginal(r, ci) {
+  const o = (originals[r.id] ??= {}),
+    k = colLetter(ci);
+  if (!(k in o)) o[k] = r.v[ci];
+}
+const now = () => new Date();
+const loadSetting = k => {
+    try {
+      return localStorage.getItem(k);
+    } catch (e) {
+      return null;
+    }
+  },
+  saveSetting = (k, v) => {
+    try {
+      localStorage.setItem(k, v);
+    } catch (e) {}
+  };
+// Edits live only in memory, so every page load starts clean. Also clear edits older versions stored in the browser.
+try {
+  localStorage.removeItem('bbEscEdits');
+} catch (e) {}
+const saveEdits = () => {
+  $('rst').disabled = !rows.length;
+  $('pvb').disabled = !rows.length;
+  const n = myChanges().length;
+  $('pvb').textContent = n ? `View Changes (${n})` : 'View Changes';
+};
+const toast = t => {
+  const el = $('toast');
+  el.textContent = t;
+  el.classList.add('on');
+  clearTimeout(toast.t);
+  toast.t = setTimeout(() => el.classList.remove('on'), 4000);
+};
+const fmtDateTime = d => d.toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }),
+  fmtDate = d => d.toLocaleDateString([], { dateStyle: 'medium' });
+const toLocalInput = d => new Date(d - d.getTimezoneOffset() * 6e4).toISOString().slice(0, 16);
+const isDate = v => v instanceof Date && !isNaN(v);
+const val = (r, k) => r.v[colIndex(k)];
+const clean = x => {
+  if (x == null) return '';
+  const s = String(x).trim();
+  return /^[=#]/.test(s) ? '' : s;
+};
+const cellText = (r, k) => clean(val(r, k)) || '(none)';
+const norm = s =>
+  String(s ?? '')
+    .trim()
+    .toLowerCase();
+const nextStepClass = o => {
+  const k = norm(o).replace(/\s+/g, '-').replace(/s$/, '');
+  return ['field', 'cs-part', 'cs-cf', 'cs-qc', 'cs-issue', 'dm', 'damage', 'admin', 'new'].includes(k)
+    ? 'nx-' + (k === 'cs-part' ? 'cs-parts' : k)
+    : '';
+};
+const nextStepPill = r => `<span class="tag nxp ${nextStepClass(nextStep(r))}">${esc(nextStep(r))}</span>`;
+const nextStep = r => cellText(r, 'A'),
+  vendor = r => maps.vcanon?.[norm(val(r, 'G'))] || cellText(r, 'G');
+
+// Some rows have priority shifted into AA, so check AB first and then AA.
+const priority = r => {
+  for (const k of ['AB', 'AA']) {
+    const x = val(r, k);
+    if (typeof x === 'string' && /^\s*[1-4]\s*[–-]/.test(x)) return x.trim()[0];
+  }
+  return '';
+};
+const priorityLabel = r => PRIORITY_LABELS[priority(r)] || 'Priority not set';
+const trackerStatus = r => clean(val(r, 'BM')) || 'Not set';
+const deadline = r => (isDate(val(r, 'AI')) ? val(r, 'AI') : isDate(r.v[1]) ? r.v[1] : null);
+const isDone = r => !!val(r, 'AF') || trackerStatus(r) === 'Completed' || norm(val(r, 'AG')) === 'closed';
+const dueState = r => {
+  if (isDone(r)) return 'done';
+  const d = deadline(r);
+  if (!d) return 'none';
+  const h = (d - now()) / 36e5;
+  return h < 0 ? 'late' : h < 48 ? 'soon' : 'later';
+};
+const isLate = r => dueState(r) === 'late';
+const DUE_LABELS = {
+  late: 'Overdue',
+  soon: 'Due within 48 hours',
+  later: 'Due later',
+  none: 'No deadline',
+  done: 'Done'
+};
+const durationText = ms => {
+  const h = Math.abs(ms) / 36e5;
+  return h < 1
+    ? Math.max(1, Math.round(h * 60)) + ' min'
+    : h < 48
+      ? Math.round(h) + ' h'
+      : Math.round(h / 24) + ' days';
+};
+const dueText = r => {
+  const s = dueState(r),
+    d = deadline(r);
+  return s === 'done'
+    ? trackerStatus(r) === 'Completed'
+      ? 'Completed'
+      : 'Resolved'
+    : s === 'none'
+      ? 'No deadline'
+      : s === 'late'
+        ? durationText(now() - d) + ' overdue'
+        : 'Due in ' + durationText(d - now());
+};
+const fieldLabel = ci => {
+  const k = colLetter(ci),
+    h = headers[ci];
+  return (
+    FIELD_LABELS[k] ||
+    (typeof h === 'string' && h.trim() ? h.replace(/\s+/g, ' ').trim().slice(0, 70) : 'Unlabeled column')
+  );
+};
+
+function writeCell(r, ci, v) {
+  const a = XLSX.utils.encode_cell({ r: r.r, c: toSheetCol(ci) });
+  if (v == null || v === '') delete ws[a];
+  else
+    ws[a] =
+      v instanceof Date
+        ? { t: 'd', v, z: 'm/d/yyyy h:mm' }
+        : typeof v === 'number'
+          ? { t: 'n', v }
+          : { t: 's', v: String(v) };
+}
+
+function setValue(r, ci, v, track = true) {
+  keepOriginal(r, ci);
+  r.v[ci] = v;
+  writeCell(r, ci, v);
+  if (track) {
+    (edits[r.id] ??= {})[colLetter(ci)] = v;
+    saveEdits();
+  }
+}
+
+// Lookups read from the other sheets in the same workbook.
+function sheet(n) {
+  const s = wb.Sheets[n] || wb.Sheets[Object.keys(wb.Sheets).find(x => x.trim() === n)];
+  return s ? XLSX.utils.sheet_to_json(s, { header: 1, raw: true, defval: null }) : [];
+}
+const findHeading = (h, n) => h.findIndex(x => norm(x).replace(/\s+/g, ' ') === n);
+
+function lookups() {
+  maps = { usl: {}, fedr: {}, dm2sr: {}, v2csm: {}, vcanon: {}, cforms: [] };
+  const U = sheet('BBY USL'),
+    uh = U[0] || [],
+    [ub, us, ua, uc, ut] = ['bds #', 'store #', 'address', 'city', 'state'].map(n => findHeading(uh, n));
+  if (us >= 0)
+    U.slice(1).forEach(a => {
+      const s = clean(a[us]);
+      if (s) maps.usl[s] = { bds: a[ub], addr: a[ua], city: a[uc], state: a[ut] };
+    });
+  $('usl').innerHTML = Object.entries(maps.usl)
+    .map(([s, o]) => `<option value="${esc(s)}">${esc(o.city)}, ${esc(o.state)}</option>`)
+    .join('');
+  const F = sheet('FEDR'),
+    fh = F[0] || [],
+    [fs, ff, fd, fr, fx, fty, frs, fwe, fpg, fbd, fti, fto, fhg, fha, fhm, fmd, fnb] = [
+      'chain store #',
+      'call form name',
+      'visit date scheduled',
+      'rep name',
+      'status',
+      'visit type',
+      'visit reason',
+      'wave end date',
+      'program',
+      'bds store id',
+      'scheduled time in',
+      'scheduled time out',
+      'in-store hours goal',
+      'in-store hours actual',
+      'had materials',
+      'materials description',
+      'reason not brought'
+    ].map(n => findHeading(fh, n));
+  if (fs >= 0)
+    F.slice(1).forEach(a => {
+      const s = clean(a[fs]);
+      if (!s || !a[ff]) return;
+      const o = {
+        form: String(a[ff]).trim(),
+        date: isDate(a[fd]) ? a[fd] : null,
+        rep: a[fr],
+        st: clean(a[fx]),
+        type: clean(a[fty]),
+        reason: clean(a[frs]),
+        we: isDate(a[fwe]) ? a[fwe] : null,
+        prog: clean(a[fpg]),
+        store: storeKey(a[fs]),
+        bds: storeKey(a[fbd]),
+        tin: a[fti],
+        tout: a[fto],
+        hg: a[fhg],
+        ha: a[fha],
+        had: clean(a[fhm]),
+        mat: clean(a[fmd]),
+        nb: clean(a[fnb]),
+        ship: '',
+        src: 'FEDR sheet'
+      };
+      (maps.fedr[s] ??= []).push(o);
+    });
+  indexVisits();
+  sheet('Data Validation')
+    .slice(1)
+    .forEach(a => {
+      const s = clean(a[2]);
+      if (s.length >= 12) maps.cforms.push(s);
+    });
+  const multi = (kf, vf, out) => {
+    const m = {};
+    rows.forEach(r => {
+      const k = norm(kf(r)),
+        v = clean(vf(r));
+      if (k && v) (m[k] ??= new Set()).add(v);
+    });
+    for (const k in m) if (m[k].size === 1) out[k] = [...m[k]][0];
+  };
+  const vc = {};
+  rows.forEach(r => {
+    const s = clean(val(r, 'G'));
+    if (s) {
+      const k = norm(s);
+      (vc[k] ??= {})[s] = (vc[k][s] || 0) + 1;
+    }
+  });
+  for (const k in vc) maps.vcanon[k] = Object.entries(vc[k]).sort((a, b) => b[1] - a[1])[0][0];
+  multi(
+    r => val(r, 'D'),
+    r => val(r, 'C'),
+    maps.dm2sr
+  );
+  multi(
+    r => vendor(r),
+    r => val(r, 'E'),
+    maps.v2csm
+  );
+}
+
+// Parsing blocks the page, so each stage paints first; the bar's creep animation runs on the compositor and keeps moving meanwhile.
+const nextFrame = () => new Promise(r => requestAnimationFrame(() => setTimeout(r, 0)));
+
+function setLoadStep(step) {
+  const e = $('vstep');
+  if (e) e.textContent = step;
+}
+
+function readFile(f) {
+  return new Promise((ok, no) => {
+    const r = new FileReader();
+    r.onprogress = e => e.lengthComputable && setLoadStep('Reading the file…');
+    r.onload = () => ok(r.result);
+    r.onerror = () => no(r.error);
+    r.readAsArrayBuffer(f);
+  });
+}
+
+async function loadWorkbook(f, b) {
+  if (loadWorkbook.busy) return;
+  loadWorkbook.busy = 1;
+  const prev = $('d').innerHTML,
+    prevList = $('list').innerHTML,
+    prevSum = $('sum').innerHTML;
+  busyBtn('imp', true, 'Opening…');
+  $('list').innerHTML = skList(8);
+  $('sum').innerHTML = skPills(5);
+  $('d').innerHTML = busyCard(
+    'Loading workbook',
+    `${f ? f.name : fileName}${f ? ` · ${(f.size / 1048576).toFixed(1)} MB` : ''}`,
+    'Starting…'
+  );
+  const fail = m => {
+    $('d').innerHTML = prev;
+    $('list').innerHTML = prevList;
+    $('sum').innerHTML = prevSum;
+    toast(m);
+  };
+  try {
+    setLoadStep('Reading the file…');
+    await nextFrame();
+    const nb = b || (await readFile(f));
+    setLoadStep('Opening the workbook. Large files take a few seconds…');
+    await nextFrame();
+    const nwb = XLSX.read(nb, { type: 'array', cellDates: true }),
+      nws = nwb.Sheets[LAYOUT.sheet];
+    if (!nws)
+      return fail(`This workbook has no "${LAYOUT.sheet}" sheet. Import the daily escalations workbook.`);
+    fileBuffer = nb;
+    wb = nwb;
+    ws = nws;
+    if (f) fileName = f.name;
+    setLoadStep('Reading escalations…');
+    await nextFrame();
+    const raw = XLSX.utils.sheet_to_json(ws, { header: 1, raw: true, defval: null }),
+      bad = layoutCheck(raw[0] || []),
+      A = raw.map(toInternalRow),
+      ID = colIndex('AL');
+    headers = A[0] || [];
+    rows = [];
+    A.forEach((a, i) => {
+      if (i && a[ID] != null && a[ID] !== '') rows.push({ r: i, v: a, id: String(a[ID]) });
+    });
+    pending = {};
+    originals = {};
+    rows.forEach(r => {
+      const e = edits[r.id];
+      if (e)
+        for (const k in e) {
+          const ci = colIndex(k),
+            v = e[k];
+          setValue(
+            r,
+            ci,
+            DATE_COLS.has(ci) && typeof v === 'string' && /^\d{4}-\d\d-\d\dT/.test(v) ? new Date(v) : v,
+            false
+          );
+        }
+    });
+    setLoadStep('Loading the store list and visit history…');
+    await nextFrame();
+    lookups();
+    filters();
+    setLoadStep(`Loaded ${rows.length} escalations.`);
+    await nextFrame();
+    saveEdits();
+    $('pvb').disabled = false;
+    btnState();
+    layoutWarn(bad);
+    toast(`✓ Loaded ${rows.length} escalations from ${fileName}.`);
+    summaryView();
+    if (pivotFile && !importedVisits.cur.v.length) openVisits(pivotFile, 'cur');
+  } catch (e) {
+    fail("This file couldn't be opened as a workbook. Check that it's the .xlsx escalations file.");
+  } finally {
+    loadWorkbook.busy = 0;
+    busyBtn('imp', false);
+  }
+}
+
+const FILTERS = [
+  ['fd', 'When', r => DUE_LABELS[dueState(r)]],
+  ['fo', 'Next step', nextStep],
+  ['fp', 'Priority', priorityLabel],
+  ['fv', 'Vendor', vendor],
+  ['fc', 'CS manager', r => cellText(r, 'E')],
+  ['fs', 'Senior DM', r => cellText(r, 'C')],
+  ['fm', 'DM', r => cellText(r, 'D')],
+  ['ft', 'Tracker', trackerStatus],
+  ['fst', 'State', r => cellText(r, 'K')],
+  ['fr', 'Reason', r => cellText(r, 'AK')]
+];
+
+function filters() {
+  FILTERS.forEach(([id, t, f]) => {
+    const el = $(id),
+      old = el.value,
+      c = {};
+    rows.forEach(r => {
+      const x = f(r);
+      c[x] = (c[x] || 0) + 1;
+    });
+    const ks =
+      id === 'fd'
+        ? Object.values(DUE_LABELS).filter(x => c[x])
+        : Object.keys(c).sort(
+            (a, b) =>
+              (a[0] === '(' || a === 'Not set') - (b[0] === '(' || b === 'Not set') || a.localeCompare(b)
+          );
+    el.innerHTML =
+      `<option value="">${t}: all</option>` +
+      (id === 'fd'
+        ? `<option value="__open">In progress (${rows.filter(r => !isDone(r)).length})</option>`
+        : '') +
+      ks
+        .map(x => `<option value="${esc(x)}">${esc(id === 'fp' ? x.split(' · ')[0] : x)} (${c[x]})</option>`)
+        .join('');
+    el.value = [...el.options].some(o => o.value === old) ? old : '';
+  });
+}
+
+// Every filter except the pill's own ("When", plus priority for Incomplete) narrows what the status pills count.
+function matches(r, skip) {
+  const q = $('s').value.trim().toLowerCase();
+  return (
+    FILTERS.every(([id, , f]) => {
+      if (skip.has(id)) return true;
+      const v = $(id).value;
+      return !v || (v === '__open' ? !isDone(r) : f(r) === v);
+    }) &&
+    (!storeFilter || clean(val(r, 'F')) === storeFilter) &&
+    (!q || [clean(val(r, 'F')), clean(val(r, 'H'))].some(x => x.toLowerCase() === q))
+  );
+}
+
+function summary() {
+  const base = rows.filter(r => matches(r, new Set(['fd']))),
+    open = base.filter(r => !isDone(r)),
+    n = s => base.filter(r => dueState(r) === s).length;
+  const B = [
+    ['In progress', open.length, 'ip', { fd: '__open' }],
+    ['Overdue', n('late'), 'bad', { fd: 'Overdue' }],
+    ['Due within 48 hours', n('soon'), 'warn', { fd: 'Due within 48 hours' }],
+    [
+      'Incomplete',
+      open.filter(r => priority(r) === '1').length,
+      'bad',
+      { fd: '__open', fp: PRIORITY_LABELS[1] }
+    ],
+    ['Done', n('done'), 'ok', { fd: 'Done' }]
+  ];
+  const incOn = $('fd').value === '__open' && $('fp').value === PRIORITY_LABELS[1],
+    isAct = f => (f.fp ? incOn : $('fd').value === f.fd && !incOn);
+  const narrowed = FILTERS.some(([id]) => $(id).value) || storeFilter || $('s').value.trim();
+  $('sum').innerHTML =
+    B.map(
+      ([t, c, k, f], i) =>
+        `<button class="${k}${isAct(f) ? ' act' : ''}" data-b="${i}" aria-pressed="${isAct(f)}"><b>${c}</b>${t}</button>`
+    ).join('') + (narrowed ? '<span class="sfil">Counts match your filters</span>' : '');
+  summary.B = B;
+}
+let storeFilter = '';
+
+// Reads the PIVOT sheet as saved in Excel. Each table is a block of columns separated by an empty column, headed on the first filled row.
+function pivotSheet() {
+  const A = sheet('PIVOT');
+  const hi = A.findIndex(r => r && r.some(x => clean(x)));
+  if (hi < 0) return [];
+  const H = A[hi],
+    out = [];
+  for (let c = 0; c < H.length; c++) {
+    if (!clean(H[c])) continue;
+    let e = c;
+    while (e + 1 < H.length && clean(H[e + 1])) e++;
+    const cols = H.slice(c, e + 1).map(clean),
+      body = [];
+    let total = null,
+      gap = 0;
+    for (let r = hi + 1; r < A.length; r++) {
+      const row = (A[r] || []).slice(c, e + 1);
+      if (row.every(x => x == null || x === '')) {
+        if (++gap > 2) break;
+        continue;
+      }
+      gap = 0;
+      if (/^grand total$/i.test(clean(row[0]))) total = row;
+      else if (!/^\(blank\)$/i.test(clean(row[0]))) body.push(row);
+    }
+    out.push({ cols, body, total });
+    c = e;
+  }
+  return out;
+}
+const PIVOT_FILTERS = { 'sr dm': 'fs', dm: 'fm', 'cs manager': 'fc', vendor: 'fv' };
+
+// The PIVOT sheet's vendor table is filtered in Excel (only Samsung and LG), so vendors are counted from every escalation instead.
+// Spellings that differ only by case or spacing ("Klipsch", "klipsch ") count as one vendor.
+function pivotTables() {
+  const T = pivotSheet(),
+    vc = headers.findIndex(h => /vendor/i.test(clean(h))),
+    key = r => (vc >= 0 ? maps.vcanon[norm(r.v[vc])] || clean(r.v[vc]) : vendor(r));
+  const m = {};
+  rows.forEach(r => {
+    const k = key(r) || '(none)';
+    m[k] = (m[k] || 0) + 1;
+  });
+  const body = Object.entries(m).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])),
+    vt = { cols: ['Vendor', 'Count of Vendor'], body, total: ['Grand Total', rows.length], live: true };
+  const i = T.findIndex(t => t.cols.some(c => /vendor/i.test(c)));
+  if (i >= 0) T[i] = vt;
+  else T.push(vt);
+  return T;
+}
+
+// A PIVOT table's title and column headings. Store tables keep their own headings; the others become "Escalations by X" and a count.
+function tableInfo(cols) {
+  const cnt = cols.find(x => /^count of /i.test(x)),
+    what = cnt ? cnt.replace(/^count of /i, '') : cols[0],
+    isStore = /store/i.test(cols[0]);
+  return {
+    what,
+    isStore,
+    title: isStore ? cols[cols.length - 1] : `Escalations by ${what}`,
+    head: isStore ? cols : [what, 'Count']
+  };
+}
+
+function summaryView() {
+  current = null;
+  const T = pivotTables();
+  const tbl = T.map(({ cols, body, total, live }) => {
+    const { what, isStore, title, head } = tableInfo(cols),
+      fid = isStore ? 'store' : PIVOT_FILTERS[norm(what)] || '';
+    return `<details class="pv"><summary><h3>${esc(title)}</h3><span class="m">${body.length}</span></summary>${live ? '<p class="pvn">Counted from every escalation, since the PIVOT sheet only lists some vendors.</p>' : ''}<table><thead><tr>${head.map(h => `<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${body.map(r => `<tr${fid ? ` data-f="${fid}" data-v="${esc(isStore ? 'Store ' + clean(r[0]) : clean(r[0]))}" tabindex="0" title="Show these in the list"` : ''}>${r.map(x => `<td${typeof x === 'number' ? ' class="n"' : ''}>${esc(x ?? '')}</td>`).join('')}</tr>`).join('')}</tbody>
+  ${total ? `<tfoot><tr>${total.map(x => `<td>${esc(x ?? '')}</td>`).join('')}</tr></tfoot>` : ''}</table></details>`;
+  }).join('');
+  $('d').innerHTML =
+    `<div class="pvh"><h2>Summary</h2><p class="m">From the workbook's PIVOT sheet, as last refreshed in Excel. Your edits here don't change these numbers. Click a title to open or close a table, or a row to show matching escalations in the list.</p>
+ <p class="pvt"><button class="lnk" id="pvopen">Open all</button> · <button class="lnk" id="pvclose">Close all</button></p></div>
+ <div class="pvg">${tbl || '<p class="m">This workbook has no PIVOT sheet.</p>'}</div>`;
+  draw();
+}
+
+function draw() {
+  if (!rows.length) return;
+  summary();
+  const tm = r => (isDate(val(r, 'AC')) ? +val(r, 'AC') : 0),
+    dt = r => (deadline(r) ? +deadline(r) : Infinity);
+  const S = {
+    urg: (a, b) => isDone(a) - isDone(b) || dt(a) - dt(b),
+    new: (a, b) => tm(b) - tm(a),
+    old: (a, b) => tm(a) - tm(b),
+    store: (a, b) => (+val(a, 'F') || 0) - (+val(b, 'F') || 0)
+  }[$('so').value];
+  const list = rows.filter(r => matches(r, new Set())).sort(S);
+  $('cnt').textContent = `${list.length} of ${rows.length}`;
+  const act = FILTERS.filter(([id]) => $(id).value).map(([id, t]) => {
+    const v = $(id).value;
+    return `<button class="fchip" data-clr="${id}" title="Remove this filter">${esc(t)}: <b>${esc(v === '__open' ? 'In progress' : id === 'fp' ? v.split(' · ')[0] : v)}</b> ${ICONS.x}</button>`;
+  });
+  if (storeFilter)
+    act.push(
+      `<button class="fchip" data-clr="store" title="Remove this filter">Store <b>${esc(storeFilter)}</b> ${ICONS.x}</button>`
+    );
+  $('chips').innerHTML = act.join('');
+  $('fcount').textContent = act.length || '';
+  FILTERS.forEach(([id]) => $(id).classList.toggle('on', !!$(id).value));
+  const st = $('list').scrollTop;
+  $('list').innerHTML =
+    list
+      .map(r => {
+        const s = dueState(r);
+        return `<div class="it${r === current ? ' sel' : ''}${s === 'late' ? ' late' : ''}" data-i="${rows.indexOf(r)}">
+ <div class="l1"><b>${esc(vendor(r))}</b><span class="m">${esc(clean(val(r, 'J')))}, ${esc(clean(val(r, 'K')))}</span><span class="due ${s}">${esc(dueText(r))}</span></div>
+ <div class="l2">${priority(r) ? `<span class="tag p${priority(r)}">P${priority(r)}</span>` : ''}${nextStepPill(r)}<span class="txt">Store ${esc(clean(val(r, 'F')))} · #${esc(r.id)}</span><span class="tag trk${trackerStatus(r) === 'Completed' ? ' ok' : /progress/i.test(trackerStatus(r)) ? ' ip' : ''}">${esc(trackerStatus(r))}</span></div></div>`;
+      })
+      .join('') || '<p class="m" style="padding:12px">No escalations match these filters.</p>';
+  $('list').scrollTop = st;
+}
+
+function timeline(r) {
+  const E = [
+    ['AC', 'Created at Best Buy'],
+    ['AD', 'Last responded or modified'],
+    ['Z', 'Anticipated completion'],
+    ['AF', 'Resolved (Best Buy date)']
+  ].map(([k, t]) => [val(r, k), t, '']);
+  const d = deadline(r);
+  if (d) E.push([d, 'SLA deadline', isLate(r) ? 'late' : 'due']);
+  E.push([now(), 'Today', 'now']);
+  return (
+    '<ul class="tl">' +
+    E.filter(e => isDate(e[0]))
+      .sort((a, b) => a[0] - b[0])
+      .map(e => `<li class="${e[2]}"><b>${fmtDateTime(e[0])}</b> &nbsp;${e[1]}</li>`)
+      .join('') +
+    '</ul>'
+  );
+}
+const NOTES = [
+  {
+    k: 'csm',
+    t: 'CSM / CS team notes',
+    q: 'S',
+    add: 'T',
+    ok: 'W',
+    cols: [
+      ['T', ''],
+      ['V', 'Expectation notes for the revisit']
+    ]
+  },
+  { k: 'dm', t: 'DM notes', q: 'P', add: 'Q', ok: 'R', cols: [['Q', '']] },
+  {
+    k: 'patti',
+    t: "Patti's team feedback",
+    add: 'X',
+    cols: [
+      ['X', ''],
+      ['Y', '']
+    ]
+  },
+  { k: 'rep', t: 'What the rep fixed', add: 'AA', cols: [['AA', '']] },
+  { k: 'bby', t: 'Best Buy action', add: 'AJ', cols: [['AJ', '']] }
+];
+
+// A note line usually starts with a date ("9/21 - ...", "9/21 (DV) ...") or initials then a date ("SN 9.23 ...").
+const NOTE_START =
+  /^(?:([A-Z]{2,3})\s+)?(\d{1,2}[\/.]\d{1,2}(?:[\/.]\d{2,5})?)\)?\s*(?:\(([A-Za-z]{1,3})\))?\s*[-–:]?\s*/;
+
+function noteEntries(s) {
+  return s
+    .split(/\n+|(?<=[.!?])\s+(?=\d{1,2}[\/.]\d{1,2}\b)/)
+    .map(x => x.trim())
+    .filter(Boolean)
+    .map(x => {
+      const m = x.match(NOTE_START);
+      return m
+        ? { d: m[2].replace(/\./g, '/'), who: m[1] || m[3] || '', t: x.slice(m[0].length) || x }
+        : { d: '', who: '', t: x };
+    });
+}
+let freshNote = '';
+
+function noteCard(r, n) {
+  const body = n.cols
+    .map(([k, sub]) => {
+      let s = clean(val(r, k));
+      if (k === 'AA' && /^\s*[1-4]\s*[–-]/.test(s)) s = '';
+      if (!s) return '';
+      return (
+        (sub ? `<h4>${sub}</h4>` : '') +
+        noteEntries(s)
+          .map(e => {
+            const cs = /^CS:\s*/.test(e.t),
+              t = e.t.replace(/^CS:\s*/, '');
+            return `<div class="ent${freshNote && e.t === freshNote ? ' new' : ''}"><time>${esc(e.d)}</time><div>${cs ? '<span class="who cs">CS team</span>' : ''}${e.who ? `<span class="who">${esc(e.who)}</span>` : ''}${highlightTracking(esc(t))}</div></div>`;
+          })
+          .join('')
+      );
+    })
+    .join('');
+  const q = n.q && clean(val(r, n.q));
+  if (!body && !q) return '';
+  return `<section class="nc ${n.k}"><h3>${n.t}${n.ok ? resolvedChip(r, n.ok, n.k === 'dm' ? 'DM' : 'CSM') : ''}</h3>${q ? `<p class="q"><b>Question asked:</b> ${esc(q)}</p>` : ''}${body || '<p class="none">No notes yet.</p>'}</section>`;
+}
+
+// Who can add a note, and which spreadsheet column it goes into. CS team notes go in the CSM column.
+const ROLES = [
+  ['dm', 'DM', 'Q'],
+  ['csm', 'CSM / CS team', 'T'],
+  ['rep', 'What the rep fixed', 'AA'],
+  ['patti', "Patti's team", 'X']
+];
+let noteRole = loadSetting('bbEscRole') || 'dm';
+if (noteRole === 'cs') noteRole = 'csm';
+const roleOf = k => ROLES.find(x => x[0] === k) || ROLES[0];
+
+function history(r) {
+  const cards = NOTES.map(n => noteCard(r, n)),
+    empty = NOTES.filter((n, i) => !cards[i]).map(n => n.t),
+    ro = roleOf(noteRole);
+  return `<div class="notes">${cards.join('')}</div>${empty.length ? `<p class="none">No notes yet from: ${empty.map(esc).join(', ')}.</p>` : ''}<h3 class="tlh">Timeline</h3>${timeline(r)}
+ <section class="entry"><h3>Add a note</h3><div class="roles" role="radiogroup" aria-label="Who is this note from?"><span class="m">From</span>${ROLES.map(([k, t]) => `<button role="radio" data-role="${k}" aria-checked="${k === ro[0]}">${t}</button>`).join('')}</div>
+ <div class="erow"><label class="fl"><span>Your initials</span><input id="nini" value="${esc(loadSetting('bbEscIni') || '')}" placeholder="e.g. SN" aria-describedby="nerr"></label>
+ <label class="fl grow"><span>Note (today's date is added for you)</span><textarea id="ntxt" rows="2" placeholder="What happened, or what's next?"></textarea></label></div>
+ <p class="nerr" id="nerr" role="alert" hidden>Enter your initials before adding a note.</p>
+ <button class="p" id="addn">Add note</button></section>`;
+}
+
+function dropdownOptions(k) {
+  const d = DROPDOWNS[k],
+    seen = new Map(),
+    add = x => {
+      const s = clean(x);
+      if (!s || s.length > 80) return;
+      const n = s.toLowerCase();
+      if (!seen.has(n)) seen.set(n, s);
+    };
+  (d.fixed || []).forEach(add);
+  if (d.from) rows.forEach(r => add(k === 'G' ? vendor(r) : val(r, k)));
+  const a = [...seen.values()];
+  return d.fixed
+    ? a.slice(0, d.fixed.length).concat(a.slice(d.fixed.length).sort())
+    : a.sort((x, y) => x.localeCompare(y));
+}
+
+function callForms(r) {
+  const st = clean(val(r, 'F')),
+    vn = norm(vendor(r)),
+    used = new Set(),
+    take = a =>
+      a.filter(x => {
+        const n = norm(x);
+        if (!n || used.has(n)) return false;
+        used.add(n);
+        return true;
+      });
+  const here = take([
+    ...new Set((maps.fedr[st] || []).filter(x => norm(x.form).includes(vn)).map(x => x.form))
+  ]);
+  const vend = take(
+    [...maps.cforms, ...rows.map(x => clean(val(x, 'U')))].filter(x => vn && norm(x).includes(vn))
+  );
+  const other = take([...new Set((maps.fedr[st] || []).map(x => x.form))]);
+  const all = take([...maps.cforms, ...rows.map(x => clean(val(x, 'U')))].sort());
+  return [
+    [`${vendor(r)} visits at this store (FEDR)`, here],
+    [`All ${vendor(r)} call forms`, vend],
+    ['Other visits at this store', other],
+    ['All call forms', all]
+  ].filter(g => g[1].length);
+}
+
+function dropdownInput(r, ci) {
+  const k = colLetter(ci),
+    d = DROPDOWNS[k],
+    cv = clean(r.v[ci]) || (r.v[ci] == null ? '' : String(r.v[ci])),
+    groups = d.opts ? d.opts(r) : [['', dropdownOptions(k)]];
+  let found = !cv.trim(),
+    html = '';
+  for (const [g, list] of groups) {
+    const o = list
+      .map(x => {
+        const m = !found && norm(x) === norm(cv);
+        if (m) found = true;
+        return `<option value="${esc(m ? r.v[ci] : x)}"${m ? ' selected' : ''}>${esc(d.lab ? d.lab(x) : x)}</option>`;
+      })
+      .join('');
+    html += g ? `<optgroup label="${esc(g)}">${o}</optgroup>` : o;
+  }
+  if (!found)
+    html =
+      `<option value="${esc(r.v[ci])}" selected>${esc(isDate(r.v[ci]) ? fmtDate(r.v[ci]) : cv)} (current${k === 'AB' ? ', not a priority' : ''})</option>` +
+      html;
+  return `<select data-c="${ci}"><option value=""${cv.trim() ? '' : ' selected'}>Not set</option>${html}<option value="__other">Other (type your own)…</option></select>`;
+}
+
+function fieldInput(r, ci) {
+  const P = pending[r.id] || {},
+    p = ci in P;
+  if (p) r = { ...r, v: Object.assign([...r.v], { [ci]: P[ci] }) };
+  const v = r.v[ci],
+    k = colLetter(ci),
+    c = edits[r.id] && k in edits[r.id];
+  let s = '',
+    inp;
+  if (DROPDOWNS[k]) inp = dropdownInput(r, ci);
+  else if (DATE_COLS.has(ci) && (v == null || isDate(v)))
+    inp = `<input type="datetime-local" data-c="${ci}" value="${isDate(v) ? toLocalInput(v) : ''}">`;
+  else if (k === 'F')
+    inp = `<input data-c="${ci}" list="usl" value="${esc(v ?? '')}" placeholder="Type a store #">`;
+  else {
+    s =
+      v == null
+        ? ''
+        : isDate(v)
+          ? fmtDateTime(v)
+          : typeof v === 'number' && !Number.isInteger(v)
+            ? v.toFixed(2)
+            : String(v);
+    inp = `<textarea data-c="${ci}" rows="${Math.min(9, Math.max(1, s.split('\n').length + Math.floor(s.length / 60)))}">${esc(s)}</textarea>`;
+  }
+  return `<label class="fl${p ? ' pend' : c ? ' chg' : ''}${s.length > 50 ? ' w' : ''}"><span>${esc(fieldLabel(ci))}</span>${inp}</label>`;
+}
+const RESOLVED_ICONS = {
+  yes: '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="10" fill="currentColor"/><path d="M5.5 10.5l3 3 6-6.5" fill="none" stroke="var(--pan)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  no: '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="10" fill="currentColor"/><path d="M6.5 6.5l7 7m0-7l-7 7" fill="none" stroke="var(--pan)" stroke-width="2.2" stroke-linecap="round"/></svg>',
+  unk: '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="9" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="3 2.5"/></svg>'
+};
+
+function resolvedChip(r, k, who) {
+  const x = norm(val(r, k)),
+    s = x === 'yes' ? 'yes' : x === 'no' ? 'no' : 'unk';
+  return `<span class="ck ${s}">${RESOLVED_ICONS[s]}${s === 'yes' ? `${who} says resolved` : s === 'no' ? `${who} not resolved` : `${who} has not answered`}</span>`;
+}
+
+function glanceTab(r) {
+  const g = k => esc(clean(val(r, k))),
+    dd = k => (isDate(val(r, k)) ? fmtDate(val(r, k)) : ''),
+    mail = clean(val(r, 'L')),
+    iss = clean(val(r, 'N'));
+  const row = (t, v) => (v ? `<dt>${t}</dt><dd>${v}</dd>` : ''),
+    ppl = [
+      ['Senior DM', 'C'],
+      ['DM', 'D'],
+      ['CSM', 'E']
+    ]
+      .filter(([, k]) => clean(val(r, k)))
+      .map(([t, k]) => `<span><em>${t}</em>${g(k)}</span>`)
+      .join('');
+  const when = [dd('AC') && 'Created ' + dd('AC'), dd('AD') && 'Last response ' + dd('AD')]
+    .filter(Boolean)
+    .join(' · ');
+  return `${iss ? `<div class="issw"><p class="issue${iss.length > 320 ? ' clamp' : ''}" id="iss">${g('N')}</p>${iss.length > 320 ? '<button class="lnk" id="more">Show more</button>' : ''}</div>` : ''}
+ <div class="gl"><div><div class="checks">${resolvedChip(r, 'R', 'DM')}${resolvedChip(r, 'W', 'CSM')}</div>${when ? `<p class="m created">${when}</p>` : ''}
+ <dl class="facts">${row('Issued', g('AH'))}${row('Planogram', g('M'))}${row('Best Buy contact', mail.includes('@') ? `<a href="mailto:${esc(mail)}">${esc(mail)}</a>` : esc(mail))}
+ ${row('Reason', g('AK') || '<span class="m">Not set</span>')}${row('Team', ppl && `<div class="team">${ppl}</div>`)}${row('Call form', g('U'))}</dl></div>${partsBox(r)}</div>`;
+}
+
+// Follow-up = a FEDR visit at this store for this vendor (call form or program), dated on or after the escalation was created.
+const visitDate = x => x.date || x.we;
+
+// ---- Visit data: the workbook's FEDR sheet plus up to two visit reports imported on their own (previous weeks and current week).
+// Store numbers are compared as plain numbers, so "0347", "347.0" and "Best Buy #347" all match store 347.
+function storeKey(v) {
+  const x = clean(v);
+  if (!x) return '';
+  const m = x.match(/(\d+)(?:\.0+)?\s*$/);
+  return m ? String(+m[1]) : x.toLowerCase();
+}
+// Each slot: its box, file input and which week's pivot report it takes.
+const VISIT_SLOTS = {
+  cur: ['vimp', 'vfile', "this week's"],
+  prev: ['pimp', 'pfile', "last week's"]
+};
+const importedVisits = { cur: { v: [], name: '' }, prev: { v: [], name: '' } };
+let replaceFedr = false;
+// File name of the People Report loaded into Store Visits.
+let peopleName = '';
+// File name of the current visits Store Visits read, shown on the button until a workbook is loaded.
+let storeVisitsName = '';
+const allImportedVisits = () => [...importedVisits.prev.v, ...importedVisits.cur.v];
+const VISITS = { byS: {}, byB: {}, srcs: [] };
+
+function indexVisits() {
+  VISITS.byS = {};
+  VISITS.byB = {};
+  VISITS.srcs = [];
+  const imp = allImportedVisits(),
+    fed = replaceFedr && imp.length ? [] : Object.values(maps.fedr || {}).flat(),
+    all = [...fed, ...imp];
+  all.forEach(x => {
+    if (x.store) (VISITS.byS[x.store] ??= []).push(x);
+    if (x.bds) (VISITS.byB[x.bds] ??= []).push(x);
+  });
+  const src = {};
+  all.forEach(x => {
+    const o = (src[x.src] ??= { name: x.src, n: 0, max: null });
+    o.n++;
+    const w = visitDate(x);
+    if (w && (!o.max || w > o.max)) o.max = w;
+  });
+  VISITS.srcs = Object.values(src);
+}
+
+function visitsFor(r) {
+  const a = VISITS.byS[storeKey(val(r, 'F'))] || [],
+    b = VISITS.byB[storeKey(val(r, 'H'))] || [];
+  return [...new Set([...a, ...b])];
+}
+const latestVisitDate = () => VISITS.srcs.reduce((m, o) => (o.max && (!m || o.max > m) ? o.max : m), null);
+const FIELDS = [
+  [
+    'store',
+    'Best Buy store #',
+    [
+      'chain store #',
+      'store #',
+      'bby store #',
+      'best buy store #',
+      'store number',
+      'store no',
+      'store',
+      'bby store'
+    ]
+  ],
+  ['bds', 'BDS store #', ['bds store id', 'bds store #', 'bds #', 'bds id', 'bds']],
+  [
+    'date',
+    'Visit date',
+    ['visit date scheduled', 'visit date', 'scheduled date', 'date scheduled', 'scheduled', 'date']
+  ],
+  ['rep', 'Rep', ['rep name', 'rep', 'representative', 'assigned rep', 'merchandiser']],
+  ['status', 'Status', ['status', 'visit status', 'call status']],
+  [
+    'form',
+    'Call form or project',
+    ['call form name', 'call form', 'project', 'wave name', 'visit name', 'program name']
+  ],
+  ['prog', 'Vendor or program', ['program', 'vendor', 'client', 'brand']],
+  ['reason', 'Visit reason or type', ['visit reason', 'visit type', 'reason', 'type']],
+  ['we', 'Due or wave end date', ['wave end date', 'due date', 'end date', 'deadline']],
+  ['tin', 'Time in', ['scheduled time in', 'time in', 'check in', 'arrival time', 'start time']],
+  ['tout', 'Time out', ['scheduled time out', 'time out', 'check out', 'departure time', 'end time']],
+  [
+    'hg',
+    'Scheduled hours',
+    ['in-store hours goal', 'scheduled hours', 'planned hours', 'hours goal', 'duration']
+  ],
+  ['ha', 'Actual hours', ['in-store hours actual', 'actual hours', 'hours actual', 'hours worked']],
+  ['had', 'Had parts or materials (Y/N)', ['had materials', 'had parts', 'parts placed', 'materials placed']],
+  ['mat', 'Parts or materials', ['materials description', 'parts description', 'parts', 'materials']],
+  [
+    'ship',
+    'Parts shipped to',
+    ['shipped to', 'ship to', 'shipping destination', 'deliver to', 'ship destination']
+  ]
+];
+const headingKey = x => norm(x).replace(/\s+/g, ' ');
+
+function guessCol(H, names) {
+  for (const n of names) {
+    const i = H.findIndex(h => headingKey(h) === n);
+    if (i >= 0) return i;
+  }
+  for (const n of names) {
+    const i = H.findIndex(h => headingKey(h).includes(n));
+    if (i >= 0) return i;
+  }
+  return -1;
+}
+
+function headerRow(A) {
+  let best = 0,
+    bs = -1;
+  for (let r = 0; r < Math.min(15, A.length); r++) {
+    const H = A[r] || [];
+    const sc = FIELDS.filter(f => guessCol(H, f[2]) >= 0).length;
+    if (sc > bs) {
+      bs = sc;
+      best = r;
+    }
+  }
+  return [best, bs];
+}
+let visitImport = null;
+
+// The spinners are CSS transform animations, so they keep turning while the file is parsed.
+// A box while its file is read: a spinner and "Opening…" under the report's name.
+function busyBtn(id, on, label) {
+  const b = $(id);
+  b.disabled = on;
+  if (on) {
+    b.classList.remove('done');
+    b.innerHTML = `<span class="spin sm" aria-hidden="true"></span><span class="ibt"><b>${b.dataset.what}</b><span>${label}</span></span>`;
+    filesPill();
+  } else btnState();
+}
+
+// Each import box names its report and says what goes in it until the file is loaded, then shows a check and the file name.
+let filesLoaded = 0;
+function btnState() {
+  const wok = !!rows.length,
+    ck = `<span class="okc">${ICONS.check}</span>`;
+  let n = 0;
+  const paint = (id, ok, what, okNote, emptyNote) => {
+    const b = $(id);
+    n += ok;
+    b.dataset.what = what;
+    b.classList.toggle('done', ok);
+    b.classList.toggle('miss', !ok);
+    b.innerHTML = `${ok ? ck : '<span class="nd"></span>'}<span class="ibt"><b>${what}</b><span>${esc(ok ? okNote : emptyNote)}</span></span>`;
+    b.title = ok ? `${okNote}. Click or drop to import a different file.` : emptyNote;
+  };
+  paint('imp', wok, 'FEDR', fileName, 'The escalations workbook (.xlsx)');
+  Object.entries(VISIT_SLOTS).forEach(([k, [id, , when]]) => {
+    const o = importedVisits[k],
+      vok = !!o.v.length || (k === 'cur' && !wok && !!storeVisitsName);
+    paint(
+      id,
+      vok,
+      `${when[0].toUpperCase() + when.slice(1)} pivot report`,
+      `${o.name || storeVisitsName}${o.v.length ? ` · ${o.v.length.toLocaleString()} visits` : ''}`,
+      k === 'prev' && !wok ? 'Load the FEDR first' : `${when[0].toUpperCase() + when.slice(1)} Priority Pivot (.xlsx or .csv)`
+    );
+    // Not disabled: a disabled button would let a dropped file fall through to the page and load as the FEDR.
+    $(id).setAttribute('aria-disabled', k === 'prev' && !wok);
+  });
+  paint('rimp', !!peopleName, 'People report', peopleName, 'Rep phone numbers and email (.xlsx)');
+  // The popup closes by itself once the last of the four files is in.
+  if (n === 4 && filesLoaded < 4 && !$('imports').hidden) setTimeout(closeImports, 900);
+  filesLoaded = n;
+  filesPill();
+}
+// The files pill counts loaded reports, with a spinner while one is being read.
+function filesPill() {
+  const busy = [...document.querySelectorAll('.imgrid .ib')].some(b => b.disabled),
+    all = filesLoaded === 4,
+    p = $('fpill');
+  p.classList.toggle('done', all && !busy);
+  p.classList.toggle('miss', !all || busy);
+  p.innerHTML = busy
+    ? '<span class="spin sm" aria-hidden="true"></span>Importing…'
+    : all
+      ? `<span class="okc">${ICONS.check}</span>4 of 4 files imported`
+      : `${filesLoaded} of 4 files loaded`;
+  $('imcount').textContent = `${filesLoaded} of 4 files loaded`;
+}
+function openImports(title) {
+  $('imtitle').textContent = title;
+  $('imports').hidden = false;
+  $('imclose').focus();
+}
+function closeImports() {
+  $('imports').hidden = true;
+}
+$('fpill').onclick = () => openImports('Import reports here');
+$('imclose').onclick = closeImports;
+$('imports').addEventListener('click', e => {
+  if (e.target.id === 'imports') closeImports();
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && !$('imports').hidden) closeImports();
+});
+$('d').addEventListener('click', e => {
+  if (e.target.id === 'openimp') openImports("Let's get started");
+});
+const visitsBusy = (slot, on, label) => busyBtn(VISIT_SLOTS[slot][0], on, label);
+
+// Skeleton lines: widths are percentages.
+const skLines = (...w) => w.map(x => `<div class="sk" style="width:${x}%"></div>`).join('');
+const skList = n => Array.from({ length: n }, (_, i) => `<div class="skit">${skLines(60 - (i % 3) * 10, 85)}</div>`).join('');
+const skPills = n => Array.from({ length: n }, () => '<div class="sk skpill"></div>').join('');
+// The detail pane while a file imports: what's loading, then skeleton header and cards.
+function busyCard(title, name, step) {
+  return `<div id="loading" role="status" aria-live="polite"><p class="m lst"><span class="spin sm" aria-hidden="true"></span><b>${title}</b> · ${esc(name)} · <span id="vstep">${step}</span></p>
+ <div class="top"><div class="sk h"></div>${skLines(30, 55, 40)}</div>
+ ${[4, 3, 5].map(n => `<div class="skcard"><div class="sk" style="width:25%;height:16px"></div>${skLines(...[90, 70, 80, 60, 75].slice(0, n))}</div>`).join('')}</div>`;
+}
+
+// One visit file at a time: imports share visitImport and the detail pane, so a second one waits for the first.
+let visitQueue = Promise.resolve();
+function openVisits(f, slot) {
+  visitQueue = visitQueue.then(() => readVisitFile(f, slot));
+}
+async function readVisitFile(f, slot) {
+  const back = current,
+    prev = $('d').innerHTML;
+  visitsBusy(slot, true, 'Opening…');
+  $('d').innerHTML = busyCard(
+    'Opening visit file',
+    `${f.name} · ${(f.size / 1048576).toFixed(1)} MB`,
+    'Reading the file…'
+  );
+  try {
+    const b = await f.arrayBuffer();
+    $('vstep').textContent = 'Reading the sheets. Large files take a few seconds…';
+    await nextFrame();
+    const vb = XLSX.read(b, { type: 'array', cellDates: true });
+    $('vstep').textContent = 'Finding the columns…';
+    await nextFrame();
+    const sc = vb.SheetNames.map(n => {
+      const A = XLSX.utils.sheet_to_json(vb.Sheets[n], { header: 1, raw: true, defval: null });
+      return [n, headerRow(A)[1]];
+    }).sort((a, b) => b[1] - a[1]);
+    const data =
+      vb.SheetNames.find(n => /^data$/i.test(n.trim())) || vb.SheetNames.find(n => /data/i.test(n));
+    visitImport = { name: f.name, slot, wb: vb, back, sheet: data || sc[0][0] };
+    mapSheet();
+    // Import straight away when the store and date columns are recognized; only ask when they aren't.
+    if (
+      (visitImport.map.store >= 0 || visitImport.map.bds >= 0) &&
+      (visitImport.map.date >= 0 || visitImport.map.we >= 0)
+    ) {
+      $('vstep').textContent = 'Adding visits…';
+      await nextFrame();
+      commitVisits(replaceFedr);
+      return;
+    }
+    mapView();
+    toast("Some columns weren't recognized. Check them below.");
+  } catch (e) {
+    $('d').innerHTML = prev;
+    toast("This file couldn't be opened. Use an .xlsx or .csv visit report.");
+  } finally {
+    visitsBusy(slot, false);
+  }
+}
+
+function mapSheet() {
+  const A = XLSX.utils.sheet_to_json(visitImport.wb.Sheets[visitImport.sheet], {
+      header: 1,
+      raw: true,
+      defval: null
+    }),
+    [h] = headerRow(A);
+  visitImport.A = A;
+  visitImport.h = h;
+  visitImport.H = (A[h] || []).map(x => clean(x));
+  let saved = {};
+  try {
+    saved = JSON.parse(loadSetting('bbVisMap:' + visitImport.H.join('|')) || '{}');
+  } catch (e) {}
+  visitImport.map = Object.fromEntries(
+    FIELDS.map(([k, , names]) => [k, k in saved ? saved[k] : guessCol(visitImport.H, names)])
+  );
+}
+const toDate = v => {
+  if (isDate(v)) return v;
+  if (v == null || v === '') return null;
+  const d = new Date(v);
+  return isNaN(d) ? null : d;
+};
+
+function buildVisits() {
+  const m = visitImport.map,
+    g = (row, k) => (m[k] >= 0 ? row[m[k]] : null),
+    out = [];
+  visitImport.A.slice(visitImport.h + 1).forEach(row => {
+    if (!row) return;
+    const store = storeKey(g(row, 'store')),
+      bds = storeKey(g(row, 'bds'));
+    if (!store && !bds) return;
+    out.push({
+      store,
+      bds,
+      date: toDate(g(row, 'date')),
+      we: toDate(g(row, 'we')),
+      rep: clean(g(row, 'rep')),
+      st: clean(g(row, 'status')),
+      form: clean(g(row, 'form')) || clean(g(row, 'prog')),
+      prog: clean(g(row, 'prog')),
+      reason: clean(g(row, 'reason')),
+      type: '',
+      tin: g(row, 'tin'),
+      tout: g(row, 'tout'),
+      hg: g(row, 'hg'),
+      ha: g(row, 'ha'),
+      had: clean(g(row, 'had')),
+      mat: clean(g(row, 'mat')),
+      nb: '',
+      ship: clean(g(row, 'ship')),
+      src: visitImport.name
+    });
+  });
+  return out;
+}
+
+function mapPreview() {
+  const v = buildVisits(),
+    S = new Set(rows.map(r => storeKey(val(r, 'F')))),
+    B = new Set(rows.map(r => storeKey(val(r, 'H')))),
+    hit = v.filter(x => S.has(x.store) || B.has(x.bds)).length,
+    dated = v.filter(x => visitDate(x)).length;
+  const need =
+    visitImport.map.store < 0 && visitImport.map.bds < 0
+      ? 'Pick the column with the store # or BDS #.'
+      : visitImport.map.date < 0 && visitImport.map.we < 0
+        ? 'Pick the column with the visit date.'
+        : '';
+  $('vprev').innerHTML = need
+    ? `<span class="bad">${need}</span>`
+    : `${v.length} visits found · <b>${hit}</b> are at stores in your escalations · ${dated} have a date.`;
+  $('vok').disabled = !!need || !v.length;
+}
+
+// The visit file's first non-empty data row, shown as an example next to each column choice.
+const firstDataRow = () =>
+  visitImport.A.slice(visitImport.h + 1).find(r => r && r.some(x => x != null && x !== '')) || [];
+
+function mapView() {
+  const ex = firstDataRow();
+  $('d').innerHTML =
+    `<div class="mapv"><h2>Import ${VISIT_SLOTS[visitImport.slot][2]} pivot report</h2><p class="m">${esc(visitImport.name)}. Check which column holds each piece of information. The page guessed from the column names.</p>
+ ${visitImport.wb.SheetNames.length > 1 ? `<label class="msh">Sheet <select id="vsheet">${visitImport.wb.SheetNames.map(n => `<option${n === visitImport.sheet ? ' selected' : ''}>${esc(n)}</option>`).join('')}</select></label>` : ''}
+ <div class="tw"><table class="mapt"><tr><th>Information</th><th>Column in your file</th><th>First row</th></tr>${FIELDS.map(
+   ([k, t]) => {
+     const c = visitImport.map[k],
+       x = c >= 0 ? ex[c] : '';
+     return `<tr><td>${t}${k === 'store' || k === 'date' ? ' <span class="m">(needed)</span>' : ''}</td><td><select data-map="${k}"><option value="-1">Not in this file</option>${visitImport.H.map((h, i) => (h ? `<option value="${i}"${i === c ? ' selected' : ''}>${esc(h)}</option>` : '')).join('')}</select></td><td class="m">${esc(isDate(x) ? fmtDate(x) : (x ?? ''))}</td></tr>`;
+   }
+ ).join('')}</table></div>
+ <p id="vprev" class="m"></p>
+ <label class="msh"><input type="checkbox" id="vrepl"${replaceFedr ? ' checked' : ''}> Use only this file (hide the workbook's FEDR sheet visits)</label>
+ <div class="mbtn"><button class="p" id="vok">Use these visits</button><button id="vcancel">Cancel</button></div></div>`;
+  mapPreview();
+}
+
+function commitVisits(repl) {
+  const slot = visitImport.slot,
+    v = buildVisits();
+  importedVisits[slot] = { v, name: visitImport.name };
+  replaceFedr = repl;
+  saveSetting('bbVisMap:' + visitImport.H.join('|'), JSON.stringify(visitImport.map));
+  indexVisits();
+  filters();
+  visitsBusy(slot, false);
+  toast(
+    `✓ Added ${v.length.toLocaleString()} visit${v.length === 1 ? '' : 's'} from ${visitImport.name}${visitImport.wb.SheetNames.length > 1 ? ` (${visitImport.sheet} sheet)` : ''} as ${VISIT_SLOTS[slot][2]} pivot report.`
+  );
+  const back = visitImport.back;
+  visitImport = null;
+  if (back) {
+    activeTab = 'vis';
+    saveSetting('bbEscTab', activeTab);
+  }
+  back ? showEscalation(back) : summaryView();
+}
+
+async function mapDone(ok) {
+  if (ok) {
+    $('vok').disabled = true;
+    $('vok').innerHTML = '<span class="spin sm on" aria-hidden="true"></span>Adding visits…';
+    visitsBusy(visitImport.slot, true, 'Adding…');
+    await nextFrame();
+    return commitVisits($('vrepl').checked);
+  }
+  const back = visitImport.back;
+  visitImport = null;
+  back ? showEscalation(back) : summaryView();
+}
+
+// ---- Parts shipping. Read from the escalation's notes (latest mention wins) and from any "shipped to" column in the visit data.
+const PARTS_PENDING =
+  /\b(not|n't|never)\s+(yet\s+)?(been\s+)?ship|no shipping|waiting (on|for) (the )?(parts?|shipping|shipment|tracking)|\bonce\b.{0,25}\bship|\bafter\b.{0,20}\bships?\b|\buntil\b.{0,30}\bship|parts? (were |was )?(ordered|requested|on order|needed)|needs? parts|estimated ship|ready to ship|shipping update|no eta/i;
+const PARTS_SHIPPED =
+  /\b(re-?)?shipped\b|\bshipping (on|to)\b|tracking\s*#?\s*:?\s*\d{8,}|\b(fed ?ex|ups)\b\s*#?\s*\d{8,}|#\s?\d{10,}|\bdelivered\b|\bin transit\b|\bparts? (sent|arrived|received)\b/i;
+const shipDestination = t => {
+  const m =
+    t.match(/(ship\w*|sent|send\w*|deliver\w*|mail\w*)\s+(directly\s+)?(to|at)\s+(the\s+)?(store|rep)\b/i) ||
+    t.match(/\bto\s+(the\s+)?(rep|store)'?s?\s+(home|address|location)/i);
+  return m ? (/rep/i.test(m[0]) ? 'rep' : 'store') : '';
+};
+const TRACKING_NO = /(?:tracking|fed ?ex|ups|#)\s*#?\s*:?\s*(\d{10,22})/i;
+
+// Highlight tracking numbers in text that is already escaped.
+const highlightTracking = h =>
+  h.replace(/((?:tracking|fed ?ex|ups|#)\s*#?\s*:?\s*)(\d{10,22})/gi, '$1<mark class="trk">$2</mark>');
+
+function noteDate(d) {
+  if (!d) return null;
+  const [m, dd, y] = d.split('/').map(Number);
+  const base = now();
+  let yr = y ? (y < 100 ? 2000 + y : y) : base.getFullYear();
+  let x = new Date(yr, m - 1, dd);
+  if (!y && x - base > 31 * 864e5) x = new Date(yr - 1, m - 1, dd);
+  return isNaN(x) ? null : x;
+}
+
+function partsInfo(r) {
+  const hits = [];
+  ['T', 'Q', 'AJ', 'V', 'X', 'Y', 'AA', 'N'].forEach(k => {
+    const s = clean(val(r, k));
+    if (!s) return;
+    noteEntries(s).forEach(e => {
+      const t = e.t;
+      if (!/\bparts?\b|ship|tracking|fed ?ex|\bups\b|bracket|mount|pallet|materials?|cable|kit/i.test(t))
+        return;
+      const pend = PARTS_PENDING.test(t),
+        ship = !pend && PARTS_SHIPPED.test(t);
+      if (!pend && !ship) return;
+      hits.push({
+        d: noteDate(e.d),
+        t,
+        ship,
+        dest: shipDestination(t),
+        trk: (t.match(TRACKING_NO) || [])[1] || '',
+        col: k
+      });
+    });
+  });
+  visitsFor(r).forEach(x => {
+    if (x.ship)
+      hits.push({
+        d: visitDate(x),
+        t: `Visit data: parts shipped to ${x.ship}${x.mat ? ` (${x.mat})` : ''}`,
+        ship: true,
+        dest: /rep/i.test(x.ship) ? 'rep' : /store/i.test(x.ship) ? 'store' : '',
+        trk: '',
+        col: ''
+      });
+  });
+  if (!hits.length) return null;
+  hits.sort((a, b) => (b.d || 0) - (a.d || 0));
+  const last = hits[0],
+    shipped = hits.filter(h => h.ship);
+  return {
+    state: last.ship ? 'shipped' : 'pending',
+    dest: last.ship ? last.dest || shipped.map(h => h.dest).find(Boolean) || '' : '',
+    trk: (last.ship ? last.trk || shipped.map(h => h.trk).find(Boolean) : '') || '',
+    last
+  };
+}
+const BOX_ICON =
+  '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 1.8 2.5 5.6v8.8l7.5 3.8 7.5-3.8V5.6z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M2.8 5.8 10 9.4l7.2-3.6M10 9.4v8.6M6.2 3.7l7.3 3.7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>';
+
+function partsBox(r) {
+  const p = partsInfo(r),
+    lv = followUp(r)
+      .fu.filter(x => (x.had || x.mat || x.nb) && visitDate(x) && visitDate(x) <= now())
+      .sort((a, b) => visitDate(b) - visitDate(a))[0];
+  const head = !p
+    ? `<b class="pnone">${BOX_ICON}No parts shipments mentioned</b>`
+    : p.state === 'shipped'
+      ? `<b>${BOX_ICON}Parts shipped${p.dest ? ` to the ${p.dest}` : ''}</b>${p.dest ? '' : '<span>Destination not stated in the notes.</span>'}`
+      : `<b>${BOX_ICON}Waiting on parts</b>`;
+  const lvTxt = lv
+    ? `<div class="plv"><em>At the last ${esc(vendor(r))} visit (${fmtDate(visitDate(lv))})</em>${/^y/i.test(lv.had) ? `<span class="ok2">${ICONS.check} Rep had the parts</span>` : /^n/i.test(lv.had) ? `<span class="no2">${ICONS.x} Rep did not have the parts</span>` : ''}${lv.nb ? `<span>${esc(lv.nb)}</span>` : ''}${lv.mat ? `<span title="${esc(lv.mat)}">${esc(lv.mat.length > 80 ? lv.mat.slice(0, 80) + '…' : lv.mat)}</span>` : ''}</div>`
+    : '';
+  return `<aside class="pside ${p ? p.state : 'none'}"><h4>Parts</h4>${head}${p && p.trk ? `<div class="ptrk"><em>Tracking #</em><strong>${esc(p.trk)}</strong></div>` : ''}${p ? `<p class="pnote">${p.last.d ? `<time>${fmtDate(p.last.d)}</time> ` : ''}${highlightTracking(esc(p.last.t))}</p>` : ''}${lvTxt}</aside>`;
+}
+const isOpenVisit = x =>
+  /schedul|assign|pending|open|upcoming|planned|not started/i.test(x.st) && !/past|complete|miss/i.test(x.st);
+const isMissedVisit = x => /scheduled past|miss|incomplete|no.?show|skipp|cancel/i.test(x.st);
+const isDoneVisit = x => /complete|visited|done|finished|closed/i.test(x.st);
+
+function followUp(r) {
+  const vn = norm(vendor(r)),
+    c = isDate(val(r, 'AC')) ? val(r, 'AC') : null,
+    t = now();
+  const all = visitsFor(r).map(x => ({
+    ...x,
+    hit: !!vn && vn !== '(none)' && (norm(x.form).includes(vn) || norm(x.prog) === vn)
+  }));
+  const since = x => !c || (visitDate(x) && visitDate(x) >= c - 864e5);
+  // With no status column, a future date counts as scheduled and a past date as visited.
+  const up = x => (isOpenVisit(x) || !x.st) && visitDate(x) >= t,
+    miss = x => isMissedVisit(x) || (isOpenVisit(x) && visitDate(x) < t),
+    dn = x => isDoneVisit(x) || (!x.st && visitDate(x) && visitDate(x) < t);
+  const fu = all.filter(x => x.hit && since(x)),
+    by = asc => (a, b) => (asc ? visitDate(a) - visitDate(b) : visitDate(b) - visitDate(a));
+  const U = fu.filter(up).sort(by(true)),
+    M = fu.filter(miss).sort(by(false)),
+    D = fu.filter(dn).sort(by(false));
+  return { fu, up: U, missed: M, doneV: D, created: c };
+}
+
+// Visit status as a symbol: ✓ done, – scheduled, ✗ missed. Display only; the original wording is in the tooltip and nothing is written back.
+function statusIcon(x) {
+  const t = now(),
+    w = visitDate(x),
+    k = /not\s*sched/i.test(x.st)
+      ? ['no2', 'x', 'Not scheduled']
+      : isDoneVisit(x) || (!x.st && w && w < t)
+        ? ['ok2', 'check', 'Completed']
+        : (isOpenVisit(x) || !x.st) && w >= t
+          ? ['m', 'dash', 'Scheduled']
+          : isMissedVisit(x) || (isOpenVisit(x) && w < t)
+            ? ['no2', 'x', 'Missed']
+            : null;
+  return k
+    ? `<span class="${k[0]} sti-i">${ICONS[k[1]]}</span><span class="${k[0]} sti-l">${esc(x.st || k[2])}</span>`
+    : `<span class="sti-l">${esc(x.st)}</span>`;
+}
+
+// A rep's name on an escalation opens the Directory on that rep's week, with this escalation's visits highlighted.
+// "Open" means no rep is assigned yet, so it stays plain text.
+const repLink = n =>
+  /^open$/i.test(clean(n))
+    ? esc(clean(n))
+    : clean(n)
+    ? `<button type="button" class="lnk" data-rep="${esc(clean(n))}" title="Open ${esc(clean(n))} in the Directory">${esc(clean(n))}</button>`
+    : '';
+$('d').addEventListener('click', e => {
+  const b = e.target.closest('[data-rep]');
+  if (!b || !current) return;
+  showApp('dir');
+  if (!visFrame().openRep(b.dataset.rep, storeKey(val(current, 'H')), storeKey(val(current, 'F')), vendor(current)))
+    toast(`${b.dataset.rep} isn't in the visits file or the people report.`);
+});
+
+function visitsTab(r) {
+  const f = followUp(r),
+    vn = vendor(r),
+    dt = x => (visitDate(x) ? fmtDate(visitDate(x)) : 'no date');
+  const vm = latestVisitDate(),
+    stale = vm && f.created && vm < f.created;
+  let v;
+  if (f.up.length) {
+    const x = f.up[0];
+    v = `<div class="fu ok"><b>${repLink(x.rep) || 'A rep'} is scheduled for ${dt(x)}</b><span>${esc(x.form)}</span>${f.up.length > 1 ? `<span>${f.up.length - 1} more visit${f.up.length > 2 ? 's' : ''} scheduled after that.</span>` : ''}</div>`;
+  } else if (f.missed.length) {
+    const x = f.missed[0];
+    v = `<div class="fu warn"><b>${repLink(x.rep) || 'A rep'} was scheduled for ${dt(x)} but hasn't completed the visit</b><span>${esc(x.form)}</span></div>`;
+  } else if (f.doneV.length) {
+    const x = f.doneV[0];
+    v = `<div class="fu done"><b>${repLink(x.rep) || 'A rep'} visited on ${dt(x)}, after this escalation was created</b><span>${esc(x.form)}</span></div>`;
+  } else
+    v = `<div class="fu bad"><b>No rep follow-up is scheduled</b><span>The visit data has no ${esc(vn)} visit at this store${f.created ? ` since ${fmtDate(f.created)}` : ''}.</span>${stale ? `<span>The visit data only goes through ${fmtDate(vm)}, which is before this escalation was created. Import a newer pivot report to see later visits.</span>` : ''}</div>`;
+  // Only visits for this escalation: same store, same vendor, on or after the escalation was created.
+  const a = f.fu
+    .slice()
+    .sort((x, y) => f.up.includes(y) - f.up.includes(x) || (visitDate(y) || 0) - (visitDate(x) || 0));
+  if (!a.length) return v;
+  return (
+    v +
+    visitTable(a, x => (f.up.includes(x) ? 'up' : ''), partsInfo(r)) +
+    `<p class="vnote">${a.length > 10 ? `Showing 10 of ${a.length} visits. ` : ''}${esc(vn)} visits at this store since the escalation was created, newest first.</p>`
+  );
+}
+
+function visitTable(a, cls, p) {
+  const tm = x => (isDate(x) ? x.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) : clean(x)),
+    hrs = x => {
+      const n = parseFloat(x);
+      return isNaN(n) ? '' : n >= 1 ? `${n.toFixed(n % 1 ? 1 : 0)} h` : `${Math.round(n * 60)} min`;
+    };
+  const inStore = x => {
+    const a = tm(x.tin),
+      b = tm(x.tout),
+      g = hrs(x.hg),
+      h = hrs(x.ha);
+    return [
+      a || b ? `${a || '?'} – ${b || '?'}` : '',
+      g ? `Planned ${g}` : '',
+      h && parseFloat(x.ha) > 0 ? `Actual ${h}` : ''
+    ]
+      .filter(Boolean)
+      .join('<br>');
+  };
+  // Parts: shipped or not, then where it went (store or rep). Uses the visit's own "shipped to" column when it has one,
+  // otherwise the escalation's notes: a visit on or after the latest shipped note counts as shipped.
+  const parts = x => {
+    let sh = clean(x.ship);
+    if (!sh && p && p.state === 'shipped' && (!p.last.d || !visitDate(x) || visitDate(x) >= p.last.d))
+      sh = p.dest || '-';
+    const to = /rep/i.test(sh)
+      ? 'To the rep'
+      : /store/i.test(sh)
+        ? 'To the store'
+        : sh === '-'
+          ? 'Destination not in notes'
+          : sh
+            ? 'To ' + esc(sh)
+            : '';
+    return (
+      (sh
+        ? `<span class="ok2 pst">${ICONS.check} Shipped</span><span class="m pto">${to}</span>`
+        : `<span class="m pst">Not shipped</span>`) +
+      (x.mat
+        ? `<span class="m pto" title="${esc(x.mat)}">${esc(x.mat.length > 60 ? x.mat.slice(0, 60) + '…' : x.mat)}</span>`
+        : '')
+    );
+  };
+  return `<div class="tw"><table class="vis"><tr><th>Date</th><th>Call form</th><th>Rep</th><th>Time in store</th><th class="pcol">Parts</th><th>Status</th></tr>${a
+    .slice(0, 10)
+    .map(
+      x =>
+        `<tr class="${cls(x)}"><td>${visitDate(x) ? fmtDate(visitDate(x)) : ''}</td><td>${esc(x.form)}${x.reason || x.type ? `<br><span class="m vt">${esc(x.reason || x.type)}</span>` : ''}</td><td>${repLink(x.rep)}</td><td class="nw">${inStore(x)}</td><td class="pcol">${parts(x)}</td><td class="sti">${statusIcon(x)}</td></tr>`
+    )
+    .join('')}</table></div>`;
+}
+const collapsible = (k, t, body, hint = '', open = true) =>
+  `<details class="card" data-k="${k}"${(openCards[k] ?? open) ? ' open' : ''}><summary>${t}${hint ? `<span class="hint">${hint}</span>` : ''}</summary>${body}</details>`;
+let activeTab = loadSetting('bbEscTab') || 'glance';
+const TABS = [
+  ['glance', 'At a glance'],
+  ['hist', 'History and notes'],
+  ['vis', 'Recent visits at this store']
+];
+
+function showEscalation(r, keep) {
+  if (r !== current) freshNote = '';
+  current = r;
+  const d = deadline(r),
+    s = dueState(r),
+    mapped = new Set(FIELD_GROUPS.flatMap(g => g[1])),
+    other = [],
+    sc = keep ? $('d').scrollTop : 0;
+  for (let ci = 0; ci < headers.length; ci++)
+    if (!mapped.has(ci) && ci !== colIndex('BM') && rows.some(x => x.v[ci] != null && x.v[ci] !== ''))
+      other.push(ci);
+  const g = [...FIELD_GROUPS, ['Other columns', other]].filter(x => x[1].length),
+    c = k => esc(clean(val(r, k))),
+    nv = followUp(r).fu.length;
+  const city = [clean(val(r, 'J')), clean(val(r, 'K'))].filter(Boolean).map(esc).join(', ');
+  const sp = ['', 'Urgent', '7-day follow-up', 'Waiting on parts', 'Issue not provided'][priority(r)] || '';
+  $('d').innerHTML = `<div class="top"><div class="hd">
+ <div class="chips">${priority(r) ? `<span class="tag p${priority(r)}" title="${esc(PRIORITY_LABELS[priority(r)])}">P${priority(r)} · ${sp}</span>` : ''}<span class="due ${s}">${esc(dueText(r))}</span></div>${d ? `<div class="m dln">Deadline ${fmtDateTime(d)}</div>` : ''}
+ <div class="idr2"><div class="idb"><h2 class="vn">${esc(vendor(r))}</h2><div class="sid"><b>Store ${c('F')}</b> · BDS ${c('H') || '?'}</div>
+ <div class="m ids">Best Buy ID #${esc(r.id)}</div></div>
+ ${c('I') || city ? `<div class="addr">${c('I') ? `<div>${c('I')}</div>` : ''}${city ? `<div class="city">${city}</div>` : ''}<a href="https://www.google.com/maps/search/?api=1&amp;query=${encodeURIComponent([clean(val(r, 'I')), clean(val(r, 'J')), clean(val(r, 'K'))].filter(Boolean).join(', '))}" target="_blank" rel="noopener">Open in Google Maps ${ICONS.ext}</a></div>` : ''}</div></div>
+ <div class="side"><div class="sidetop"><span class="tag nx nxp ${nextStepClass(nextStep(r))}">Next step: <b>${esc(nextStep(r))}</b></span></div>${typeof val(r, 'AE') === 'number' ? `<span class="tag age">${Math.round(val(r, 'AE'))} day${Math.round(val(r, 'AE')) === 1 ? '' : 's'} aging</span>` : ''}</div></div>
+ <div class="tabrow"><div class="tabs" role="tablist">${TABS.map(([k, t]) => `<button role="tab" id="tab-${k}" data-tab="${k}" aria-selected="${k === activeTab}" aria-controls="panel">${t}${k === 'vis' && nv ? `<span class="n">${nv}</span>` : ''}</button>`).join('')}</div><button id="copy">Copy summary for email</button></div>
+ <div class="panel" id="panel" role="tabpanel" aria-labelledby="tab-${activeTab}">${activeTab === 'hist' ? history(r) : activeTab === 'vis' ? visitsTab(r) : glanceTab(r)}</div>
+ ${collapsible('quick', 'Quick edits', `<div class="gb">${QUICK_EDIT_COLS.map(ci => fieldInput(r, ci)).join('')}</div>`, 'Frequently updated fields', false)}
+ ${collapsible('all', 'Full record', g.map(([t, cs]) => `<h4 style="margin:6px 0">${t}</h4><div class="gb">${cs.map(ci => fieldInput(r, ci)).join('')}</div>`).join(''), 'All workbook fields, editable', false)}${pendingBar(r)}`;
+  $('d').scrollTop = sc;
+  draw();
+}
+
+// Changing one field can fill in related fields from the workbook's own data.
+const AUTOFILL = {
+  D: (r, v) => {
+    const s = maps.dm2sr[norm(v)];
+    if (s && s !== clean(val(r, 'C'))) {
+      setValue(r, colIndex('C'), s);
+      return `Senior DM set to ${s}, who covers this DM on other escalations.`;
+    }
+  },
+  G: (r, v) => {
+    const s = maps.v2csm[norm(v)];
+    if (s && s !== clean(val(r, 'E'))) {
+      setValue(r, colIndex('E'), s);
+      return `CS manager set to ${s}, who handles ${v} on other escalations.`;
+    }
+  },
+  F: (r, v) => {
+    const u = maps.usl[clean(v)];
+    if (!u) return v ? `Store ${v} is not in the BBY USL store list.` : '';
+    const ch = [
+      ['H', u.bds],
+      ['I', u.addr],
+      ['J', u.city],
+      ['K', u.state]
+    ].filter(([k, x]) => x != null && String(val(r, k) ?? '').trim() !== String(x).trim());
+    ch.forEach(([k, x]) => setValue(r, colIndex(k), typeof x === 'string' ? x.trim() : x));
+    return ch.length ? `Filled in BDS #, address, city and state for store ${v} from the store list.` : '';
+  }
+};
+$('d').addEventListener(
+  'toggle',
+  e => {
+    const k = e.target.dataset?.k;
+    if (k) openCards[k] = e.target.open;
+  },
+  true
+);
+$('d').addEventListener('change', e => {
+  const t = e.target;
+  if (visitImport) {
+    if (t.id === 'vsheet') {
+      visitImport.sheet = t.value;
+      mapSheet();
+      mapView();
+    } else if (t.dataset.map) {
+      visitImport.map[t.dataset.map] = +t.value;
+      mapPreview();
+      const ex = firstDataRow(),
+        x = +t.value >= 0 ? ex[+t.value] : '';
+      t.closest('tr').lastElementChild.textContent = isDate(x) ? fmtDate(x) : (x ?? '');
+    }
+    return;
+  }
+  if (!current || t.dataset.c == null) return;
+  const ci = +t.dataset.c;
+  let v = t.value;
+  if (v === '__other') {
+    const w = document.createElement('span');
+    w.className = 'oth';
+    w.innerHTML = `<input data-c="${ci}" placeholder="Type a value, then press Enter"><button type="button" data-cancel="1">Cancel</button>`;
+    t.replaceWith(w);
+    w.firstChild.focus();
+    return;
+  }
+  const old = current.v[ci];
+  if (t.type === 'datetime-local') v = v ? new Date(v) : null;
+  else if (typeof old === 'number' && v.trim() !== '' && !isNaN(v)) v = Number(v);
+  else if (v === '') v = null;
+  const P = (pending[current.id] ??= {});
+  if (sameValue(v, old)) delete P[ci];
+  else P[ci] = v;
+  if (!Object.keys(P).length) delete pending[current.id];
+  // Update in place: re-rendering here would swallow a click on Review and save that blurred this field.
+  if (t.closest('.oth')) return showEscalation(current, 1);
+  const fl = t.closest('.fl'),
+    on = ci in P;
+  fl.classList.toggle('pend', on);
+  fl.classList.toggle('chg', !on && !!edits[current.id] && colLetter(ci) in edits[current.id]);
+  const bar = $('d').querySelector('.pbar'),
+    n = Object.keys(pending[current.id] || {}).length;
+  if (!n) bar?.remove();
+  else if (bar) bar.querySelector('b').textContent = `${n} unsaved change${n > 1 ? 's' : ''}`;
+  else $('d').insertAdjacentHTML('beforeend', pendingBar(current));
+});
+
+// Pending changes: nothing reaches the overview or list until the person confirms them.
+const sameValue = (a, b) =>
+  isDate(a) || isDate(b) ? isDate(a) && isDate(b) && +a === +b : (a ?? '') === (b ?? '');
+const displayValue = (ci, v) =>
+  v == null || v === ''
+    ? '(blank)'
+    : isDate(v)
+      ? fmtDateTime(v)
+      : DROPDOWNS[colLetter(ci)]?.lab
+        ? DROPDOWNS[colLetter(ci)].lab(String(v))
+        : String(v);
+
+function pendingBar(r) {
+  const n = Object.keys(pending[r.id] || {}).length;
+  if (!n) return '';
+  return `<div class="pbar" role="status"><b>${n} unsaved change${n > 1 ? 's' : ''}</b><span class="m">The overview updates once you confirm.</span><span class="sp"></span><button id="pdis">Discard</button><button class="p" id="prev">Review and save</button></div>`;
+}
+
+function openPendingDialog() {
+  const P = pending[current.id];
+  const o = document.createElement('div');
+  o.className = 'ovl';
+  o.id = 'pconf';
+  o.innerHTML = `<div class="nbox" role="dialog" aria-modal="true" aria-labelledby="ptitle"><h2 id="ptitle">Save ${Object.keys(P).length > 1 ? 'these changes' : 'this change'}?</h2><p class="m" style="margin:0">Escalation #${esc(current.id)}. Saving updates the overview at the top and the list.</p>
+ <div style="overflow:auto"><table class="pchg"><tr><th>Field</th><th>Was</th><th>Now</th></tr>${Object.entries(
+   P
+ )
+   .map(
+     ([ci, v]) =>
+       `<tr><td>${esc(fieldLabel(+ci))}</td><td class="was">${esc(displayValue(+ci, current.v[ci]))}</td><td>${esc(displayValue(+ci, v))}</td></tr>`
+   )
+   .join('')}</table></div>
+ <div class="mbtn"><span class="sp" style="flex:1"></span><button id="pback">Keep editing</button><button class="p" id="pok">Save changes</button></div></div>`;
+  document.body.append(o);
+  $('pok').focus();
+}
+
+function savePending() {
+  const P = pending[current.id],
+    notes = [];
+  let f = false;
+  delete pending[current.id];
+  for (const [c, v] of Object.entries(P)) {
+    const ci = +c;
+    setValue(current, ci, v);
+    const n = AUTOFILL[colLetter(ci)]?.(current, v);
+    if (n) notes.push(n);
+    if (DROPDOWNS[colLetter(ci)] || DATE_COLS.has(ci)) f = true;
+  }
+  $('pconf').remove();
+  if (f) filters();
+  showEscalation(current, 1);
+  const k = Object.keys(P).length;
+  toast(`✓ Saved ${k} change${k > 1 ? 's' : ''}.` + (notes.length ? ' ' + notes.join(' ') : ''));
+}
+document.addEventListener('click', e => {
+  if (!$('pconf')) return;
+  const id = e.target.closest('button')?.id;
+  if (id === 'pok') savePending();
+  else if (id === 'pback' || e.target.id === 'pconf') $('pconf').remove();
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && $('pconf')) $('pconf').remove();
+});
+
+// View Changes: every confirmed edit that differs from the imported FEDR, to carry over into the live file.
+function myChanges() {
+  const out = [];
+  for (const r of rows) {
+    const e = edits[r.id];
+    if (!e) continue;
+    for (const [k, v] of Object.entries(e)) {
+      const ci = colIndex(k),
+        was = originals[r.id]?.[k];
+      if (!sameValue(was, v)) out.push({ r, ci, was, v });
+    }
+  }
+  return out;
+}
+// Grouped vendor -> store -> changes, both sorted by name / store number.
+function groupChanges(list) {
+  const G = new Map();
+  for (const c of list) {
+    const vn = vendor(c.r) || 'No vendor',
+      st = clean(val(c.r, 'F')) || '?';
+    if (!G.has(vn)) G.set(vn, new Map());
+    const S = G.get(vn);
+    if (!S.has(st)) S.set(st, []);
+    S.get(st).push(c);
+  }
+  return [...G]
+    .sort((a, b) => a[0].localeCompare(b[0]))
+    .map(([vn, S]) => [vn, [...S].sort((a, b) => (+a[0] || 0) - (+b[0] || 0) || a[0].localeCompare(b[0]))]);
+}
+const changeCell = c => XLSX.utils.encode_cell({ r: c.r.r, c: toSheetCol(c.ci) });
+const storeLine = r =>
+  [`Store ${clean(val(r, 'F')) || '?'}`, clean(val(r, 'H')) && `BDS ${clean(val(r, 'H'))}`, [clean(val(r, 'J')), clean(val(r, 'K'))].filter(Boolean).join(', ')]
+    .filter(Boolean)
+    .join(' · ');
+function openMyChanges() {
+  const list = myChanges(),
+    groups = groupChanges(list),
+    ids = new Set(list.map(c => c.r.id)).size,
+    o = document.createElement('div');
+  o.className = 'ovl';
+  o.id = 'mych';
+  o.innerHTML = `<div class="nbox wide" role="dialog" aria-modal="true" aria-labelledby="mytitle"><h2 id="mytitle">View Changes</h2>
+ <p class="m" style="margin:0">${list.length ? `${list.length} change${list.length > 1 ? 's' : ''} in ${ids} escalation${ids > 1 ? 's' : ''}, by vendor and store. Cells are on the ${esc(LAYOUT.sheet)} sheet of ${esc(fileName)}.` : 'No changes yet. Edits you save on an escalation show here.'}</p>
+ <div class="mych">${groups
+   .map(
+     ([vn, S]) =>
+       `<section><h3>${esc(vn)}</h3>${S.map(
+         ([, cs]) =>
+           `<div class="mys">${esc(storeLine(cs[0].r))}</div><table class="pchg"><tr><th>Escalation</th><th>Field</th><th>Cell</th><th>Was</th><th>Now</th></tr>${cs
+             .map(
+               c =>
+                 `<tr><td>#${esc(c.r.id)}</td><td>${esc(fieldLabel(c.ci))}</td><td>${changeCell(c)}</td><td class="was">${esc(displayValue(c.ci, c.was))}</td><td>${esc(displayValue(c.ci, c.v))}</td></tr>`
+             )
+             .join('')}</table>`
+       ).join('')}</section>`
+   )
+   .join('')}</div>
+ <div class="mbtn"><span class="sp" style="flex:1"></span><button id="myclose">Close</button></div></div>`;
+  document.body.append(o);
+  $('myclose').focus();
+}
+document.addEventListener('click', e => {
+  if (!$('mych')) return;
+  const id = e.target.closest('button')?.id;
+  if (id === 'myclose' || e.target.id === 'mych') $('mych').remove();
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && $('mych')) $('mych').remove();
+});
+
+function addNote() {
+  const txt = $('ntxt')?.value.trim();
+  if (!txt || !current) {
+    $('ntxt')?.focus();
+    return;
+  }
+  const ini = ($('nini')?.value || '').trim();
+  if (!ini) {
+    $('nini').classList.add('err');
+    $('nini').setAttribute('aria-invalid', 'true');
+    $('nerr').hidden = false;
+    $('nini').focus();
+    return;
+  }
+  saveSetting('bbEscIni', ini);
+  const [, t, k] = roleOf(noteRole),
+    ci = colIndex(k),
+    n = now(),
+    line = `${n.getMonth() + 1}/${n.getDate()}${ini ? ` (${ini})` : ''} - ${txt}`,
+    old = clean(current.v[ci]);
+  freshNote = txt;
+  setValue(current, ci, old ? old + '\n' + line : line);
+  showEscalation(current, 1);
+  toast(`Note added under ${t}.`);
+}
+
+function filterFromPivot(tr) {
+  const f = tr.dataset.f,
+    v = tr.dataset.v;
+  FILTERS.forEach(([id]) => ($(id).value = ''));
+  storeFilter = '';
+  $('s').value = '';
+  if (f === 'store') storeFilter = v.replace(/^Store /, '');
+  else {
+    const el = $(f);
+    el.value = [...el.options].some(o => o.value === v) ? v : '';
+  }
+  draw();
+  {
+    const n = +$('cnt').textContent.split(' ')[0];
+    toast(`Showing ${n} escalation${n === 1 ? '' : 's'} in the list.`);
+  }
+}
+
+function copyForEmail() {
+  const r = current,
+    g = k => clean(val(r, k)),
+    d = deadline(r);
+  const t = [
+    `Best Buy #${g('F')} - ${vendor(r)} - ID ${r.id}`,
+    `Deadline: ${d ? fmtDateTime(d) : 'none'} (${dueText(r)})`,
+    `Priority: ${PRIORITY_LABELS[priority(r)] || 'Not set'}`,
+    `Next step: ${nextStep(r)}`,
+    `Senior DM: ${g('C')} | DM: ${g('D')} | CS manager: ${g('E')}`,
+    `Store: ${g('I')}, ${g('J')}, ${g('K')} (BDS ${g('H')})`,
+    `Best Buy contact: ${g('L')}`,
+    `Planogram: ${g('M')}`,
+    `Reason: ${g('AK') || 'Not set'}`,
+    `Issue: ${g('N')}`
+  ].join('\n');
+  const fb = () => {
+    let a = $('cpy');
+    if (!a) {
+      a = document.createElement('textarea');
+      a.id = 'cpy';
+      a.rows = 10;
+      $('d').querySelector('.top').after(a);
+    }
+    a.value = t;
+    a.select();
+    toast('Select the text below and copy it with Ctrl+C.');
+  };
+  try {
+    navigator.clipboard.writeText(t).then(() => toast('Summary copied. Paste it into your email.'), fb);
+  } catch (e) {
+    fb();
+  }
+}
+$('d').addEventListener('click', e => {
+  const tr = e.target.closest('tr[data-f]');
+  if (tr) return filterFromPivot(tr);
+  const t = e.target.closest('button');
+  if (!t) return;
+  if (t.id === 'pvopen' || t.id === 'pvclose') {
+    $('d')
+      .querySelectorAll('details.pv')
+      .forEach(d => (d.open = t.id === 'pvopen'));
+    return;
+  }
+  if (t.id === 'vok') return mapDone(1);
+  if (t.id === 'vcancel') return mapDone(0);
+  if (t.id === 'prev') return openPendingDialog();
+  if (t.id === 'pdis') {
+    delete pending[current.id];
+    showEscalation(current, 1);
+    return toast('Changes discarded.');
+  }
+  if (t.id === 'addn') addNote();
+  if (t.dataset.role) {
+    noteRole = t.dataset.role;
+    saveSetting('bbEscRole', noteRole);
+    $('d')
+      .querySelectorAll('[data-role]')
+      .forEach(b => b.setAttribute('aria-checked', b === t));
+  }
+  if (t.id === 'copy') copyForEmail();
+  if (t.dataset.cancel) showEscalation(current, 1);
+  if (t.dataset.tab) {
+    activeTab = t.dataset.tab;
+    saveSetting('bbEscTab', activeTab);
+    showEscalation(current, 1);
+    $('tab-' + activeTab)?.focus();
+  }
+  if (t.id === 'more') {
+    $('iss').classList.remove('clamp');
+    t.remove();
+  }
+});
+$('d').addEventListener('input', e => {
+  if (e.target.id === 'nini' && e.target.value.trim()) {
+    e.target.classList.remove('err');
+    e.target.removeAttribute('aria-invalid');
+    $('nerr').hidden = true;
+  }
+});
+$('d').addEventListener('keydown', e => {
+  const t = e.target;
+  if (t.dataset.f && (e.key === 'Enter' || e.key === ' ')) {
+    e.preventDefault();
+    return filterFromPivot(t);
+  }
+  if (t.id === 'ntxt' && e.key === 'Enter' && (e.ctrlKey || e.metaKey)) addNote();
+  if (t.dataset.tab && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')) {
+    const i = TABS.findIndex(x => x[0] === activeTab),
+      n = TABS[(i + (e.key === 'ArrowRight' ? 1 : TABS.length - 1)) % TABS.length][0];
+    activeTab = n;
+    saveSetting('bbEscTab', n);
+    showEscalation(current, 1);
+    $('tab-' + n).focus();
+  }
+});
+$('q').addEventListener('click', e => {
+  const c = e.target.closest('[data-clr]');
+  if (c) {
+    const id = c.dataset.clr;
+    if (id === 'store') storeFilter = '';
+    else $(id).value = '';
+    draw();
+  }
+});
+{
+  const t = $('ftog'),
+    pnl = $('fpanel'),
+    setP = o => {
+      pnl.hidden = !o;
+      t.setAttribute('aria-expanded', o);
+      saveSetting('bbFiltOpen', o ? '1' : '');
+    };
+  setP(loadSetting('bbFiltOpen') === '1');
+  t.onclick = () => setP(pnl.hidden);
+}
+$('pvb').onclick = openMyChanges;
+
+// A one-time easter egg on the footer's "click here": the first-ever click plays a surprise instead,
+// and clicking off the video (or Esc) closes it and opens the Teams chat the link points to.
+{
+  const rrEmbed = 'https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=0',
+    cta = $('cta'),
+    link = $('ctalink'),
+    orig = cta.innerHTML;
+  link.addEventListener('click', e => {
+    if (loadSetting('bbRickrolled')) return;
+    e.preventDefault();
+    saveSetting('bbRickrolled', '1');
+    const ov = document.createElement('div');
+    ov.className = 'rroverlay';
+    ov.innerHTML = `<iframe src="${rrEmbed}" allow="autoplay; encrypted-media" allowfullscreen></iframe><p>Click anywhere off the video to close it.</p>`;
+    document.body.appendChild(ov);
+    cta.textContent = 'Too bad you just got rickrolled.';
+    const close = () => {
+      ov.remove();
+      removeEventListener('keydown', onKey);
+      cta.innerHTML = orig;
+      open(link.href, '_blank', 'noopener');
+    };
+    const onKey = k => k.key === 'Escape' && close();
+    ov.addEventListener('click', close);
+    addEventListener('keydown', onKey);
+  });
+}
+$('list').addEventListener('click', e => {
+  const it = e.target.closest('.it');
+  if (!it) return;
+  const r = rows[+it.dataset.i];
+  follow(clean(val(r, 'H')) || clean(val(r, 'F')));
+  showEscalation(r);
+});
+$('sum').addEventListener('click', e => {
+  const b = e.target.closest('button');
+  if (!b) return;
+  const f = summary.B[+b.dataset.b][3],
+    on = b.classList.contains('act');
+  if ($('fd').value === '__open' && $('fp').value === PRIORITY_LABELS[1]) $('fp').value = '';
+  $('fd').value = '';
+  if (!on)
+    for (const id in f) {
+      const el = $(id),
+        o = [...el.options].find(o => o.value === f[id] || o.value.startsWith(f[id]));
+      el.value = o ? o.value : '';
+    }
+  draw();
+});
+$('clr').onclick = () => {
+  $('s').value = '';
+  follow('');
+  storeFilter = '';
+  FILTERS.forEach(([id]) => ($(id).value = ''));
+  draw();
+};
+['s', 'so', ...FILTERS.map(f => f[0])].forEach(i => $(i).addEventListener('input', draw));
+$('s').addEventListener('input', () => follow($('s').value));
+function importVisits(slot, f) {
+  if (slot === 'cur') {
+    pivotFile = f;
+    visFrame()
+      .loadPivot(f)
+      .then(ok => {
+        if (ok) storeVisitsName = f.name;
+        if (!rows.length) btnState();
+      });
+  }
+  if (rows.length) openVisits(f, slot);
+}
+async function importPeople(f) {
+  busyBtn('rimp', true, 'Opening…');
+  if (await visFrame().loadPeople(f)) peopleName = f.name;
+  busyBtn('rimp', false);
+}
+// A file dropped on the Store Visits or Directory tab. Re-wrapped so this page reads it as its own File.
+function importDropped(view, f) {
+  f = new File([f], f.name, { type: f.type });
+  if (view === 'vis') importVisits('cur', f);
+  else importPeople(f);
+}
+// Import box id -> [its file input, what a picked or dropped file goes to].
+const IMPORTS = {
+  imp: ['file', f => loadWorkbook(f)],
+  vimp: ['vfile', f => importVisits('cur', f)],
+  pimp: ['pfile', f => importVisits('prev', f)],
+  rimp: ['rfile', importPeople]
+};
+Object.entries(IMPORTS).forEach(([id, [fid, load]]) => {
+  const b = $(id);
+  const off = () => b.getAttribute('aria-disabled') === 'true' && (toast('Load the FEDR first.'), true);
+  b.onclick = () => off() || $(fid).click();
+  $(fid).onchange = e => {
+    const f = e.target.files[0];
+    e.target.value = '';
+    if (f) load(f);
+  };
+  b.addEventListener('dragover', e => {
+    e.preventDefault();
+    b.classList.add('over');
+  });
+  b.addEventListener('dragleave', () => b.classList.remove('over'));
+  b.addEventListener('drop', e => {
+    e.preventDefault();
+    e.stopPropagation();
+    b.classList.remove('over');
+    if (!b.disabled && !off() && e.dataTransfer.files[0]) load(e.dataTransfer.files[0]);
+  });
+});
+// A file dropped anywhere else on the page is taken as the FEDR.
+addEventListener('dragover', e => e.preventDefault());
+addEventListener('drop', e => {
+  e.preventDefault();
+  if ($('imports').hidden && e.dataTransfer.files[0]) loadWorkbook(e.dataTransfer.files[0]);
+});
+$('rst').onclick = () => {
+  const b = $('rst');
+  if (!b.dataset.arm) {
+    b.dataset.arm = 1;
+    b.textContent = 'Click again to undo all edits';
+    setTimeout(() => {
+      delete b.dataset.arm;
+      b.textContent = 'Undo all my edits';
+    }, 5000);
+    return;
+  }
+  delete b.dataset.arm;
+  b.textContent = 'Undo all my edits';
+  edits = {};
+  saveEdits();
+  loadWorkbook(null, fileBuffer);
+  toast('All edits undone. Showing the imported values.');
+};
+
+// Text cut off with "…" (or clamped to a few lines) shows in full after a short hover, here and in the Store Visits frame.
+const tip = document.createElement('div');
+tip.id = 'tip';
+tip.hidden = true;
+document.body.append(tip);
+let tipEl = null,
+  tipTimer = 0;
+function cutOff(el) {
+  if (el.matches('input, textarea')) return el.scrollWidth > el.clientWidth + 1 || el.scrollHeight > el.clientHeight + 1;
+  const cs = el.ownerDocument.defaultView.getComputedStyle(el);
+  return (
+    (cs.textOverflow === 'ellipsis' && el.scrollWidth > el.clientWidth + 1) ||
+    (/^\d+$/.test(cs.webkitLineClamp) && el.scrollHeight > el.clientHeight + 1)
+  );
+}
+function hoverTip(t, frame) {
+  // The hovered element, or its parent or grandparent (a bold name inside a cut-off line).
+  const el = [t, t?.parentElement, t?.parentElement?.parentElement].find(e => e?.nodeType === 1 && cutOff(e)) || null;
+  if (el === tipEl) return;
+  tipEl = el;
+  clearTimeout(tipTimer);
+  tip.hidden = true;
+  if (!el) return;
+  tipTimer = setTimeout(() => {
+    const text = (el.matches('input, textarea') ? el.value : el.innerText).replace(/\s+/g, ' ').trim();
+    if (!text) return;
+    const r = el.getBoundingClientRect(),
+      o = frame ? frame.getBoundingClientRect() : { left: 0, top: 0 };
+    tip.textContent = text;
+    tip.hidden = false;
+    const w = tip.offsetWidth,
+      h = tip.offsetHeight,
+      below = o.top + r.bottom + 6;
+    tip.style.left = Math.max(8, Math.min(o.left + r.left, innerWidth - w - 8)) + 'px';
+    tip.style.top = (below + h > innerHeight - 8 ? o.top + r.top - h - 6 : below) + 'px';
+  }, 300);
+}
+addEventListener('mouseover', e => hoverTip(e.target));
+addEventListener('scroll', () => hoverTip(null), true);
+addEventListener('mousedown', () => hoverTip(null));
+// Light/dark toggle. With no saved choice the page follows the device setting.
+const SUN =
+    '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="4" fill="currentColor"/><path d="M10 1.5v2.5M10 16v2.5M1.5 10H4M16 10h2.5M4 4l1.8 1.8M14.2 14.2L16 16M4 16l1.8-1.8M14.2 5.8L16 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>',
+  MOON =
+    '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M16.5 12.5A7 7 0 0 1 7.5 3.5a7 7 0 1 0 9 9z" fill="currentColor"/></svg>';
+const isDark = () =>
+  (document.documentElement.dataset.theme ||
+    (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')) === 'dark';
+
+function paintThemeToggle() {
+  const d = isDark(),
+    t = $('thm');
+  t.innerHTML = `<span class="knob">${d ? MOON : SUN}</span>`;
+  t.setAttribute('role', 'switch');
+  t.setAttribute('aria-checked', d);
+  t.setAttribute('aria-label', 'Dark mode');
+  t.title = d ? 'Dark mode on' : 'Dark mode off';
+  // Store Visits shows the same switch; clicking it clicks this one.
+  const f = $('visView').contentDocument?.getElementById('thm');
+  if (f) {
+    f.innerHTML = t.innerHTML;
+    for (const a of ['role', 'aria-checked', 'aria-label', 'title']) f.setAttribute(a, t.getAttribute(a));
+  }
+}
+{
+  const t = loadSetting('bbEscTheme');
+  if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+}
+$('thm').onclick = () => {
+  const t = isDark() ? 'light' : 'dark';
+  document.documentElement.dataset.theme = t;
+  saveSetting('bbEscTheme', t);
+  paintThemeToggle();
+};
+matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', paintThemeToggle);
+paintThemeToggle();
+
+// ---- V4: Escalations, Store Visits and Directory tabs. Store Visits and Directory are visits.html in a frame;
+// Escalations and Store Visits share one store search.
+const visFrame = () => $('visView').contentWindow;
+// The current visits file imported before a workbook; it is applied once an escalations workbook is loaded.
+let pivotFile = null;
+// Store Visits has no imports of its own: the header's Current visits and People report buttons load it,
+// and it reports read errors here.
+function visitsFileError(t) {
+  toast(t);
+}
+function setStoreSearch(q) {
+  $('s').value = q;
+  follow(q);
+  draw();
+}
+// The followed store: the last store searched, or picked on any tab (an escalation, a store, an assignment row).
+// Switching tabs opens it there, so one store can be traced from the Directory to its visits and escalations.
+let followed = '';
+function follow(q) {
+  followed = String(q ?? '').trim();
+  $('follow').innerHTML = followed
+    ? `<button class="fchip" id="unfollow" title="Stop following this store">Following store <b>${esc(followed)}</b> ${ICONS.x}</button>`
+    : '';
+}
+$('follow').onclick = e => {
+  if (!e.target.closest('#unfollow')) return;
+  follow('');
+  $('s').value = '';
+  draw();
+  visFrame().showStore('');
+};
+// Escalations shows the followed store's escalations and opens the first, unless the open one is already of that store.
+function openFollowedOnEscalations() {
+  if (!rows.length || $('s').value.trim() === followed) return;
+  $('s').value = followed;
+  draw();
+  if (!followed || (current && matches(current, new Set()))) return;
+  const it = $('list').querySelector('.it');
+  if (it) showEscalation(rows[+it.dataset.i]);
+  else toast(`No escalations for store ${followed}.`);
+}
+// Store Visits and Directory send their counts here as [label, count, tone, pill id, on]; they show in the bar
+// where Escalations shows its own. A pill with an id filters that tab's table.
+function showVisitCounts(pills) {
+  $('vsum').innerHTML = pills
+    .map(([t, n, k, id, on]) =>
+      id
+        ? `<button class="pl ${k}${on ? ' act' : ''}" data-pill="${id}" aria-pressed="${on}"><b>${esc(n)}</b>${esc(t)}</button>`
+        : `<span class="pl ${k}"><b>${esc(n)}</b>${esc(t)}</span>`
+    )
+    .join('');
+}
+$('vsum').onclick = e => {
+  const b = e.target.closest('[data-pill]');
+  if (b) visFrame().setPill(b.dataset.pill);
+};
+function showApp(k) {
+  $('escView').hidden = k !== 'esc';
+  $('visView').hidden = k === 'esc';
+  document.body.classList.toggle('on-vis', k === 'vis');
+  document.body.classList.toggle('on-dir', k === 'dir');
+  document.querySelectorAll('#apptabs [role=tab]').forEach(b => b.setAttribute('aria-selected', b.dataset.app === k));
+  if (k !== 'esc') visFrame().showView(k);
+  if (k === 'vis') visFrame().showStore(followed);
+  if (k === 'esc') openFollowedOnEscalations();
+  saveSetting('bbV4App', k);
+}
+function syncFrameTheme() {
+  const t = document.documentElement.dataset.theme,
+    el = $('visView').contentDocument.documentElement;
+  if (t) el.dataset.theme = t;
+  else delete el.dataset.theme;
+}
+$('apptabs').onclick = e => {
+  const b = e.target.closest('[data-app]');
+  if (b) showApp(b.dataset.app);
+};
+new MutationObserver(syncFrameTheme).observe(document.documentElement, { attributeFilter: ['data-theme'] });
+$('visView').addEventListener('load', () => {
+  syncFrameTheme();
+  paintThemeToggle();
+  const k = loadSetting('bbV4App');
+  showApp(k === 'vis' || k === 'dir' ? k : 'esc');
+});
+saveEdits();
+btnState();
+openImports("Let's get started");
+</script></body></html>

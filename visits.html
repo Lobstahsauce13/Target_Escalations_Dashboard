@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Store visits</title><style>
+:root{--ink:#0D161E;--mut:#3E4A55;--line:#E3E7EB;--bg:#E9ECEF;--pan:#fff;--pan2:#F5F6F7;--sel:#E6F1F8;--acc:#0275B2;--acch:#015A8A;--gold:#C0A16B;--hdr:#015A8A;--hbg:#DCE2E8;--zebra:#F8F9FA;--onacc:#fff;--inp:#fff;--bad:#b3261e;--badbg:#fde3e1;--warn:#8f5200;--warnbg:#fff0d4;--ok:#1b7a43;--okbg:#dff1e6;--chip:#EAEDF0;--p3:#5b3fc4;--p3bg:#ebe6fc;--p4:#0e6674;--p4bg:#dcf1f4;--c-ok:#23964F;--c-warn:#D08A1E;--c-acc:#0275B2;--c-bad:#D32F2F;--c-mut:#A7B1BB;--s-mut:#56626E}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--ink:#E9EDF1;--mut:#9AA7B4;--line:#2B3845;--bg:#0D161E;--pan:#1B2733;--pan2:#223140;--sel:#0F3350;--acc:#4DAEE3;--acch:#7CC4EC;--hdr:#0B3552;--hbg:#16212B;--zebra:#1F2B37;--onacc:#0D161E;--inp:#14202A;--bad:#ff8a80;--badbg:#4a1f1c;--warn:#f0b35a;--warnbg:#3d2e12;--ok:#6fd49a;--okbg:#173a26;--chip:#27343F;--p3:#b69cff;--p3bg:#2e2650;--p4:#5ec8dc;--p4bg:#163a40;--c-ok:#6fd49a;--c-warn:#f0b35a;--c-acc:#4DAEE3;--c-bad:#ff8a80;--c-mut:#56626E;--s-mut:var(--mut)}}
+:root[data-theme="dark"]{color-scheme:dark;--ink:#E9EDF1;--mut:#9AA7B4;--line:#2B3845;--bg:#0D161E;--pan:#1B2733;--pan2:#223140;--sel:#0F3350;--acc:#4DAEE3;--acch:#7CC4EC;--hdr:#0B3552;--hbg:#16212B;--zebra:#1F2B37;--onacc:#0D161E;--inp:#14202A;--bad:#ff8a80;--badbg:#4a1f1c;--warn:#f0b35a;--warnbg:#3d2e12;--ok:#6fd49a;--okbg:#173a26;--chip:#27343F;--p3:#b69cff;--p3bg:#2e2650;--p4:#5ec8dc;--p4bg:#163a40;--c-ok:#6fd49a;--c-warn:#f0b35a;--c-acc:#4DAEE3;--c-bad:#ff8a80;--c-mut:#56626E;--s-mut:var(--mut)}
+*{box-sizing:border-box}
+body{margin:0;font:14px/1.45 "Segoe UI",system-ui,sans-serif;color:var(--ink);background:var(--bg)}
+button,select,input{font:inherit;color:inherit}
+select,input{background:var(--inp);border:1px solid var(--line);border-radius:6px;padding:5px 8px;min-height:34px}
+select:focus-visible,input:focus-visible,button:focus-visible{outline:2px solid var(--acc);outline-offset:-1px}
+p{margin:4px 0;color:var(--mut)}h1{font-size:17px;margin:0;font-weight:650}h2{font-size:15px;margin:0 0 8px;font-weight:650}
+/* Layout, as on Escalations: search, filters and the store list in the left panel; the store header and its call forms on the right.
+   The Directory tab uses this page too: rep search and list on the left, the rep's details and this week's assignments on the right. */
+html,body{height:100%}
+#workView{display:grid;grid-template-columns:370px minmax(0,1fr);height:100%}
+#q{display:flex;flex-direction:column;min-height:0;background:var(--pan);border-right:1px solid var(--line)}
+.side{flex:1;min-height:0;display:flex;flex-direction:column}.side[hidden]{display:none}
+#d{min-width:0;overflow:auto;padding:16px 22px 60px}
+.panel{background:var(--pan);border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:12px}
+.muted{color:var(--mut)}.small{font-size:12px}
+.intro{margin:12vh auto;text-align:center;max-width:440px;padding:36px;border:2px dashed var(--line);border-radius:10px;background:var(--pan)}.intro h2{font-size:20px;margin:0}
+/* Search and filters */
+#f,#rf{display:flex;flex-direction:column;gap:6px;padding:10px 16px 8px;border-bottom:1px solid var(--line)}
+.srow{display:flex;gap:6px}
+/* The search hint is an overlay, not a placeholder, so part of it can be smaller and darker. */
+.sbox{flex:1;min-width:0;position:relative;display:flex}
+.sph{position:absolute;left:10px;top:50%;transform:translateY(-50%);white-space:nowrap;color:var(--s-mut);pointer-events:none}.sph small{font-size:11px;color:var(--ink)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .sph small{color:#6f7c89}}
+:root[data-theme="dark"] .sph small{color:#6f7c89}
+.sbox input:not(:placeholder-shown)+.sph{display:none}
+.sbox input{flex:1;min-width:0;min-height:0;padding:6px 9px;background:var(--pan2);border-color:transparent;border-radius:10px}.sbox input:focus{background:var(--inp);border-color:var(--acc);outline:none}
+#ftog{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border:1px solid transparent;border-radius:10px;background:var(--pan2);font-size:13px;font-weight:600;color:var(--mut);cursor:pointer}#ftog svg{width:15px;height:15px}
+#ftog[aria-expanded="true"],#ftog:has(#fcount:not(:empty)){color:var(--acc);background:var(--sel)}
+#fcount:not(:empty){background:var(--acc);color:var(--onacc);border-radius:10px;font-size:11px;padding:0 6px;margin-left:2px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.g2 select{min-width:0;width:100%;min-height:0;padding:5px 6px;background:var(--pan2);border-color:transparent;font-size:13px;color:var(--ink)}.g2 select:hover{border-color:var(--line)}
+.g2 select:has(option:checked:not([value=""])){background:var(--sel);border-color:var(--acc);color:var(--acc);font-weight:600}
+.fbar{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center;font-size:13px;white-space:nowrap}.sp{flex:1}
+button.lnk{border:0;background:none;padding:0;color:var(--acc);text-decoration:underline;cursor:pointer}
+/* Store and rep lists, like the escalations list */
+.list{flex:1;min-height:0;overflow:auto}
+/* Rows off screen skip layout, so a list of every store stays quick to redraw. The size stands in for their content height
+   (a row is 60.5px with its padding and border), so the list does not jump when it is redrawn. */
+.it{content-visibility:auto;contain-intrinsic-size:auto 41.5px;display:block;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--line);border-left:4px solid transparent;border-radius:0;padding:9px 16px;cursor:pointer}
+.it:hover{background:var(--pan2)}.it.sel{background:var(--sel);border-left-color:var(--acc)}.it.late{border-left-color:var(--bad)}
+.l1{display:flex;gap:6px;align-items:baseline}.l2{display:flex;gap:4px;align-items:center;margin-top:3px;font-size:12.5px;color:var(--mut)}
+.l1 .m,.l2 .txt{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.l1 .m{color:var(--mut)}
+.tag{flex:none;margin-left:auto;padding:0 7px;border-radius:10px;font-size:12px;background:var(--chip);color:var(--mut);white-space:nowrap}.tag.ok{background:var(--okbg);color:var(--ok)}.tag.acc{background:var(--sel);color:var(--acc)}.tag.warn{background:var(--warnbg);color:var(--warn)}
+.none{margin:0;padding:12px 16px}
+/* Store header, laid out like the Escalations one: store details on the left, the assignment status chart on the right */
+.top{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:flex-start;background:var(--hbg);border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:12px}
+.top[hidden]{display:none}
+/* The chart or rep counts sit right of the details while the details keep 200px, enough for "Store 1092 · BDS 252426"; with less room they wrap below. */
+.top>.hd{flex:1 1 200px;min-width:0}
+.idr2{display:flex;flex-wrap:wrap;align-items:flex-start;gap:8px 0}.idr2>*{padding-right:18px}.idr2>*+*{padding-left:18px;border-left:2px solid var(--line)}
+.vn{font-size:20px;font-weight:700;line-height:1.2;margin:0}.sid{font-size:14px;margin-top:3px}.ids{margin-top:2px;font-size:12.5px;color:var(--mut)}
+.addr{font-size:13.5px;line-height:1.35}.addr .city{font-size:17px;font-weight:600;line-height:1.3}.addr a{font-size:12.5px;display:inline-block;margin-top:2px;color:var(--acc)}
+.ic{width:1em;height:1em;display:inline-block;vertical-align:-.15em}
+.chart{flex:none;display:flex;align-items:center;gap:12px}
+.chart h2{font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--mut);margin:0 0 4px}
+.donut{flex:none;width:64px;height:64px;border-radius:50%;position:relative;background:var(--chip)}.donut:after{content:"";position:absolute;inset:14px;border-radius:50%;background:var(--hbg)}
+.legend{display:grid;grid-template-columns:repeat(2,max-content);gap:3px 14px;font-size:12.5px;color:var(--mut)}
+.swatch{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px}
+/* Directory: the rep's details in a header like the store one, with their counts on the right */
+.rc-facts{display:grid;grid-template-columns:max-content 1fr;gap:4px 14px;margin:8px 0 0}.rc-facts dt{color:var(--mut);font-size:12.5px}.rc-facts dd{margin:0;overflow-wrap:anywhere;min-width:0}
+.rc-facts a{color:var(--acc);font-weight:600;text-decoration:none}.rc-facts a:hover{text-decoration:underline}
+.rc-note{color:var(--mut);font-size:12.5px;margin:8px 0 0}
+.stats{flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:6px}.stats span{background:var(--pan);border:1px solid var(--line);border-radius:8px;padding:2px 10px;font-size:12.5px;color:var(--mut)}
+.range{margin-left:6px;font-size:13px;font-weight:400;color:var(--mut)}
+/* Directory: State and Supervisor filters, store pills above the week table, the completion % in the chart,
+   and the rows of the escalation a rep was opened from */
+#dfp[hidden]{display:none}
+.chips{display:flex;flex-wrap:nowrap;gap:6px;margin:0 0 10px;overflow-x:auto}.chips[hidden]{display:none}.chips button{--cc:var(--mut);flex:none;white-space:nowrap;padding:3px 12px;border:1px solid var(--cc);border-radius:14px;background:color-mix(in srgb,var(--cc) 12%,var(--pan));font-size:12.5px;color:var(--ink);cursor:pointer}.chips button b{margin-left:5px;font-weight:600}.chips button[aria-pressed="true"]{background:var(--cc);color:#fff;font-weight:600}
+.chips button.all[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--pan)}.chips button.mer{--cc:var(--line);background:var(--pan);color:var(--mut)}.chips button.mer[aria-pressed="true"]{background:var(--sel);border-color:var(--acc);color:var(--acc)}
+.donut b{position:absolute;inset:0;z-index:1;display:grid;place-items:center;font-size:13px}
+tr.esc-hl td{background:var(--sel)}tr.esc-hl td:first-child{box-shadow:inset 4px 0 var(--acc)}
+/* Theme switch, the same one as on the Escalations panel */
+.foot{display:flex;justify-content:flex-end;padding:8px 16px 5px;border-top:1px solid var(--line)}
+#thm{width:40px;height:22px;padding:0;border-radius:999px;background:var(--chip);border:1px solid var(--line);position:relative;cursor:pointer}#thm[aria-checked="true"]{background:var(--acc);border-color:var(--acc)}
+#thm .knob{position:absolute;top:1px;left:1px;width:18px;height:18px;border-radius:50%;background:var(--pan);color:var(--mut);display:flex;align-items:center;justify-content:center;box-shadow:0 1px 2px rgba(0,0,0,.25);transition:transform .15s}
+#thm[aria-checked="true"] .knob{transform:translateX(18px);color:var(--acc)}#thm .knob svg{width:11px;height:11px}
+@media(prefers-reduced-motion:reduce){#thm .knob{transition:none}}
+/* Table */
+.bar{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:baseline}.bar h2{margin:0 0 10px}
+.counts{font-size:12.5px;color:var(--mut)}
+.tablewrap{overflow:auto;max-height:70vh;border:1px solid var(--line);border-radius:10px}
+table{width:100%;border-collapse:collapse;font-size:13px;white-space:nowrap}
+th{text-align:left;position:sticky;top:0;z-index:1;background:var(--hbg);color:var(--mut);font-size:12px;font-weight:600;padding:8px 9px;border-bottom:1px solid var(--line)}
+td{padding:7px 9px;border-bottom:1px solid var(--line);vertical-align:top}
+:is(#workRows,#weekRows) tr:nth-child(even) td{background:var(--zebra)}
+:is(#workRows,#weekRows) tr{cursor:pointer}:is(#workRows,#weekRows) tr:hover td{background:var(--pan2)}
+:is(#workRows,#weekRows) tr.selected td,:is(#workRows,#weekRows) tr.selected:hover td{background:var(--sel)!important}
+:is(#workRows,#weekRows) tr.selected td:first-child{box-shadow:inset 4px 0 var(--acc)!important}
+:is(#workRows,#weekRows) tr:focus-visible{outline:2px solid var(--acc);outline-offset:-2px}
+.priority-row-p1 td:first-child{box-shadow:inset 4px 0 var(--bad)}.priority-row-p2 td:first-child{box-shadow:inset 4px 0 var(--warn)}.priority-row-p3 td:first-child{box-shadow:inset 4px 0 var(--p3)}
+:is(#workRows,#weekRows) tr.past-due td{background:color-mix(in srgb,var(--badbg) 55%,var(--pan))}:is(#workRows,#weekRows) tr.not-scheduled td{background:color-mix(in srgb,var(--warnbg) 55%,var(--pan))}
+.name{font-weight:650;color:var(--ink)}
+.empty{padding:28px;text-align:center;color:var(--mut);white-space:normal}
+.priority-col,.revisit-col{width:62px;text-align:center!important;padding-left:5px!important;padding-right:5px!important}
+.chain-number-col{text-align:center!important}
+.assignment-table td:nth-child(4){max-width:170px}.assignment-table td:nth-child(5){max-width:230px;overflow:hidden;text-overflow:ellipsis}
+.location-cell{white-space:normal!important}.location-address{display:block;margin-top:2px;font-size:12px;line-height:1.25;color:var(--mut);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rep-contact{display:block;color:var(--mut);font-size:12px;margin-top:2px}
+.date-week{color:var(--ok);font-weight:600}
+/* Chips and badges */
+.badge{display:inline-block;padding:1px 9px;border-radius:10px;font-size:12px;background:var(--chip);color:var(--ink)}
+.priority{font-weight:700}.priority-number{min-width:28px;text-align:center}
+.priority.p1{background:var(--badbg);color:var(--bad)}.priority.p2{background:var(--warnbg);color:var(--warn)}.priority.p3{background:var(--p3bg);color:var(--p3)}.priority.other{background:var(--chip);color:var(--mut)}
+.status-sched{background:var(--sel);color:var(--acc);font-weight:600}.status-not-sched{background:var(--warnbg);color:var(--warn);font-weight:600}.status-completed{background:var(--okbg);color:var(--ok);font-weight:600}.status-exception{background:var(--badbg);color:var(--bad);font-weight:600}
+.past-due .badge.status-sched,.past-due .badge.status-not-sched,.past-due .badge.status-exception{background:var(--bad);color:var(--pan)}
+.shipping-yes{background:var(--okbg);color:var(--ok);font-weight:600}.shipping-no{background:var(--badbg);color:var(--bad);font-weight:600}
+.revisit-icon{display:inline-flex;width:28px;height:28px;align-items:center;justify-content:center;border-radius:50%;font-weight:700;font-size:15px;line-height:1;background:var(--chip);color:var(--mut)}
+.revisit-escalation,.revisit-closure{background:var(--badbg);color:var(--bad)}.revisit-qa,.revisit-generic{background:var(--p3bg);color:var(--p3)}.revisit-material{background:var(--okbg);color:var(--ok)}.revisit-vendor{background:var(--warnbg);color:var(--warn)}.revisit-reschedule{background:var(--sel);color:var(--acc)}.revisit-original{background:var(--p4bg);color:var(--p4)}
+/* Details cells */
+.shipping-cell{min-width:150px;line-height:1.5}.shipping-line{display:block}.shipping-line strong{color:var(--mut);font-weight:600}.shipping-details{margin-top:3px}
+:is(#workRows,#weekRows) td:last-child{white-space:normal;min-width:260px;max-width:440px;line-height:1.45}
+details summary{cursor:pointer;color:var(--acc);font-weight:600}
+.detail-body{padding:8px 10px;margin-top:4px;background:var(--pan2);border-radius:6px;line-height:1.5;overflow-wrap:anywhere;white-space:normal}.detail-body div{margin:4px 0}.detail-body strong{color:var(--mut);font-weight:600}
+/* Responsive */
+@media(max-width:800px){html,body{height:auto}#workView{display:block;height:auto}#q{border-right:0;border-bottom:1px solid var(--line)}.list{max-height:55vh}#d{overflow:visible;padding:12px 16px 60px}}
+@media(max-width:600px){.panel{padding:12px}}
+
+/* Skeleton placeholders while a file imports (same as the parent page's). */
+.sk{position:relative;overflow:hidden;background:var(--chip);border-radius:6px;height:12px;margin:8px 0}
+.sk::after{content:'';position:absolute;inset:0;transform:translateX(-100%);background:linear-gradient(90deg,transparent,var(--pan),transparent);opacity:.8;animation:shine 1.3s ease-in-out infinite;will-change:transform}
+@keyframes shine{to{transform:translateX(100%)}}
+@media(prefers-reduced-motion:reduce){.sk::after{animation-duration:3s}}
+.sk.h{height:20px;width:45%}.skit{padding:10px 16px;border-bottom:1px solid var(--line)}
+</style></head><body><div id="workView"><aside id="q"><div id="visSide" class="side"><div id="f">
+<div class="srow"><label class="sbox"><input id="search" type="search" inputmode="numeric" autocomplete="off" placeholder=" " aria-label="Search Store (BDS/Best Buy #)"><span class="sph" aria-hidden="true">Search Store <small>(BDS/Best Buy #)</small></span></label><button id="ftog" type="button" aria-expanded="false" aria-controls="fpanel"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 5h14M6 10h8M8.5 15h3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Filters<span id="fcount"></span></button></div>
+<div id="fpanel" hidden><div class="g2"><select id="chain" aria-label="Chain"><option value="">All chains</option></select><select id="project" aria-label="Project"><option value="">All projects</option></select><select id="manager" aria-label="District manager / territory"><option value="">All territories</option></select><select id="state" aria-label="State"><option value="">All states</option></select><select id="priorityFilter" aria-label="Priority"><option value="">All priorities</option></select><select id="statusFilter" aria-label="Status"><option value="">All statuses</option></select><select id="wave" aria-label="Wave"><option value="">All waves</option></select><select id="waveDate" aria-label="Wave / scheduled date"><option value="">All dates</option></select></div></div>
+<div class="fbar"><span id="cnt" class="muted"></span><span class="sp"></span><button id="clr" type="button" class="lnk">Clear</button></div></div>
+<div id="stores" class="list" aria-label="Stores"></div></div>
+<div id="dirSide" class="side" hidden><div id="rf">
+<div class="srow"><label class="sbox"><input id="repSearch" type="search" autocomplete="off" placeholder=" " aria-label="Search Rep (name or person ID)"><span class="sph" aria-hidden="true">Search Rep <small>(name or person ID)</small></span></label></div>
+<div id="dfp" class="g2" hidden><select id="dstate" aria-label="Home state"><option value="">All states</option></select><select id="dsup" aria-label="Supervisor"><option value="">All supervisors</option></select></div>
+<div class="fbar"><span id="rcnt" class="muted"></span><span class="sp"></span><button id="rclr" type="button" class="lnk">Clear</button></div></div>
+<div id="reps" class="list" aria-label="Reps"></div></div>
+<div class="foot"><button id="thm" type="button"></button></div></aside>
+<section id="d"><div id="visMain"><div id="empty" class="intro"><h2>Import this week's pivot report to begin</h2><p>Drop this week's pivot report here, or use the files button at the top right. The file is read in your browser only.</p></div>
+<div id="storeTop" class="top" hidden><div id="storeInfo" class="hd"></div><div class="chart"><div id="donut" class="donut"></div><div><h2>Assignment status</h2><div id="legend" class="legend"></div></div></div></div>
+<section id="workPanel" class="panel" hidden><div class="bar"><h2>Assignments</h2><span id="workCount" class="counts"></span></div><div class="tablewrap"><table class="assignment-table"><thead><tr><th class="priority-col">Priority</th><th>Store</th><th class="chain-number-col">Chain #</th><th>Location</th><th>Project / wave</th><th>Rep</th><th class="revisit-col">Revisit?</th><th>Status</th><th>Scheduled date / time</th><th>Goal / actual</th><th>Materials shipping</th><th>Revisit notes</th></tr></thead><tbody id="workRows"></tbody></table></div></section></div>
+<div id="dirMain" hidden><div id="dirEmpty" class="intro"></div>
+<div id="repTop" class="top" hidden><div id="repInfo" class="hd"></div><div class="chart"><div id="rdonut" class="donut"></div><div><h2 id="rchartT">This week</h2><div id="rlegend" class="legend"></div></div></div><div id="repStats" class="stats"></div></div>
+<section id="weekPanel" class="panel" hidden><div class="bar"><h2><span id="weekTitle">This week</span><span id="weekRange" class="range"></span></h2><span id="weekCount" class="counts"></span></div><div id="storeChips" class="chips" role="group" aria-label="Stores" hidden></div><div class="tablewrap"><table class="assignment-table"><thead><tr><th class="priority-col">Priority</th><th>Store</th><th class="chain-number-col">Chain #</th><th>Location</th><th>Project / wave</th><th class="revisit-col">Revisit?</th><th>Status</th><th>Scheduled date / time</th><th>Goal / actual</th><th>Materials shipping</th><th>Revisit notes</th></tr></thead><tbody id="weekRows"></tbody></table></div></section></div></section></div>
+<script src="./xlsx.full.min.js"></script><script>
+const $=id=>document.getElementById(id), esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));let work=[],selectedKey='',people=new Map(),peopleRows=new Map(),peopleHeaders=[],reps=new Map(),selStore='',selRep='',storeTotal=0;const fmt=n=>n.toLocaleString();const val=(r,k)=>String(r[k]??'').trim();
+// Filter selects in the left panel: [id, column, empty option]. "__date" filters on the day of Visit Date Scheduled.
+const FILTERS=[['chain','Chain Name','All chains'],['project','Call Form Name','All projects'],['manager','FOM Territory','All territories'],['state','Store State','All states'],['priorityFilter','Current Priority Level','All priorities'],['statusFilter','Scheduled Status','All statuses'],['wave','Wave Name','All waves'],['waveDate','__date','All dates']];
+const dateKey=v=>{let d=date(v);return d?d.toISOString().slice(0,10):''},cell=(r,k)=>k==='__date'?dateKey(r['Visit Date Scheduled']):val(r,k);
+function date(v){if(v instanceof Date)return isNaN(v)?null:v;if(typeof v==='number'){let d=new Date(Date.UTC(1899,11,30)+v*86400000);return isNaN(d)?null:d}if(!v)return null;let d=new Date(v);return isNaN(d)?null:d}function ds(v){let d=date(v);return d?d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric',timeZone:'UTC'}):'—'}function monday(d){let x=new Date(Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate()));x.setUTCDate(x.getUTCDate()-(x.getUTCDay()+6)%7);return x}function inWeek(v){let d=date(v);if(!d)return false;let a=monday(new Date()),b=new Date(a);b.setUTCDate(a.getUTCDate()+7);return d>=a&&d<b}function unique(rows,k){return [...new Set(rows.map(r=>cell(r,k)).filter(Boolean))].sort((a,b)=>a.localeCompare(b))}function options(id,k,label){let old=$(id).value,items=unique(work,k);$(id).innerHTML='<option value="">'+label+'</option>'+items.map(x=>'<option value="'+esc(x)+'">'+esc(k==='__date'?ds(x):x)+'</option>').join('');$(id).value=items.includes(old)?old:''}function msg(s,bad=false){if(bad)parent.visitsFileError(s)}
+// Skeletons fill the list, header and table while a file is parsed; the next render replaces them.
+const nextFrame=()=>new Promise(r=>requestAnimationFrame(()=>setTimeout(r,0)));
+const skLines=(...w)=>w.map(x=>`<div class="sk" style="width:${x}%"></div>`).join(''),skList=n=>Array.from({length:n},(_,i)=>`<div class="skit">${skLines(60-i%3*10,85)}</div>`).join(''),skRows=(n,c)=>Array.from({length:n},()=>`<tr>${Array.from({length:c},(_,i)=>`<td>${skLines(i%2?80:60)}</td>`).join('')}</tr>`).join('');
+function skelWork(){$('empty').hidden=true;$('storeTop').hidden=$('workPanel').hidden=false;$('stores').innerHTML=skList(10);$('storeInfo').innerHTML='<div class="sk h"></div>'+skLines(30,55,40);$('legend').innerHTML=skLines(70,50,60);$('workCount').textContent='';$('workRows').innerHTML=skRows(8,12);skelDir()}
+function skelDir(){$('dirEmpty').hidden=true;$('repTop').hidden=$('weekPanel').hidden=false;$('reps').innerHTML=skList(10);$('repInfo').innerHTML='<div class="sk h"></div>'+skLines(30,55,45,50);$('repStats').innerHTML='';$('weekCount').textContent='';$('weekRows').innerHTML=skRows(6,11)}
+async function readPivot(file){if(!window.XLSX){msg('Priority Pivot: Excel reader did not load. Refresh the page.',true);return false}try{skelWork();await nextFrame();let wb=XLSX.read(await file.arrayBuffer(),{type:'array',cellDates:true,sheets:'Data'}),dataSheet=wb.Sheets.Data;if(!dataSheet)throw Error('Missing “Data” sheet.');let rows=XLSX.utils.sheet_to_json(dataSheet,{defval:'',raw:true}),afHeader=dataSheet.AF1&&dataSheet.AF1.v;let required=['Scheduled Status','BDS Store ID','Call Form Name','Rep Person ID','FOM Territory'];let headers=Object.keys(rows[0]||{}),missing=required.filter(x=>!headers.includes(x));if(missing.length)throw Error('Missing columns: '+missing.join(', '));work=rows;for(let i=0;i<work.length;i++){let r=work[i];r.__revisitAF=afHeader?r[afHeader]:'';r.__rowKey=String(r['Assignment ID']||'row-'+i)}selectedKey='';selStore='';storeTotal=new Set(work.map(storeKey)).size;for(let [id,k,label] of FILTERS)options(id,k,label);buildReps();renderWork();renderDir();return true}catch(e){renderWork();renderDir();msg('Priority Pivot: '+e.message,true);return false}}
+function peopleMsg(s,bad=false){if(bad)parent.visitsFileError(s)}
+async function readPeople(file){if(!window.XLSX){peopleMsg('People Report: Excel reader did not load. Refresh the page.',true);return false}try{skelDir();await nextFrame();let wb=XLSX.read(await file.arrayBuffer(),{type:'array',cellDates:true});let sheet=wb.Sheets['People Report'];if(!sheet)throw Error('Missing “People Report” sheet.');let rows=XLSX.utils.sheet_to_json(sheet,{defval:'',raw:true});let required=['Person ID','Home Phone','Mobile Phone'];let headers=Object.keys(rows[0]||{}),missing=required.filter(x=>!headers.includes(x));if(missing.length)throw Error('Missing columns: '+missing.join(', '));let next=new Map(),full=new Map();for(let r of rows){let id=val(r,'Person ID');if(!id)continue;let existing=next.get(id)||{};next.set(id,{home:existing.home||val(r,'Home Phone'),mobile:existing.mobile||val(r,'Mobile Phone')});let f=full.get(id)||{};for(let h of headers)if(!val(f,h)&&val(r,h))f[h]=r[h];full.set(id,f)}people=next;peopleRows=full;peopleHeaders=headers;personOptions('dstate',STATE_RX,'All states');personOptions('dsup',SUP_RX,'All supervisors');buildReps();renderDir();renderWork();return true}catch(e){renderDir();peopleMsg('People Report: '+e.message,true);return false}}
+function projectKey(r){return [val(r,'BDS Store ID')||val(r,'Chain Name')+'|'+val(r,'Chain Store #'),val(r,'Call Form Name'),val(r,'Wave Name')].join('|')}
+// A search matches the start of a BDS Store ID or chain store number, so the store list narrows as you type.
+function atStore(r,q){return ['BDS Store ID','Chain Store #'].some(k=>val(r,k).toLowerCase().startsWith(q))}
+function filteredWork(){let q=$('search').value.trim().toLowerCase(),on=FILTERS.filter(([id])=>$(id).value).map(([id,k])=>[k,$(id).value]);return work.filter(r=>(!q||atStore(r,q))&&on.every(([k,v])=>cell(r,k)===v))}
+function hours(v){if(v===null||v===undefined||v===''||String(v).toLowerCase()==='none')return '—';let n=Number(v);return Number.isFinite(n)?`${Number(n.toFixed(2))} h`:esc(v)}
+function revisitInfo(r){let x=val(r,'__revisitAF')||val(r,'VisitGoalReasonName');if(/store escalation/i.test(x))return{kind:'escalation',icon:'⚠',label:'Store escalation',source:x};if(/store closure revisit/i.test(x))return{kind:'closure',icon:'⊘',label:'Store closure revisit',source:x};if(/qa revisit/i.test(x))return{kind:'qa',icon:'↻',label:'QA revisit',source:x};if(/material revisit/i.test(x))return{kind:'material',icon:'▣',label:'Material revisit',source:x};if(/parts\s*\/\s*vendor/i.test(x))return{kind:'vendor',icon:'⚙',label:'Parts or vendor',source:x};if(/team reschedule/i.test(x))return{kind:'reschedule',icon:'↪',label:'Team reschedule',source:x};if(/original visit/i.test(x))return{kind:'original',icon:'1',label:'Original visit',source:x};if(/revisit/i.test(x))return{kind:'generic',icon:'↻',label:'Revisit',source:x};return{kind:'unknown',icon:'?',label:'Not stated',source:x}}
+function revisit(r){return revisitInfo(r).label}
+function shippingLabel(r,key){let x=val(r,key);return /^yes$/i.test(x)?'Yes':/^no$/i.test(x)?'No':'Not stated'}
+function statusClass(x){let s=String(x||'').toLowerCase();return s==='sched this week'?'status-sched':s==='not sched this week'?'status-not-sched':s==='completed'?'status-completed':s&&s!=='blank'?'status-exception':''}function statusColor(x){let s=String(x||'').toLowerCase();return s==='sched this week'?'var(--c-acc)':s==='not sched this week'?'var(--c-warn)':s==='completed'?'var(--c-ok)':s&&s!=='blank'?'var(--c-bad)':'var(--c-mut)'}
+function priorityClass(r){let m=/^Priority\s+(\d+)/i.exec(val(r,'Current Priority Level'));return m&&['1','2','3'].includes(m[1])?'p'+m[1]:'other'}
+function priorityNumber(r){let m=/^Priority\s+(\d+)/i.exec(val(r,'Current Priority Level'));return m?m[1]:'?'}
+// One table row. Store Visits and Directory list assignments with the same columns.
+// rep: false leaves out the Rep column, for the Directory, where every row is the same rep.
+function rowHtml(r,today,rep=true){
+  let rv=revisitInfo(r),reason=rv.source,qa=val(r,'QA Reason'),required=shippingLabel(r,'Shipped Materials Required'),ship=shippingLabel(r,'Have Materials Shipped'),destination=val(r,'Materials Destination'),available=val(r,'Date Available'),timeIn=val(r,'Scheduled Time In'),timeOut=val(r,'Scheduled Time Out');
+  let contact=people.get(val(r,'Rep Person ID'));let contactHtml=contact?[['Mobile',contact.mobile],['Home',contact.home]].filter(([,number])=>number).map(([label,number])=>`<span class="rep-contact">${label}: ${esc(fmtPhone(number))}</span>`).join(''):'';
+  let time=[timeIn,timeOut].filter(Boolean).join('–')||'Time not entered';
+  let itemFields=[['Materials to store','Materials to Store Description'],['Parts to store','Parts to Store Description'],['Materials to rep','Materials to Rep Description'],['Parts to rep','Parts to Rep Description']];
+  let items=itemFields.filter(([label,key])=>val(r,key)&&val(r,key).toLowerCase()!=='none').map(([label,key])=>`<div><strong>${label}:</strong> ${esc(val(r,key))}</div>`).join('');
+  let shippingDetails=ship==='Yes'?`<details class="shipping-details"><summary>Materials shipped</summary><div class="detail-body">${items||'<div>No item descriptions entered.</div>'}</div></details>`:'';
+  return `<tr data-key="${esc(r.__rowKey)}" tabindex="0" class="priority-row-${priorityClass(r)} ${rowState(r,today)}${selectedKey===r.__rowKey?' selected':''}${!rep&&isEscRow(r)?' esc-hl':''}"><td class="priority-col"><span class="badge priority priority-number ${priorityClass(r)}" title="${esc(val(r,'Current Priority Level')||'Priority not stated')}" aria-label="${esc(val(r,'Current Priority Level')||'Priority not stated')}">${esc(priorityNumber(r))}</span></td><td><span class="name">${esc(val(r,'Store Name')||'Unknown store')}</span><br><span class="small muted">BDS ${esc(val(r,'BDS Store ID')||'—')}</span></td><td class="chain-number-col">${esc(val(r,'Chain Store #')||'—')}</td><td class="location-cell"><span>${esc([val(r,'Store City'),val(r,'Store State')].filter(Boolean).join(', ')||'—')}</span>${val(r,'Store Address')?`<span class="location-address" title="${esc(val(r,'Store Address'))}">${esc(val(r,'Store Address'))}</span>`:''}</td><td><span class="name">${esc(val(r,'Call Form Name'))}</span><br><span class="small muted">${esc(val(r,'Wave Name'))}</span></td>${rep?`<td>${esc(val(r,'Rep Name')||'—')}${contactHtml}</td>`:''}<td class="revisit-col"><span class="revisit-icon revisit-${rv.kind}" title="Column AF: ${esc(reason||'Not stated')}" aria-label="Column AF visit type: ${esc(reason||'Not stated')}">${rv.icon}</span></td><td><span class="badge ${statusClass(val(r,'Scheduled Status'))}">${esc(val(r,'Scheduled Status')||'Blank')}</span></td><td class="${inWeek(r['Visit Date Scheduled'])?'date-week':''}">${ds(r['Visit Date Scheduled'])}<br><span class="small muted">${esc(time)}</span></td><td>Goal: ${hours(r['Total Goal Hours'])}<br>Actual: ${hours(r['In-Store Hours Actual'])}</td><td class="shipping-cell"><span class="shipping-line"><strong>Required:</strong> <span class="badge ${required==='Yes'?'shipping-yes':required==='No'?'shipping-no':''}">${esc(required)}</span></span><span class="shipping-line small"><strong>To:</strong> ${esc(destination||'Not stated')}</span><span class="shipping-line small"><strong>Shipped:</strong> ${esc(ship)}</span>${available?`<span class="shipping-line small"><strong>Available:</strong> ${esc(ds(r['Date Available']))}</span>`:''}${shippingDetails}</td><td class="detail-cell"><details><summary>View details</summary><div class="detail-body"><div><strong>Visit goal / revisit type (AF):</strong> ${esc(reason||'Not entered')}</div><div><strong>Reason / instructions (AG):</strong> ${esc(qa||'Not entered')}</div><div><strong>Report entered:</strong> ${ds(r['Date Report Entered'])}</div></div></details></td></tr>`
+}
+// wait: milliseconds before the table is redrawn. Typing passes one, so the store list keeps up with each keystroke
+// and the table, which takes a moment to lay out when it holds hundreds of rows, is drawn once typing pauses.
+let tableTimer=0;
+// Count pills in the parent's bar, for the table this view shows. All but Store projects filter the table;
+// clicking the active pill again goes back to the view's default (everything on Store Visits, this week on Directory).
+const isDone=r=>val(r,'Scheduled Status').toLowerCase()==='completed';
+const PILLS=[['all','Assignments','',()=>true],['projects','Store projects','',null],['open','Not completed','warn',r=>!isDone(r)],['week','Scheduled this week','acc',r=>inWeek(r['Visit Date Scheduled'])],['done','Completed','ok',isDone]];
+const PILL_DEFAULT={vis:'all',dir:'week'};
+let view='vis',pill={...PILL_DEFAULT},pillBase={vis:null,dir:null};
+const pillTest=v=>PILLS.find(x=>x[0]===pill[v])[3];
+function sendPills(v,base){pillBase[v]=base;if(v!==view)return;parent.showVisitCounts(base?PILLS.map(([id,t,tone,f])=>[t,fmt(f?base.filter(f).length:new Set(base.map(projectKey)).size),tone,f?id:'',pill[v]===id]):[])}
+function setPill(id){pill[view]=pill[view]===id?PILL_DEFAULT[view]:id;view==='vis'?renderWork():renderDir()}
+function renderWork(wait=0){
+ let rows=filteredWork(),q=$('search').value.trim(),on=FILTERS.filter(([id])=>$(id).value).length,stores=new Map(),today=new Date();today.setHours(0,0,0,0);
+ for(let r of rows){let k=storeKey(r);stores.has(k)?stores.get(k).push(r):stores.set(k,[r])}
+ // A store picked in the list stays picked while the search and filters keep it; when they leave one store, it is picked.
+ if(!stores.has(selStore))selStore=stores.size===1?stores.keys().next().value:'';
+ let shown=selStore?stores.get(selStore):rows;
+ sendPills('vis',work.length?shown:null);
+ drawDonut('donut','legend',shown);
+ $('empty').hidden=!!work.length;$('storeTop').hidden=$('workPanel').hidden=!work.length;
+ $('cnt').textContent=work.length?fmt(stores.size)+' of '+fmt(storeTotal)+' stores':'';$('fcount').textContent=on||'';
+ renderStores(stores,q.toLowerCase(),today);renderTop(stores,q,on);
+ let table=shown.filter(pillTest('vis'));clearTimeout(tableTimer);if(wait)tableTimer=setTimeout(drawTable,wait,table,q,today);else drawTable(table,q,today);
+}
+// Status chart: one slice per Scheduled Status, with a legend of counts.
+function drawDonut(id,legend,rows){let counts={};rows.forEach(r=>{let x=val(r,'Scheduled Status')||'Blank';counts[x]=(counts[x]||0)+1});let entries=Object.entries(counts).sort((a,b)=>b[1]-a[1]),degree=0;
+ $(id).style.background=entries.length?'conic-gradient('+entries.map(([x,n])=>{let start=degree;degree+=n/rows.length*100;return `${statusColor(x)} ${start}% ${degree}%`}).join(',')+')':'';
+ $(legend).innerHTML=entries.map(([x,n])=>`<span><i class="swatch" style="background:${statusColor(x)}"></i>${esc(x)}: ${fmt(n)}</span>`).join('')}
+function drawTable(shown,q,today){
+ $('workCount').textContent=fmt(shown.length)+' matching rows'+(shown.length>500?' · showing first 500':'');
+ $('workRows').innerHTML=shown.length?shown.slice(0,500).map(r=>rowHtml(r,today)).join(''):'<tr><td colspan="12" class="empty">'+(q&&!work.some(r=>atStore(r,q.toLowerCase()))?'No assignments match this store number.':'No assignments match these filters.')+'</td></tr>';
+}
+// Row tint: past due when an open visit's date has passed; not scheduled when an open visit has no date or says so.
+function rowState(r,today){let s=val(r,'Scheduled Status').toLowerCase(),d=date(r['Visit Date Scheduled']);return s==='completed'?'':d&&d<today?'past-due':!d||s.includes('not sched')?'not-scheduled':''}
+const EXT='<svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3H3v10h10v-3M9 3h4v4M13 3L7 9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+function storeKey(r){return val(r,'BDS Store ID')||val(r,'Chain Name')+'|'+val(r,'Chain Store #')}
+function storeName(r){return val(r,'Store Name')||val(r,'Chain Name')||'Unknown store'}
+function storeCity(r){return [val(r,'Store City'),val(r,'Store State')].filter(Boolean).join(', ')}
+// Left panel: every store the search and filters leave, exact number matches first, then by store number.
+function renderStores(stores,q,today){let exact=r=>['BDS Store ID','Chain Store #'].some(k=>val(r,k).toLowerCase()===q),num=r=>parseInt(val(r,'Chain Store #'),10)||Infinity,
+  list=[...stores].sort(([,a],[,b])=>(q?exact(b[0])-exact(a[0]):0)||num(a[0])-num(b[0])||storeName(a[0]).localeCompare(storeName(b[0])));
+ $('stores').innerHTML=list.map(([k,rs])=>{let r=rs[0],open=rs.filter(x=>val(x,'Scheduled Status').toLowerCase()!=='completed').length,late=rs.some(x=>rowState(x,today)==='past-due');
+  return `<button type="button" class="it${k===selStore?' sel':''}${late?' late':''}" data-store="${esc(k)}"${late?' title="Has past-due visits"':''}><span class="l1"><b>${esc(storeName(r))}</b><span class="m">${esc(storeCity(r))}</span><span class="tag">${fmt(rs.length)} assignment${rs.length===1?'':'s'}</span></span><span class="l2"><span class="txt">Store ${esc(val(r,'Chain Store #')||'?')} · BDS ${esc(val(r,'BDS Store ID')||'?')}</span><span class="tag ${open?'warn':'ok'}">${open?fmt(open)+' not completed':'All completed'}</span></span></button>`}).join('')||(work.length?'<p class="none muted">No stores to show.</p>':'');}
+// Store header, like the one on Escalations: the picked store's details, or what the store list holds.
+function renderTop(stores,q,on){let html;
+ if(selStore){let rs=stores.get(selStore),r=rs[0],addr=val(r,'Store Address'),city=storeCity(r),chain=val(r,'Chain Name'),terr=unique(rs,'FOM Territory').join(', '),ids=[chain!==storeName(r)?chain:'',terr&&'FOM territory: '+terr].filter(Boolean).join(' · ');
+  html=`<div class="idr2"><div class="idb"><h2 class="vn">${esc(storeName(r))}</h2><div class="sid"><b>Store ${esc(val(r,'Chain Store #')||'?')}</b> · BDS ${esc(val(r,'BDS Store ID')||'?')}</div>${ids?`<div class="ids">${esc(ids)}</div>`:''}</div>${addr||city?`<div class="addr">${addr?`<div>${esc(addr)}</div>`:''}${city?`<div class="city">${esc(city)}</div>`:''}<a href="https://www.google.com/maps/search/?api=1&amp;query=${encodeURIComponent([addr,city].filter(Boolean).join(', '))}" target="_blank" rel="noopener">Open in Google Maps ${EXT}</a></div>`:''}</div>`}
+ else if(stores.size)html=`<h2 class="vn">${q?fmt(stores.size)+' stores match '+esc(q):on?fmt(stores.size)+' stores match the filters':'All stores'}</h2>${q||on?'':`<div class="sid"><b>${fmt(stores.size)} stores</b></div>`}<div class="ids">Pick a store on the left${q?'':' or search a store number'} to see its details and call forms.</div>`;
+ else if(q&&!work.some(r=>atStore(r,q.toLowerCase())))html=`<h2 class="vn">No store matches ${esc(q)}</h2><div class="ids">Search matches the start of a BDS Store ID or chain store number.</div>`;
+ else html=`<h2 class="vn">No assignments match</h2><div class="ids">${q?'Stores matching '+esc(q)+' have no assignments that match the filters.':'No assignments match these filters.'}</div>`;
+ $('storeInfo').innerHTML=html}
+for(let [id] of FILTERS)$(id).addEventListener('change',renderWork);
+$('search').addEventListener('input',()=>{parent.setStoreSearch($('search').value);renderWork(200)});
+// A store's number for the other tabs: its BDS Store ID, which is unique, else its chain store number.
+const storeId=r=>val(r,'BDS Store ID')||val(r,'Chain Store #');
+$('stores').addEventListener('click',e=>{let b=e.target.closest('[data-store]');if(b){selStore=b.dataset.store;parent.follow(storeId(work.find(r=>storeKey(r)===selStore)));renderWork()}});
+// The parent page calls this when its own store search changes and when Store Visits opens.
+function showStore(q){$('search').value=q;renderWork()}
+$('clr').onclick=()=>{for(let [id] of FILTERS)$(id).value='';selStore='';showStore('');parent.setStoreSearch('')};
+{const setFilters=o=>{$('fpanel').hidden=!o;$('ftog').setAttribute('aria-expanded',o);try{localStorage.setItem('bbVisFiltOpen',o?'1':'')}catch(e){}};let saved=null;try{saved=localStorage.getItem('bbVisFiltOpen')}catch(e){}setFilters(saved==='1');$('ftog').onclick=()=>setFilters($('fpanel').hidden)}
+// The parent page paints this switch to match the one on the Escalations panel, which owns the setting.
+$('thm').onclick=()=>parent.document.getElementById('thm').click();
+// Picking an assignment row also makes its store the one Escalations and Store Visits open to.
+function selectRow(tr){if(!tr)return;selectedKey=tr.dataset.key;let r=work.find(x=>x.__rowKey===selectedKey);if(r)parent.follow(storeId(r));for(let row of document.querySelectorAll('tr[data-key]'))row.classList.toggle('selected',row.dataset.key===selectedKey)}
+const CONTACT_RX=/phone|mobile|cell|e-?mail|address|street|city|state|zip|postal|title|position|job|manager|supervisor|territory|district|region/i,NAME_KEYS=['Full Name','Name','Preferred Name','Employee Name','Person Name'];
+function peopleName(r){for(let k of NAME_KEYS)if(val(r,k))return val(r,k);let fl=[val(r,'First Name'),val(r,'Last Name')].filter(Boolean).join(' ');if(fl)return fl;let h=peopleHeaders.find(h=>/name/i.test(h)&&!/user|login|manager|supervisor|store|chain/i.test(h));return h?val(r,h):''}
+function buildReps(){reps=new Map();for(let r of work){let id=val(r,'Rep Person ID');if(!id)continue;let x=reps.get(id)||{id,name:'',rows:[]};x.name=x.name||val(r,'Rep Name');x.rows.push(r);reps.set(id,x)}for(let [id,r] of peopleRows){let x=reps.get(id)||{id,name:'',rows:[]};x.name=x.name||peopleName(r);reps.set(id,x)}}
+// Phone numbers show as +1 (000) 000 0000; anything that isn't a 10-digit US number stays as typed.
+function usDigits(v){let d=String(v).replace(/\D/g,'');if(d.length===11&&d[0]==='1')d=d.slice(1);return d.length===10?d:''}
+function fmtPhone(v){let d=usDigits(v);return d?`+1 (${d.slice(0,3)}) ${d.slice(3,6)} ${d.slice(6)}`:String(v).trim()}
+function contactLink(h,v){let t=esc(v);if(/e-?mail/i.test(h)&&/@/.test(v))return `<a href="mailto:${esc(v)}">${t}</a>`;if(/phone|mobile|cell/i.test(h)){let d=usDigits(v);if(d)return `<a href="tel:+1${d}">${esc(fmtPhone(v))}</a>`;d=String(v).replace(/[^\d+]/g,'');if(d.length>=7)return `<a href="tel:${esc(d)}">${t}</a>`}return t}
+// Directory: everyone in the visits file or the People Report. The search matches any part of a name or the start of a person ID.
+// The rep picked in the list, or the only one the search leaves, shows with their contact details and this week's assignments.
+// State and Supervisor filter on the People Report: the person's home state and their supervisor.
+const STATE_RX=/^(home )?state$/i,SUP_RX=/supervisor|manager/i,personCol=rx=>peopleHeaders.find(h=>rx.test(h)),personVal=(id,rx)=>{let h=personCol(rx);return h?val(peopleRows.get(id)||{},h):''};
+function personOptions(id,rx,label){let old=$(id).value,h=personCol(rx),items=h?[...new Set([...peopleRows.values()].map(r=>val(r,h)).filter(Boolean))].sort((a,b)=>a.localeCompare(b)):[];$(id).innerHTML='<option value="">'+label+'</option>'+items.map(x=>`<option>${esc(x)}</option>`).join('');$(id).value=items.includes(old)?old:''}
+function renderDir(){let q=$('repSearch').value.trim().toLowerCase(),st=$('dstate').value,su=$('dsup').value,list=[...reps.values()].filter(x=>(!q||x.name.toLowerCase().includes(q)||x.id.toLowerCase().startsWith(q))&&(!st||personVal(x.id,STATE_RX)===st)&&(!su||personVal(x.id,SUP_RX)===su)).sort((a,b)=>!a.name-!b.name||a.name.localeCompare(b.name)||a.id.localeCompare(b.id));
+ if(!list.some(x=>x.id===selRep))selRep=list.length===1?list[0].id:'';
+ $('dfp').hidden=!peopleRows.size;
+ $('rcnt').textContent=reps.size?fmt(list.length)+' of '+fmt(reps.size)+' reps':'';
+ $('reps').innerHTML=list.map(x=>{let wk=x.rows.filter(r=>inWeek(r['Visit Date Scheduled'])).length,terr=unique(x.rows,'FOM Territory').join(', ');return `<button type="button" class="it${x.id===selRep?' sel':''}" data-rep="${esc(x.id)}"><span class="l1"><b>${esc(x.name||'Unnamed rep')}</b><span class="tag${wk?' acc':''}">${fmt(wk)} this week</span></span><span class="l2"><span class="txt">ID ${esc(x.id)}${terr?' · '+esc(terr):''}</span></span></button>`}).join('')||(reps.size?'<p class="none muted">No rep matches “'+esc(q)+'”.</p>':'');
+ let x=reps.get(selRep);$('dirEmpty').hidden=!!x;$('repTop').hidden=$('weekPanel').hidden=!x;
+ $('dirEmpty').innerHTML=reps.size?'<h2>Pick a rep</h2><p>Search by name or person ID, or pick someone on the left, to see their contact details and this week’s assignments.</p>':'<h2>Import the people report or this week\'s pivot report</h2><p>Drop the people report here, or use the files button at the top right. Files are read in your browser only.</p>';
+ if(x)renderRep(x);else sendPills('dir',null)}
+// Left out of the contact details on purpose (K, round 6).
+const HIDDEN_FACTS=/^(position title|territory mapped|personal e-?mail|position id)$/i;
+function renderRep(x){let p=peopleRows.get(x.id)||{},rows=x.rows,today=new Date();today.setHours(0,0,0,0);
+ // The home address, when the report has "Home" address columns next to other ones; it links to Google Maps.
+ let ADDR=/address|street|city|state|zip|postal/i,addrAll=peopleHeaders.filter(h=>ADDR.test(h)&&!/e-?mail/i.test(h)),addrHome=addrAll.filter(h=>/home/i.test(h)),addrH=(addrHome.length?addrHome:addrAll).filter(h=>val(p,h)),street=addrH.filter(h=>/address|street/i.test(h)).map(h=>val(p,h)).join(' '),city=addrH.filter(h=>/city/i.test(h)).map(h=>val(p,h)).join(' '),st=[addrH.filter(h=>/state/i.test(h)).map(h=>val(p,h)).join(' '),addrH.filter(h=>/zip|postal/i.test(h)).map(h=>val(p,h)).join(' ')].filter(Boolean).join(' '),addr=[street,city,st].filter(Boolean).join(', ');
+ let facts=peopleHeaders.filter(h=>h!=='Person ID'&&!HIDDEN_FACTS.test(h.trim())&&CONTACT_RX.test(h)&&!(ADDR.test(h)&&!/e-?mail/i.test(h))&&val(p,h)).map(h=>`<dt>${esc(h)}</dt><dd>${contactLink(h,val(p,h))}</dd>`).join('')+(addr?`<dt>Home address</dt><dd><a href="https://www.google.com/maps/search/?api=1&amp;query=${encodeURIComponent(addr)}" target="_blank" rel="noopener" title="Open in Google Maps">${esc(addr)}</a></dd>`:'');
+ let open=rows.filter(r=>val(r,'Scheduled Status').toLowerCase()!=='completed'),next=open.map(r=>date(r['Visit Date Scheduled'])).filter(d=>d&&d>=today).sort((a,b)=>a-b)[0],terr=unique(rows,'FOM Territory');
+ if(x.id!==chipFor){chipFor=x.id;repChain='';escCtx=null}
+ let chains=new Map();for(let r of rows)chains.set(chainLabel(r),(chains.get(chainLabel(r))||0)+(pillTest('dir')(r)?1:0));if(!chains.has(repChain))repChain='';
+ let mine=repChain?rows.filter(r=>chainLabel(r)===repChain):rows,wk=mine.filter(r=>inWeek(r['Visit Date Scheduled'])),done=wk.filter(isDone).length;
+ sendPills('dir',mine);drawDonut('rdonut','rlegend',wk);
+ $('rdonut').innerHTML=wk.length?`<b>${Math.round(done/wk.length*100)}%</b>`:'';$('rdonut').title=wk.length?`${fmt(done)} of ${fmt(wk.length)} completed this week`:'No assignments this week';
+ $('rchartT').textContent=wk.length?`This week · ${fmt(done)} of ${fmt(wk.length)} done`:'Nothing this week';
+ let chips=[['','All',[...chains.values()].reduce((a,b)=>a+b,0)],...[...chains].filter(([c,n])=>n||c===repChain).sort((a,b)=>(a[0]==='MER/unknown')-(b[0]==='MER/unknown')||b[1]-a[1]||a[0].localeCompare(b[0])).map(([c,n])=>[c,c,n])];
+ let when=r=>+date(r['Visit Date Scheduled'])||9e15,week=mine.filter(pillTest('dir')).sort((a,b)=>isEscRow(b)-isEscRow(a)||atEsc(b)-atEsc(a)||when(a)-when(b)||val(a,'Scheduled Time In').localeCompare(val(b,'Scheduled Time In'))),hl=week.filter(isEscRow).length,mon=monday(new Date()),sun=new Date(mon);sun.setUTCDate(mon.getUTCDate()+6);
+ $('repInfo').innerHTML=`<h2 class="vn">${esc(x.name||'Unnamed rep')}</h2><div class="sid"><b>Person ID ${esc(x.id)}</b></div>`+(facts?`<dl class="rc-facts">${facts}</dl>`:`<p class="rc-note">${peopleRows.size?'No contact details for this person ID in the People Report.':'Import the people report to see phone numbers and email.'}</p>`);
+ $('storeChips').hidden=!rows.length;$('storeChips').innerHTML=chips.map(([k,t,n])=>`<button type="button" data-chain="${esc(k)}" aria-pressed="${k===repChain}"${!k?' class="all"':k==='MER/unknown'?' class="mer"':` style="--cc:${chainColor(k)}"`}>${esc(t)}<b>${fmt(n)}</b></button>`).join('');
+ $('repStats').innerHTML=(rows.length?[fmt(rows.length)+' assignment'+(rows.length===1?'':'s'),fmt(open.length)+' not completed',next&&'Next visit '+ds(next),terr.join(', ')]:['No assignments in the visits file']).filter(Boolean).map(t=>`<span>${esc(t)}</span>`).join('');
+ let label=PILLS.find(p=>p[0]===pill.dir)[1];
+ $('weekTitle').textContent=pill.dir==='week'?'This week':pill.dir==='all'?'All assignments':label;
+ $('weekRange').textContent=pill.dir==='week'?ds(mon).replace(/, \d{4}$/,'')+' – '+ds(sun):'';
+ $('weekCount').textContent=fmt(week.length)+' assignment'+(week.length===1?'':'s')+(hl?' · '+fmt(hl)+' for the escalation, highlighted':'')+(week.length>500?' · showing first 500':'');
+ $('weekRows').innerHTML=week.length?week.slice(0,500).map(r=>rowHtml(r,today,false)).join(''):'<tr><td colspan="11" class="empty">'+(!work.length?'Import this week\'s pivot report to see assignments.':pill.dir==='week'?'No assignments scheduled this week.':'No '+label.toLowerCase()+' assignments.')+'</td></tr>'}
+$('repSearch').addEventListener('input',renderDir);
+$('reps').addEventListener('click',e=>{let b=e.target.closest('[data-rep]');if(b){selRep=b.dataset.rep;renderDir()}});
+$('rclr').onclick=()=>{$('repSearch').value=$('dstate').value=$('dsup').value='';selRep='';renderDir();$('repSearch').focus()};
+for(let id of ['dstate','dsup'])$(id).addEventListener('change',renderDir);
+// Store pills: All, or one chain. A visit with no chain is MER/unknown.
+const chainLabel=r=>{let c=val(r,'Chain Name');return !c||/unknown/i.test(c)?'MER/unknown':c};
+let repChain='',chipFor='';
+$('storeChips').addEventListener('click',e=>{let b=e.target.closest('[data-chain]');if(b){repChain=b.dataset.chain;renderDir()}});
+// Each chain's main brand color (from the chains' own logos); Fred Meyer uses a lighter red so it doesn't read as Target.
+// A chain not listed here is gray.
+const CHAIN_COLORS=[[/best\s*buy/,'#0046BE'],[/target/,'#CC0000'],[/dick'?s/,'#006150'],[/fred\s*meyer/,'#E8636B'],[/wal-?\s*mart/,'#0071CE'],[/sam'?s\s*club/,'#0067A0'],[/costco/,'#E31837'],[/home\s*depot/,'#F96302'],[/lowe'?s/,'#004990'],[/staples/,'#CC0000'],[/office\s*(depot|max)/,'#B31917'],[/kroger/,'#004990'],[/walgreens/,'#E31837'],[/\bcvs\b/,'#CC0000'],[/meijer/,'#DD1321'],[/macy'?s/,'#E21A2C'],[/verizon/,'#D52B1E'],[/t-?\s*mobile/,'#E20074'],[/\bat\s*&\s*t\b/,'#067AB4'],[/apple/,'#A2AAAD'],[/amazon/,'#FF9900']];
+const chainColor=c=>(CHAIN_COLORS.find(([rx])=>rx.test(c.toLowerCase()))||[,'#6B7785'])[1];
+// Escalations opens a rep here (openRep): the escalation's store and vendor. Its visits are highlighted and listed first,
+// then the rep's other visits at that store.
+let escCtx=null;
+const num=v=>{let m=String(v).match(/(\d+)(?:\.0+)?\s*$/);return m?String(+m[1]):''};
+const atEsc=r=>!!escCtx&&((!!escCtx.bds&&num(val(r,'BDS Store ID'))===escCtx.bds)||(!!escCtx.store&&num(val(r,'Chain Store #'))===escCtx.store&&/best\s*buy/i.test(val(r,'Chain Name'))));
+const isEscRow=r=>atEsc(r)&&!!escCtx.vendor&&val(r,'Call Form Name').toLowerCase().includes(escCtx.vendor);
+function openRep(name,bds,store,vendor){let n=name.trim().toLowerCase(),x=[...reps.values()].find(y=>y.name.trim().toLowerCase()===n);if(!x)return false;
+ $('repSearch').value=$('dstate').value=$('dsup').value='';selRep=chipFor=x.id;pill.dir='week';escCtx={bds:num(bds),store:num(store),vendor:vendor.trim().toLowerCase()};
+ let at=x.rows.find(isEscRow)||x.rows.find(atEsc);repChain=at?chainLabel(at):'';renderDir();
+ document.querySelector('#reps .sel')?.scrollIntoView({block:'nearest'});document.querySelector('#weekRows tr.esc-hl')?.scrollIntoView({block:'nearest'});return true}
+// The parent page switches between Store Visits and Directory with this.
+function showView(v){view=v;$('visSide').hidden=$('visMain').hidden=v!=='vis';$('dirSide').hidden=$('dirMain').hidden=v!=='dir';sendPills(v,pillBase[v])}
+for(let id of ['workRows','weekRows']){$(id).addEventListener('click',e=>selectRow(e.target.closest('tr[data-key]')));$(id).addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){let tr=e.target.closest('tr[data-key]');if(tr){e.preventDefault();selectRow(tr)}}})}
+renderWork();renderDir();
+// A file dropped on Store Visits is this week's pivot; on the Directory, the People Report. The parent imports it like its boxes do.
+addEventListener('dragover',e=>e.preventDefault());
+addEventListener('drop',e=>{e.preventDefault();let f=e.dataTransfer.files[0];if(f)parent.importDropped(view,f)});
+// Text cut off with "…" shows in full on hover. The parent draws the tip over this frame.
+addEventListener('mouseover',e=>parent.hoverTip(e.target,frameElement));
+addEventListener('scroll',()=>parent.hoverTip(null),true);
+// The parent page loads files through these. Its Files are re-wrapped in this frame's own File: SheetJS reads a foreign ArrayBuffer as garbage text.
+function loadPivot(f){return readPivot(new File([f],f.name,{type:f.type}))}
+function loadPeople(f){return readPeople(new File([f],f.name,{type:f.type}))}
+</script></body></html>
