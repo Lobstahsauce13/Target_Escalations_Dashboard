@@ -2,6 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Target Escalation Dashboard</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="xlsx-save.js"></script>
 <style>
 :root {
   --ink: #0d161e;
@@ -2644,9 +2645,9 @@ button:focus-visible {
 </style></head><body>
 <header><h1><svg class="logo" viewBox="0 0 28 28" role="img" aria-label="Target"><circle cx="14" cy="14" r="11.5" fill="none" stroke="#fff" stroke-width="4"/><circle cx="14" cy="14" r="4.5" fill="#fff"/></svg>Target Escalation Dashboard</h1>
 <nav id="apptabs" role="tablist"><button role="tab" data-app="esc" aria-selected="true">Escalations</button><button role="tab" data-app="vis" aria-selected="false">Store Visits</button><button role="tab" data-app="dir" aria-selected="false">Directory</button></nav>
-<button id="fpill" class="fpill miss" aria-haspopup="dialog" title="Import files">0 of 5 files loaded</button>
+<button id="tsave" class="p tsave" hidden></button><button id="fpill" class="fpill miss" aria-haspopup="dialog" title="Import files">0 of 5 files loaded</button>
 <input id="file" type="file" accept=".xlsx" hidden><input id="vfile" type="file" accept=".xlsx" hidden><input id="pfile" type="file" accept=".xlsx" hidden><input id="tfile" type="file" accept=".xlsx" hidden><input id="xfile" type="file" accept=".xlsx" hidden></header>
-<div id="sumbar"><div id="sum"></div><div id="vsum"></div><div id="follow"></div></div>
+<div id="sumbar"><div id="sum"></div><div id="vsum"></div><div id="nsum"></div><div id="follow"></div><button id="addesc" class="p" type="button"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3v10M3 8h10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Add escalation</button></div>
 <div id="escView">
 <main>
 <section id="q"><div id="f">
@@ -2672,6 +2673,22 @@ button:focus-visible {
 <p class="m">Click a square to pick its file. Files are read in your browser only.</p>
 <div class="imgrid"><button id="imp" class="ib miss"></button><button id="vimp" class="ib miss"></button><button id="pimp" class="ib miss"></button><button id="timp" class="ib miss"></button><button id="ximp" class="ib miss"></button></div>
 <div class="mbtn"><span id="imcount" class="m"></span><span class="sp" style="flex:1"></span><button id="imclose">Close</button></div></div></div>
+<div id="addbox" class="ovl" hidden><form class="nbox addform" role="dialog" aria-modal="true" aria-labelledby="addtitle" novalidate><h2 id="addtitle">Add escalation</h2>
+<p class="m">Adds the work order to the escalation list and a row to the BDS No Show and Data Review tracker. Save at the top writes it into the file.</p>
+<div class="tform">
+<label for="a-wo">Work order #</label><div><input id="a-wo" inputmode="numeric" autocomplete="off" required></div>
+<label for="a-store">Store #</label><div><input id="a-store" inputmode="numeric" autocomplete="off" required placeholder="e.g. 3319"></div>
+<label for="a-problem">Problem Code</label><div><select id="a-problem"><option>BDS_NO_SHOW</option><option>BDS_DATA_REVIEW</option></select></div>
+<label for="a-desc">Description</label><div><textarea id="a-desc" rows="2" required></textarea></div>
+<label for="a-sd">Status Date</label><div><input id="a-sd" type="datetime-local" required></div>
+<label for="a-rd">Report Date</label><div><input id="a-rd" type="datetime-local" required></div>
+<label for="a-los">LOS Finish</label><div><input id="a-los" type="datetime-local" required></div>
+<label for="a-rep">Rep</label><div><input id="a-rep" autocomplete="off"><span class="m" id="a-hint"></span></div>
+<label for="a-fom">FOM (DM)</label><div><input id="a-fom" autocomplete="off"></div>
+<label for="a-comments">Comments</label><div><textarea id="a-comments" rows="2"></textarea></div>
+</div>
+<p id="a-err" class="aerr" role="alert"></p>
+<div class="mbtn"><span class="sp" style="flex:1"></span><button type="button" id="a-cancel">Cancel</button><button class="p" type="submit">Add escalation</button></div></form></div>
 <div id="toast"></div>
 <script>
 
@@ -2685,7 +2702,10 @@ const ICONS = {
   dash: drawIcon('M4 8h8'),
   circle: drawIcon('M8 2.5a5.5 5.5 0 1 1 0 11a5.5 5.5 0 1 1 0-11z'),
   ext: drawIcon('M6 3H3v10h10v-3M9 3h4v4M13 3L7 9'),
-  mail: drawIcon('M2 4h12v8H2zM2 4l6 5 6-5')
+  mail: drawIcon('M2 4h12v8H2zM2 4l6 5 6-5'),
+  edit: drawIcon('M10.5 2.5l3 3L6 13H3v-3z'),
+  save: drawIcon('M3 2.5h8l2.5 2.5v8.5h-10.5zM5.5 2.5v3.5h5v-3.5M5 13.5v-4h6v4'),
+  plus: drawIcon('M8 3v10M3 8h10')
 };
 const $ = id => document.getElementById(id);
 
@@ -3007,70 +3027,259 @@ const woKey = v => {
 };
 
 // ---- The BDS No Show and Data Review file: the tracker kept by hand. Its No show and Data Review sheets each have a row
-// per work order with what was done about it. Any sheet with Work Order and "Response from FOM or PML" headings is read;
-// the Responses sheet of canned notes has neither and is skipped. A missing heading on a tracker sheet stops the import.
+// per work order: Maximo's fields first, then what was done about it. Any sheet with Work Order and "Response from FOM or PML"
+// headings is a tracker sheet; the Responses sheet holds canned log notes. A missing heading on a tracker sheet stops the import.
+// It is the one file the dashboard writes to: tracker fields edited here, and escalations added here, are saved back into
+// the same file (xlsx-save.js), so it stays the record.
+// [key, label, heading test, kind]. date: an Excel date (Update to FOM & PML); when: an Excel date and time, or Maximo's
+// text; yn: Y or N; long: text that can run to several lines.
 const TRACKER_COLS = [
-  ['Comments', h => h === 'comments'],
-  ['Action on Maximo', h => h === 'action on maximo'],
-  ['In Maximo', h => h === 'maximo'],
-  ['Closed in Maximo', h => h === 'closed in maximo'],
-  ['Rep', h => h === 'rep'],
-  ['FOM (DM)', h => h.startsWith('fom')],
-  ['Update to FOM & PML', h => h === 'date of update to fom & pml'],
-  ['Status emailed to FOM', h => h.startsWith('status emailed')],
-  ['Response from FOM or PML', h => h === 'response from fom or pml']
+  ['wo', 'Work Order', h => h === 'work order', 'num'],
+  ['site', 'Site', h => h === 'site', 'text'],
+  ['desc', 'Description', h => h === 'description', 'long'],
+  ['problem', 'Problem Code', h => h === 'problem code', 'text'],
+  ['val', 'Vendor Work Validation', h => h === 'vendor work validation', 'text'],
+  ['status', 'Status', h => h === 'status', 'text'],
+  ['sd', 'Status Date', h => h === 'status date', 'when'],
+  ['rd', 'Report Date', h => h === 'report date', 'when'],
+  ['los', 'LOS Finish', h => h === 'los finish', 'when'],
+  ['comments', 'Comments', h => h === 'comments', 'long'],
+  ['action', 'Action on Maximo', h => h === 'action on maximo', 'text'],
+  ['inMax', 'In Maximo', h => h === 'maximo', 'yn'],
+  ['closed', 'Closed in Maximo', h => h === 'closed in maximo', 'yn'],
+  ['rep', 'Rep', h => h === 'rep', 'long'],
+  ['fom', 'FOM (DM)', h => h.startsWith('fom'), 'long'],
+  ['upd', 'Update to FOM & PML', h => h === 'date of update to fom & pml', 'date'],
+  ['emailed', 'Status emailed to FOM', h => h.startsWith('status emailed'), 'yn'],
+  ['resp', 'Response from FOM or PML', h => h === 'response from fom or pml', 'long']
 ];
+const COL = Object.fromEntries(TRACKER_COLS.map(c => [c[0], c]));
+// The hand-kept block: what the Tracker notes card shows and edits.
+const HAND_KEYS = TRACKER_COLS.slice(TRACKER_COLS.findIndex(c => c[0] === 'comments')).map(c => c[0]);
+// The Responses sheet: canned log notes by scenario.
+const RESPONSE_COLS = { cat: 'category', scenario: 'wo scenario', status: 'bds status update, pending resolution', note: 'log note verbiage back to target' };
+// tracker: work order -> its rows; trackerSites: store -> its rows; trackerRowsByKey: "sheet!row" -> the row.
+// A row is { key, sheet (short name), sheetName, row (the Excel row), id, store, v: { column key: cell value } }.
 let tracker = new Map(),
   trackerSites = new Map(),
+  trackerRowsByKey = new Map(),
   trackerName = '',
-  trackerRows = 0;
+  trackerRows = 0,
+  // The file itself: its handle (to save to), when it was last saved, each tracker sheet's columns and last row, the log notes.
+  trackerFile = null;
+
+const ynYes = v => /^y/i.test(clean(v));
+const serialAt = n => new Date(Date.UTC(1899, 11, 30) + n * 864e5);
+// A Status Date, Report Date or LOS Finish: an Excel date and time, or Maximo's text ("09/30/2026 06:28 AM EDT").
+function whenOf(v) {
+  if (typeof v === 'number') return { at: serialAt(v), shown: serialAt(v).toLocaleString([], { timeZone: 'UTC', dateStyle: 'medium', timeStyle: 'short' }) };
+  const t = clean(v);
+  if (!t) return null;
+  try {
+    return maximoDate(t, 0) ?? null;
+  } catch (e) {
+    return { at: null, shown: t };
+  }
+}
+// A cell as text, the way the cards show it.
+function trackerText(k, v) {
+  const kind = COL[k][3];
+  return kind === 'date' ? dayText(v) : kind === 'when' ? whenOf(v)?.shown ?? '' : kind === 'num' ? woKey(v) || clean(v) : String(v ?? '').trim();
+}
 
 function readTracker(wb) {
   const out = new Map(),
-    sites = new Map();
-  let n = 0,
-    sheets = 0;
+    sites = new Map(),
+    byKey = new Map(),
+    file = { sheets: {}, responses: [] };
+  let n = 0;
   for (const name of wb.SheetNames) {
-    const A = XLSX.utils.sheet_to_json(wb.Sheets[name], { header: 1, raw: true, defval: '' }),
+    const ws = wb.Sheets[name],
+      A = XLSX.utils.sheet_to_json(ws, { header: 1, raw: true, defval: '' }),
       H = (A[0] ?? []).map(headKey),
-      wo = H.indexOf('work order'),
-      site = H.indexOf('site');
-    if (wo < 0 || !H.includes('response from fom or pml')) continue;
-    sheets++;
-    const cols = TRACKER_COLS.map(([t, m]) => [t, H.findIndex(m)]),
-      missing = cols.filter(([, i]) => i < 0).map(([t]) => t);
+      // Rows are counted from the sheet's first used row, so an index maps back to its Excel row.
+      r0 = ws['!ref'] ? XLSX.utils.decode_range(ws['!ref']).s.r : 0,
+      c0 = ws['!ref'] ? XLSX.utils.decode_range(ws['!ref']).s.c : 0;
+    if (H.includes(RESPONSE_COLS.note)) {
+      const ci = Object.fromEntries(Object.entries(RESPONSE_COLS).map(([k, h]) => [k, H.indexOf(h)]));
+      file.responses = A.slice(1)
+        .map(a => Object.fromEntries(Object.entries(ci).map(([k, i]) => [k, i < 0 ? '' : clean(a[i])])))
+        .filter(x => x.note);
+      continue;
+    }
+    if (!H.includes('work order') || !H.includes('response from fom or pml')) continue;
+    const cols = Object.fromEntries(TRACKER_COLS.map(([k, , m]) => [k, H.findIndex(m)])),
+      missing = TRACKER_COLS.filter(([k]) => cols[k] < 0).map(([, t]) => t);
     if (missing.length) throw new DataError(`The "${name}" sheet is missing columns: ${missing.join(', ')}. Nothing was loaded.`);
     // "No show 9.7.20 - Present" -> "No show".
-    const sheet = name.replace(/\s*\d.*$/, '');
-    A.slice(1).forEach(a => {
-      const id = woKey(a[wo]);
+    const sheet = name.replace(/\s*\d.*$/, ''),
+      info = (file.sheets[name] = { sheet, cols: Object.fromEntries(Object.entries(cols).map(([k, i]) => [k, c0 + i])), last: r0 + 1 });
+    A.forEach((a, i) => {
+      if (!i) return;
+      const id = woKey(a[cols.wo]);
       if (!id) return;
       n++;
-      const e = { sheet, id, facts: cols.map(([t, i]) => [t, dayText(a[i])]) },
-        st = site < 0 ? '' : storeKey(a[site]);
-      (out.get(id) ?? out.set(id, []).get(id)).push(e);
-      if (st) (sites.get(st) ?? sites.set(st, []).get(st)).push(e);
+      const row = r0 + i + 1,
+        e = { key: `${name}!${row}`, sheet, sheetName: name, row, id, store: storeKey(a[cols.site]), v: Object.fromEntries(TRACKER_COLS.map(([k]) => [k, a[cols[k]]])) };
+      info.last = Math.max(info.last, row);
+      addTrackerRow(e, out, sites, byKey);
     });
   }
-  if (!sheets)
+  if (!Object.keys(file.sheets).length)
     throw new DataError('This file has no sheet with Work Order and "Response from FOM or PML" columns. Import the BDS No Show and Data Review file.');
-  return { orders: out, sites, n };
+  return { orders: out, sites, byKey, file, n };
+}
+function addTrackerRow(e, orders = tracker, sites = trackerSites, byKey = trackerRowsByKey) {
+  (orders.get(e.id) ?? orders.set(e.id, []).get(e.id)).push(e);
+  if (e.store) (sites.get(e.store) ?? sites.set(e.store, []).get(e.store)).push(e);
+  byKey.set(e.key, e);
 }
 
-async function importTracker(f) {
+// The tracker square picks the file with the browser's file picker, which hands back a handle the dashboard can save to
+// (Chrome and Edge). Without one the file is still read, and Save says it needs Chrome or Edge.
+async function pickTracker() {
+  if (trackerDirty.size && !confirm(`You have ${trackerDirty.size} unsaved tracker changes. Opening another file drops them. Open it anyway?`)) return;
+  if (!window.showOpenFilePicker) return $('tfile').click();
+  let handle;
+  try {
+    [handle] = await showOpenFilePicker({ types: [{ description: 'Excel workbook', accept: { 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'] } }] });
+  } catch (e) {
+    return; // picker closed
+  }
+  importTracker(await handle.getFile(), handle);
+}
+async function importTracker(f, handle = null) {
   busyBtn('timp', true, 'Opening…');
   try {
     const d = readTracker(XLSX.read(await readFile(f), { type: 'array', dense: true }));
     tracker = d.orders;
+    trackerSites = d.sites;
+    trackerRowsByKey = d.byKey;
     trackerRows = d.n;
     trackerName = f.name;
-    trackerSites = d.sites;
+    trackerFile = { ...d.file, handle, stamp: f.lastModified };
+    trackerDirty.clear();
+    trackerEditing = '';
     toast(`✓ Loaded ${d.n.toLocaleString()} tracker rows for ${d.orders.size.toLocaleString()} work orders from ${f.name}.`);
   } catch (e) {
     toast(e instanceof DataError ? e.message : "This file couldn't be opened as a workbook. Import the BDS No Show and Data Review file (.xlsx).");
   }
   busyBtn('timp', false);
+  savePill();
   refreshViews();
+}
+
+// ---- Editing the tracker. Changes stay on the page until Save writes them into the file; closing the tab first warns.
+// trackerDirty: "sheet!row" -> the column keys changed on that row. trackerEditing: the row whose card is a form.
+const trackerDirty = new Map();
+let trackerEditing = '';
+function markDirty(e, keys) {
+  const set = trackerDirty.get(e.key) ?? trackerDirty.set(e.key, new Set()).get(e.key);
+  keys.forEach(k => set.add(k));
+  savePill();
+}
+const dirtyCount = () => [...trackerDirty.values()].reduce((n, s) => n + s.size, 0);
+function savePill() {
+  const b = $('tsave'),
+    n = dirtyCount();
+  b.hidden = !n;
+  b.innerHTML = `${ICONS.save}Save ${n} change${n === 1 ? '' : 's'} to the tracker`;
+}
+addEventListener('beforeunload', e => {
+  if (trackerDirty.size) e.preventDefault();
+});
+
+// The form for a row's hand-kept fields. Y/N fields are a choice; Update to FOM & PML is a date.
+function trackerForm(e) {
+  const field = k => {
+    const [, t, , kind] = COL[k],
+      v = e.v[k],
+      id = `tf-${k}`;
+    let input;
+    if (kind === 'yn') {
+      const cur = clean(v),
+        opts = ['', 'Y', 'N', ...(cur && !['Y', 'N'].includes(cur) ? [cur] : [])];
+      input = `<select id="${id}" data-k="${k}">${opts.map(o => `<option value="${esc(o)}"${o === cur ? ' selected' : ''}>${o ? esc(o) : '(blank)'}</option>`).join('')}</select>`;
+    } else if (kind === 'date') {
+      const d = typeof v === 'number' ? serialAt(v).toISOString().slice(0, 10) : '';
+      input = `<input id="${id}" data-k="${k}" type="date" value="${d}">${typeof v !== 'number' && clean(v) ? ` <span class="m">Was "${esc(v)}"</span>` : ''}`;
+    } else if (kind === 'long') input = `<textarea id="${id}" data-k="${k}" rows="${Math.min(6, Math.max(2, String(v ?? '').split('\n').length))}">${esc(String(v ?? ''))}</textarea>`;
+    else input = `<input id="${id}" data-k="${k}" type="text" value="${esc(String(v ?? ''))}">`;
+    return `<label for="${id}">${t}</label><div>${input}</div>`;
+  };
+  return `<div class="tform" data-row="${esc(e.key)}">${HAND_KEYS.map(field).join('')}</div><div class="mbtn"><button class="p" data-tdone="${esc(e.key)}">Done</button><button data-tcancel>Cancel</button><span class="m">Changes are saved to the file when you click Save at the top.</span></div>`;
+}
+// A form value as the cell value: a date becomes Excel's serial day number, text stays text.
+function formValue(k, el) {
+  if (COL[k][3] === 'date') return el.value ? (Date.parse(el.value + 'T00:00:00Z') - Date.UTC(1899, 11, 30)) / 864e5 : '';
+  return el.value.replace(/\r\n/g, '\n');
+}
+function finishEdit(key) {
+  const e = trackerRowsByKey.get(key),
+    changed = [];
+  document.querySelectorAll(`.tform[data-row="${CSS.escape(key)}"] [data-k]`).forEach(el => {
+    const k = el.dataset.k,
+      nv = formValue(k, el),
+      ov = e.v[k];
+    // An unchanged date keeps its number; text is compared as typed.
+    if ((typeof ov === 'number' ? ov : String(ov ?? '')) === nv) return;
+    if (COL[k][3] === 'date' && nv === '' && !clean(ov)) return;
+    e.v[k] = nv;
+    changed.push(k);
+  });
+  trackerEditing = '';
+  if (changed.length) markDirty(e, changed);
+  redrawTrackerViews();
+}
+function redrawTrackerViews() {
+  if (current && !$('escView').hidden) showEscalation(current, true);
+  if (!$('nsView').hidden) nsDraw(true);
+}
+document.addEventListener('click', ev => {
+  const t = ev.target.closest('[data-tedit],[data-tdone],[data-tcancel]');
+  if (!t) return;
+  if (t.dataset.tedit) trackerEditing = t.dataset.tedit;
+  else if (t.dataset.tdone) return finishEdit(t.dataset.tdone);
+  else trackerEditing = '';
+  redrawTrackerViews();
+});
+
+// Save: writes every changed cell (and every added row) into the tracker file the user opened. The file must not have
+// changed on disk since it was loaded, or the rows could have moved; then it is loaded again and the edits made again.
+async function saveTracker() {
+  const h = trackerFile?.handle;
+  if (!h) return toast('Saving needs Chrome or Edge: open the tracker square there, then edit and Save.');
+  const b = $('tsave');
+  b.disabled = true;
+  try {
+    if ((await h.requestPermission({ mode: 'readwrite' })) !== 'granted') throw new DataError('The dashboard needs your permission to save to the tracker file.');
+    const f = await h.getFile();
+    if (f.lastModified !== trackerFile.stamp)
+      throw new DataError('The tracker file changed since you opened it, so nothing was saved. Open it again from the tracker square, then make these changes again.');
+    const edits = {};
+    for (const [key, keys] of trackerDirty) {
+      const e = trackerRowsByKey.get(key),
+        cols = trackerFile.sheets[e.sheetName].cols;
+      for (const k of keys) {
+        const v = e.v[k];
+        (edits[e.sheetName] ??= []).push({ ref: XLSX.utils.encode_col(cols[k]) + e.row, value: typeof v === 'number' ? v : String(v ?? '') });
+      }
+    }
+    // Cells go in row order, so an added row's cells copy their look from the row above.
+    Object.values(edits).forEach(l => l.sort((a, b) => +a.ref.match(/\d+$/) - +b.ref.match(/\d+$/)));
+    const out = await patchXlsx(await f.arrayBuffer(), edits),
+      w = await h.createWritable();
+    await w.write(out);
+    await w.close();
+    trackerFile.stamp = (await h.getFile()).lastModified;
+    const n = dirtyCount();
+    trackerDirty.clear();
+    savePill();
+    toast(`✓ Saved ${n} change${n === 1 ? '' : 's'} to ${trackerName}.`);
+  } catch (e) {
+    toast(e instanceof DataError ? e.message : `Couldn't save to ${trackerName}. If it's open in Excel, close it there and Save again. (${e.message})`);
+  }
+  b.disabled = false;
 }
 
 // ---- The Parts Orders Detail file: parts ordered for Target stores, with their shipping and tracking. Its Ticket ID is
@@ -3269,7 +3478,7 @@ function draw() {
         const s = dueState(r);
         return `<div class="it${r === current ? ' sel' : ''}${s === 'late' ? ' late' : ''}" data-i="${r.i}">
  <div class="l1"><b>Store ${esc(r.site)}</b><span class="m">${esc([r.city, r.state].filter(Boolean).join(', '))}</span><span class="due ${s}">${esc(dueText(r))}</span></div>
- <div class="l2">${statusTag(r)}<span class="txt">WO ${esc(r.id)} · ${esc(r.desc)}</span></div></div>`;
+ <div class="l2">${statusTag(r)}${r.manual ? '<span class="tag hand">Added by hand</span>' : ''}<span class="txt">WO ${esc(r.id)} · ${esc(r.desc)}</span></div></div>`;
       })
       .join('') || '<p class="m" style="padding:12px">No work orders match these filters.</p>';
   $('list').scrollTop = st;
@@ -3371,17 +3580,19 @@ function presenceCard(store, desc) {
 }
 
 // What the tracker kept by hand says about this work order: one block per tracker row (No show or Data Review).
-const trackerFacts = e => {
-  const filled = e.facts.filter(([, v]) => v);
-  return filled.length
-    ? `<dl class="facts tfacts">${filled.map(([t, v]) => `<dt>${esc(t)}</dt><dd>${t === 'Rep' ? trackerReps(v) : esc(v)}</dd>`).join('')}</dl>`
-    : '<p class="m">Nothing entered yet.</p>';
-};
+// A tracker row's hand-kept fields, as the card shows them. editable adds an Edit button (Escalations and No Show; the
+// Store Visits overview only shows them). A changed field not yet saved is marked.
+function trackerFacts(e, editable) {
+  if (editable && trackerEditing === e.key) return trackerForm(e);
+  const dirty = trackerDirty.get(e.key) ?? new Set(),
+    filled = HAND_KEYS.map(k => [k, trackerText(k, e.v[k])]).filter(([k, v]) => v || dirty.has(k));
+  return `${filled.length ? `<dl class="facts tfacts">${filled.map(([k, v]) => `<dt>${esc(COL[k][1])}${dirty.has(k) ? ' <span class="tag unsaved" title="Not saved to the file yet">Unsaved</span>' : ''}</dt><dd>${k === 'rep' ? trackerReps(v) : esc(v)}</dd>`).join('')}</dl>` : '<p class="m">Nothing entered yet.</p>'}${editable ? `<div class="mbtn"><button data-tedit="${esc(e.key)}">${ICONS.edit}Edit</button></div>` : ''}`;
+}
 function trackerCard(r) {
   if (!trackerName) return '<p class="m">Import the BDS No Show and Data Review file to see the notes kept on this work order.</p>';
   const es = tracker.get(r.id);
   if (!es) return `<p class="m">Work order ${esc(r.id)} isn't in the tracker file yet.</p>`;
-  return es.map(e => `${es.length > 1 ? `<h4 class="pgh">${esc(e.sheet)}</h4>` : ''}${trackerFacts(e)}`).join('');
+  return es.map(e => `${es.length > 1 ? `<h4 class="pgh">${esc(e.sheet)}</h4>` : ''}${trackerFacts(e, true)}`).join('');
 }
 // Every tracker row for a store, newest work order first. Each opens from its work order number and sheet; the newest is open.
 function storeTrackerCard(store) {
@@ -3390,7 +3601,7 @@ function storeTrackerCard(store) {
   if (!es) return `<p class="m">Store ${esc(store)} has no rows in the tracker file.</p>`;
   return [...es]
     .sort((a, b) => b.id.localeCompare(a.id, undefined, { numeric: true }))
-    .map((e, i) => `<details class="tdet"${i ? '' : ' open'}><summary>WO ${esc(e.id)} <span class="m">${esc(e.sheet)}</span></summary>${trackerFacts(e)}</details>`)
+    .map((e, i) => `<details class="tdet"${i ? '' : ' open'}><summary>WO ${esc(e.id)} <span class="m">${esc(e.sheet)}</span></summary>${trackerFacts(e, false)}</details>`)
     .join('');
 }
 
@@ -3439,7 +3650,7 @@ function showEscalation(r, keep) {
       .map(([t, v]) => `<span><em>${t}</em>${esc(v)}</span>`)
       .join('');
   $('d').innerHTML = `<div class="top"><div class="hd">
- <div class="chips">${statusTag(r)}${r.problem ? `<span class="tag pcode" title="Problem Code">${esc(r.problem)}</span>` : ''}<span class="due ${s}">${esc(dueText(r))}</span></div>${r.los ? `<div class="m dln">LOS Finish ${esc(r.los.shown)}</div>` : ''}
+ <div class="chips">${statusTag(r)}${r.manual ? '<span class="tag hand" title="Typed in on this page; not in the export file yet">Added by hand</span>' : ''}${r.problem ? `<span class="tag pcode" title="Problem Code">${esc(r.problem)}</span>` : ''}<span class="due ${s}">${esc(dueText(r))}</span></div>${r.los ? `<div class="m dln">LOS Finish ${esc(r.los.shown)}</div>` : ''}
  <h2 class="vn">Store ${esc(r.site)}</h2>${where ? `<div class="sid">${mapsLink(where)}</div>` : ''}<div class="m ids">Work order #${esc(r.id)}</div></div>
  <div class="side"><div class="reply"><button id="reply" class="p" aria-haspopup="menu" aria-expanded="false">${ICONS.mail}Reply</button><div id="replymenu" role="menu" hidden><button role="menuitem" data-to="dm">To DM</button><button role="menuitem" data-to="pml">To PML</button></div></div>${org ? `<div class="team">${org}</div>` : ''}</div></div>
  <div class="panel solo">${glance(r)}</div>
@@ -3534,6 +3745,88 @@ function refreshViews() {
   visFrame().renderWork();
 }
 
+// ---- Add escalation: a work order typed in by hand. It joins the list as New, marked Added by hand, and becomes a new
+// row on the tracker's No show or Data Review sheet (by its Problem Code), filled in like the rows before it.
+const localWhen = v => {
+  const [d, t] = v.split('T'),
+    [y, mo, da] = d.split('-').map(Number),
+    [h, mi] = t.split(':').map(Number),
+    at = new Date(y, mo - 1, da, h, mi);
+  return { at, shown: fmtDateTime(at), text: `${String(mo).padStart(2, '0')}/${String(da).padStart(2, '0')}/${y} ${String(h % 12 || 12).padStart(2, '0')}:${String(mi).padStart(2, '0')} ${h < 12 ? 'AM' : 'PM'}` };
+};
+function openAdd() {
+  if (!trackerName) return toast('Import the BDS No Show and Data Review file first: a new escalation is saved as a row in it.');
+  const f = $('addbox').querySelector('form');
+  f.reset();
+  const now = new Date(Date.now() - new Date().getTimezoneOffset() * 6e4).toISOString().slice(0, 16);
+  $('a-sd').value = $('a-rd').value = now;
+  $('a-err').textContent = $('a-hint').textContent = '';
+  const st = storeKey($('s').value);
+  if (/^\d{1,5}$/.test(st)) $('a-store').value = st;
+  fillAddReps();
+  $('addbox').hidden = false;
+  $('a-wo').focus();
+}
+// The store's rep this week and its DM, from the data file, until they're typed over.
+function fillAddReps() {
+  const st = storeKey($('a-store').value),
+    v = visitsName && /^\d+$/.test(st) ? visFrame().weeksFor(st) : null;
+  $('a-hint').textContent = visitsName ? (v ? 'From the data file' : st ? `Store ${st} isn't in the data file` : '') : 'Import the data file to fill these in';
+  if (!v) return;
+  const rep = v.weeks.find(w => w.repId)?.rep ?? '';
+  if (!$('a-rep').dataset.typed) $('a-rep').value = rep;
+  if (!$('a-fom').dataset.typed) $('a-fom').value = v.dm;
+}
+function addEscalation(ev) {
+  ev.preventDefault();
+  const err = t => ($('a-err').textContent = t),
+    wo = woKey($('a-wo').value),
+    st = storeKey($('a-store').value),
+    problem = $('a-problem').value,
+    desc = $('a-desc').value.trim();
+  if (!wo) return err('Type the work order number (digits only).');
+  if (!/^\d{1,5}$/.test(st)) return err('Type the Target store number, like 3319.');
+  if (!desc) return err('Type a description.');
+  if (!$('a-sd').value || !$('a-rd').value || !$('a-los').value) return err('Fill in Status Date, Report Date and LOS Finish.');
+  if (rows.some(r => r.id === wo)) return err(`Work order ${wo} is already in the list.`);
+  if (tracker.has(wo)) return err(`Work order ${wo} is already in the tracker.`);
+  const want = problem === 'BDS_DATA_REVIEW' ? /^data review/i : /^no show/i,
+    sheetName = Object.keys(trackerFile.sheets).find(n => want.test(n));
+  if (!sheetName) return err(`The tracker has no ${problem === 'BDS_DATA_REVIEW' ? 'Data Review' : 'No show'} sheet.`);
+  const info = trackerFile.sheets[sheetName],
+    row = ++info.last,
+    site = 'T' + st.padStart(4, '0'),
+    [sd, rd, los] = ['a-sd', 'a-rd', 'a-los'].map(id => localWhen($(id).value)),
+    e = {
+      key: `${sheetName}!${row}`,
+      sheet: info.sheet,
+      sheetName,
+      row,
+      id: wo,
+      store: st,
+      v: { wo: +wo, site, desc, problem, val: '', status: 'APPR', sd: sd.text, rd: rd.text, los: los.text, comments: $('a-comments').value.trim(), action: '', inMax: '', closed: '', rep: $('a-rep').value.trim(), fom: $('a-fom').value.trim(), upd: '', emailed: '', resp: '' }
+    };
+  addTrackerRow(e);
+  trackerRows++;
+  markDirty(e, TRACKER_COLS.map(c => c[0]).filter(k => e.v[k] !== ''));
+  const a = visitsName ? visFrame().weeksFor(st)?.address : null,
+    r = { i: rows.length, row: [], manual: true, status: 'APPR', sd, rd, los, id: wo, site, desc, problem, val: '', city: a?.city ?? '', state: a?.state ?? '', region: '', group: '', district: '' };
+  rows.push(r);
+  $('addbox').hidden = true;
+  filters();
+  follow(st);
+  showEscalation(r);
+  toast(`✓ Added work order ${wo}. Click Save at the top to write it into ${trackerName}.`);
+}
+$('addesc').onclick = openAdd;
+$('a-cancel').onclick = () => ($('addbox').hidden = true);
+$('addbox').querySelector('form').onsubmit = addEscalation;
+$('a-store').addEventListener('input', fillAddReps);
+for (const id of ['a-rep', 'a-fom']) $(id).addEventListener('input', e => (e.target.dataset.typed = e.target.value ? '1' : ''));
+$('addbox').addEventListener('click', e => {
+  if (e.target.id === 'addbox') $('addbox').hidden = true;
+});
+
 // Store numbers are compared as plain numbers, so "0347", "347.0" and "T0347" all match store 347.
 function storeKey(v) {
   const x = clean(v);
@@ -3605,6 +3898,7 @@ function closeImports() {
   $('imports').hidden = true;
 }
 $('fpill').onclick = () => openImports('Import files here');
+$('tsave').onclick = saveTracker;
 $('imclose').onclick = closeImports;
 $('imports').addEventListener('click', e => {
   if (e.target.id === 'imports') closeImports();
@@ -3802,12 +4096,12 @@ const IMPORTS = {
   imp: ['file', loadData],
   vimp: ['vfile', importVisits],
   pimp: ['pfile', importPresence],
-  timp: ['tfile', importTracker],
+  timp: ['tfile', f => importTracker(f)],
   ximp: ['xfile', importParts]
 };
 Object.entries(IMPORTS).forEach(([id, [fid, load]]) => {
   const b = $(id);
-  b.onclick = () => $(fid).click();
+  b.onclick = () => (id === 'timp' ? pickTracker() : $(fid).click());
   $(fid).onchange = e => {
     const f = e.target.files[0];
     e.target.value = '';
