@@ -18,7 +18,8 @@
   --s-warn: #b86400;
   --s-ok: #23964f;
   --s-mut: #56626e;
-  --hdr: #015a8a;
+  --hdr: #a00000;
+  --btn: #015a8a;
   --hbg: #dce2e8;
   --zebra: #f1f3f5;
   --onacc: #fff;
@@ -59,7 +60,8 @@
     --s-warn: var(--warn);
     --s-ok: var(--ok);
     --s-mut: var(--mut);
-    --hdr: #0b3552;
+    --hdr: #7a0000;
+    --btn: #0b3552;
     --hbg: #16212b;
     --zebra: #1f2b37;
     --bad: #ff8a80;
@@ -99,7 +101,8 @@
   --s-warn: var(--warn);
   --s-ok: var(--ok);
   --s-mut: var(--mut);
-  --hdr: #0b3552;
+  --hdr: #7a0000;
+  --btn: #0b3552;
   --hbg: #16212b;
   --zebra: #1f2b37;
   --bad: #ff8a80;
@@ -209,13 +212,13 @@ header button.p {
   color: var(--hdr);
 }
 header button.p:hover:not(:disabled) {
-  background: #e6f1f8;
-  border-color: #e6f1f8;
+  background: #fbe9e9;
+  border-color: #fbe9e9;
 }
 header .spin.on,
 header .spin {
-  border-color: rgba(1, 90, 138, 0.25);
-  border-top-color: #015a8a;
+  border-color: rgba(160, 0, 0, 0.25);
+  border-top-color: #a00000;
 }
 header .ver {
   background: rgba(255, 255, 255, 0.18);
@@ -1540,10 +1543,10 @@ body:not(.on-vis):not(.on-dir) #vsum {
 #imports[hidden] {
   display: none;
 }
-/* Import reports popup: one box per file. Missing files have a dashed border; loaded ones turn green with the file name. */
+/* Import files popup: one box per file. Missing files have a dashed border; loaded ones turn green with the file name. */
 .imgrid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr);
   gap: 10px;
 }
 .ib {
@@ -1582,9 +1585,7 @@ body:not(.on-vis):not(.on-dir) #vsum {
 .ibt span {
   font-size: 12.5px;
   color: var(--mut);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
 }
 .ib .okc,
 .ib .nd,
@@ -1603,7 +1604,7 @@ body:not(.on-vis):not(.on-dir) #vsum {
   width: 14px;
   height: 14px;
 }
-/* Files pill at the top right: how many of the four reports are loaded; opens the popup. */
+/* Files pill at the top right: how many of the files are loaded; opens the popup. */
 .fpill {
   margin-left: auto;
   display: inline-flex;
@@ -2032,8 +2033,8 @@ header .fpill.done:hover {
   height: 34px;
   padding: 0 14px;
   white-space: nowrap;
-  background: var(--hdr);
-  border-color: var(--hdr);
+  background: var(--btn);
+  border-color: var(--btn);
   color: #fff;
 }
 #copy:hover {
@@ -2418,8 +2419,8 @@ button:focus-visible {
 </style></head><body>
 <header><h1><svg class="logo" viewBox="0 0 28 28" role="img" aria-label="Target"><circle cx="14" cy="14" r="11.5" fill="none" stroke="#fff" stroke-width="4"/><circle cx="14" cy="14" r="4.5" fill="#fff"/></svg>Target Escalation Dashboard</h1>
 <nav id="apptabs" role="tablist"><button role="tab" data-app="esc" aria-selected="true">Escalations</button><button role="tab" data-app="vis" aria-selected="false">Store Visits</button><button role="tab" data-app="dir" aria-selected="false">Directory</button></nav>
-<button id="fpill" class="fpill miss" aria-haspopup="dialog" title="Import reports">0 of 4 files loaded</button>
-<input id="file" type="file" accept=".xlsx" hidden><input id="vfile" type="file" accept=".xlsx,.xls,.csv" hidden><input id="pfile" type="file" accept=".xlsx,.xls,.csv" hidden><input id="rfile" type="file" accept=".xlsx,.xls" hidden></header>
+<button id="fpill" class="fpill miss" aria-haspopup="dialog" title="Import files">0 of 3 files loaded</button>
+<input id="file" type="file" accept=".xlsx" hidden><input id="vfile" type="file" accept=".xlsx" hidden><input id="rfile" type="file" accept=".xlsx,.xls" hidden></header>
 <div id="sumbar"><div id="sum"></div><div id="vsum"></div><div id="follow"></div></div>
 <div id="escView">
 <main>
@@ -2437,19 +2438,19 @@ button:focus-visible {
 <p><b>Completed:</b> VINPRG, a work order that has been completed.</p>
 <p><b>Closed, not removed:</b> VDECWC, a work order that has been closed but not removed.</p>
 <p><b>Past due:</b> New or Open, and its LOS Finish date has passed. <b>Due within 48 hours:</b> its LOS Finish is in the next 48 hours.</p>
-<p>Only PM work orders are loaded. CM rows in the Data file are skipped.</p></details><button id="thm" type="button"></button></div></section>
-<section id="d"><div id="empty"><h2>Import reports to begin</h2><p class="m">Files are read in your browser only.</p><button class="p" id="openimp">Import reports</button></div></section>
+<p>Only CM work orders are loaded. PM rows in the export file are skipped.</p></details><button id="thm" type="button"></button></div></section>
+<section id="d"><div id="empty"><h2>Import files to begin</h2><p class="m">Files are read in your browser only.</p><button class="p" id="openimp">Import files</button></div></section>
 </main></div>
 <iframe id="visView" src="visits.html" title="Store visits and directory" hidden></iframe>
 <footer class="contact" id="cta">Got problems? Email <a class="mail" href="mailto:kyle.didonato@channelpartners.com">kyle.didonato@channelpartners.com</a> or <a class="mail" href="https://teams.microsoft.com/l/chat/0/0?users=kyle.didonato@channelpartners.com" target="_blank" rel="noopener" id="ctalink">click here</a>.</footer>
 <div id="imports" class="ovl" hidden><div class="nbox imbox" role="dialog" aria-modal="true" aria-labelledby="imtitle"><h2 id="imtitle">Let's get started</h2>
-<p class="m">Drop each report on its box, or click a box to pick the file. Files are read in your browser only.</p>
-<div class="imgrid"><button id="imp" class="ib miss"></button><button id="vimp" class="ib miss"></button><button id="pimp" class="ib miss" aria-disabled="true"></button><button id="rimp" class="ib miss"></button></div>
+<p class="m">Drop each file on its box, or click a box to pick the file. Files are read in your browser only.</p>
+<div class="imgrid"><button id="imp" class="ib miss"></button><button id="vimp" class="ib miss"></button><button id="rimp" class="ib miss"></button></div>
 <div class="mbtn"><span id="imcount" class="m"></span><span class="sp" style="flex:1"></span><button id="imclose">Close</button></div></div></div>
 <div id="toast"></div>
 <script>
 
-// Target escalations: the Best Buy v4 framework (imports, list, filters, Store Visits, Directory), fed by Maximo work orders.
+// Target escalations: the Best Buy v4 framework (imports, list, filters, Store Visits, Directory), fed by Maximo CM work orders.
 // One icon set, drawn at text size in the current text color.
 const drawIcon = d =>
   `<svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path d="${d}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
@@ -2462,16 +2463,18 @@ const ICONS = {
 };
 const $ = id => document.getElementById(id);
 
-// ---- The Data file: Maximo's work order export ------------------------------------------------------
+// ---- The export file: Maximo's work order export ------------------------------------------------------
 // Columns are found by their heading, so their order in the file doesn't matter. A missing heading stops the import.
 const DATA_COLS = {
   id: 'work_order_number',
   type: 'work_type',
   site: 'site',
   desc: 'work_order_description',
+  problem: 'problem',
   val: 'vendor_wo_val',
   status: 'work_order_status',
   sd: 'earliest_start',
+  rd: 'arrive_by',
   los: 'repair_by',
   city: 'city',
   state: 'state',
@@ -2489,7 +2492,7 @@ const STATUSES = {
 const DONE = new Set(['VINPRG', 'VDECWC']);
 const STATUS_TAG = { APPR: 'st-new', VDECWO: 'st-open', VINPRG: 'st-done', VDECWC: '' };
 
-// A problem with the Data file itself. Its message is shown as is, and nothing is loaded.
+// A problem with the export file itself. Its message is shown as is, and nothing is loaded.
 class DataError extends Error {}
 
 // Maximo writes dates as store-local text: "09/30/2026 06:28 AM EDT". Each is read as that moment, so "past due"
@@ -2535,9 +2538,7 @@ const toast = t => {
   clearTimeout(toast.t);
   toast.t = setTimeout(() => el.classList.remove('on'), 4000);
 };
-const fmtDateTime = d => d.toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }),
-  fmtDate = d => d.toLocaleDateString([], { dateStyle: 'medium' });
-const isDate = v => v instanceof Date && !isNaN(v);
+const fmtDateTime = d => d.toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' });
 const clean = x => {
   if (x == null) return '';
   const s = String(x).trim();
@@ -2601,12 +2602,12 @@ function readFile(f) {
   });
 }
 
-// The work orders in a Data file: the sheet with Maximo's headings, PM rows only. CM and other work types are skipped.
+// The work orders in the export file: the sheet with Maximo's headings, CM rows only. PM and other work types are skipped.
 function readWorkOrders(wb) {
   const A = wb.SheetNames.map(n => XLSX.utils.sheet_to_json(wb.Sheets[n], { header: 1, raw: true, defval: null })).find(t =>
     (t[0] || []).some(h => norm(h) === DATA_COLS.id)
   );
-  if (!A) throw new DataError(`This file has no ${DATA_COLS.id} column. Import Maximo's work order export.`);
+  if (!A) throw new DataError(`This file has no ${DATA_COLS.id} column. Import Maximo's export file.`);
   const H = A[0].map(norm),
     col = Object.fromEntries(Object.entries(DATA_COLS).map(([k, h]) => [k, H.indexOf(h)])),
     missing = Object.keys(DATA_COLS).filter(k => col[k] < 0);
@@ -2620,7 +2621,7 @@ function readWorkOrders(wb) {
   let skipped = 0;
   A.slice(1).forEach((a, i) => {
     if (!text(a, 'id')) return;
-    if (text(a, 'type').toUpperCase() !== 'PM') {
+    if (text(a, 'type').toUpperCase() !== 'CM') {
       skipped++;
       return;
     }
@@ -2629,12 +2630,14 @@ function readWorkOrders(wb) {
       row: a,
       status: text(a, 'status').toUpperCase(),
       sd: maximoDate(a[col.sd], i + 2),
+      rd: maximoDate(a[col.rd], i + 2),
       los: maximoDate(a[col.los], i + 2)
     };
-    for (const k of ['id', 'site', 'desc', 'val', 'city', 'state', 'region', 'group', 'district']) r[k] = text(a, k);
+    for (const k of ['id', 'site', 'desc', 'problem', 'val', 'city', 'state', 'region', 'group', 'district']) r[k] = text(a, k);
     if (!(r.status in STATUSES)) unknown.add(r.status || '(blank)');
     out.push(r);
   });
+  if (!out.length) throw new DataError(`This file has no CM work orders (${skipped.toLocaleString()} rows are not CM). Nothing was loaded.`);
   if (unknown.size)
     throw new DataError(
       `This file has Maximo statuses the dashboard doesn't know: ${[...unknown].join(', ')}. Nothing was loaded.`
@@ -2664,10 +2667,9 @@ async function loadData(f) {
     fileName = f.name;
     filters();
     toast(
-      `✓ Loaded ${rows.length.toLocaleString()} PM work orders from ${fileName}.${d.skipped ? ` Skipped ${d.skipped.toLocaleString()} rows that aren't PM.` : ''}`
+      `✓ Loaded ${rows.length.toLocaleString()} CM work orders from ${fileName}.${d.skipped ? ` Skipped ${d.skipped.toLocaleString()} rows that aren't CM.` : ''}`
     );
     summaryView();
-    if (pivotFile && !importedVisits.cur.v.length) openVisits(pivotFile, 'cur');
   } catch (e) {
     $('d').innerHTML = prev;
     $('list').innerHTML = prevList;
@@ -2675,7 +2677,7 @@ async function loadData(f) {
     toast(
       e instanceof DataError
         ? e.message
-        : "This file couldn't be opened as a workbook. Import Maximo's work order export (.xlsx)."
+        : "This file couldn't be opened as a workbook. Import Maximo's export file (.xlsx)."
     );
   } finally {
     loadData.busy = 0;
@@ -2823,6 +2825,7 @@ function draw() {
 function timeline(r) {
   const E = [
     [r.sd, 'Status Date', ''],
+    [r.rd, 'Report Date', ''],
     [r.los, 'LOS Finish', dueState(r) === 'late' ? 'late' : 'due'],
     [{ at: now(), shown: fmtDateTime(now()) }, 'Today', 'now']
   ];
@@ -2836,17 +2839,27 @@ function timeline(r) {
 function glance(r) {
   const fact = (t, v) => `<dt>${t}</dt><dd>${v || '<span class="m">None</span>'}</dd>`;
   return `${r.desc ? `<div class="issw"><p class="issue">${esc(r.desc)}</p></div>` : ''}
- <dl class="facts">${fact('Status', `${esc(statusLabel(r))} <span class="m">· ${esc(r.status)}</span>`)}${fact('Status Date', r.sd && esc(r.sd.shown))}${fact('LOS Finish', r.los && esc(r.los.shown))}${fact('Vendor Work Validation', esc(r.val))}${fact('Work Order', esc(r.id))}${fact('Site', esc(r.site))}</dl>
+ <dl class="facts">${fact('Status', `${esc(statusLabel(r))} <span class="m">· ${esc(r.status)}</span>`)}${fact('Problem Code', esc(r.problem))}${fact('Status Date', r.sd && esc(r.sd.shown))}${fact('Report Date', r.rd && esc(r.rd.shown))}${fact('LOS Finish', r.los && esc(r.los.shown))}${fact('Vendor Work Validation', esc(r.val))}${fact('Work Order', esc(r.id))}${fact('Site', esc(r.site))}</dl>
  <h3 class="tlh">Timeline</h3>${timeline(r)}`;
 }
 
-// Every column of the work order that has a value, as the Data file has it.
+// Every column of the work order that has a value, as the export file has it.
 function fullRecord(r) {
   return `<div class="kvg">${headers
     .map((h, i) =>
       r.row[i] == null || r.row[i] === '' ? '' : `<div class="kv"><span>${esc(h)}</span><b>${esc(r.row[i])}</b></div>`
     )
     .join('')}</div>`;
+}
+
+// The tracker's middle block: the store's DM and, for its last four weeks, the rep assigned and whether they visited.
+function visitsCard(r) {
+  if (!visitsName) return '<p class="m">Import the data file to see this store\'s rep, DM and visits.</p>';
+  const v = visFrame().weeksFor(storeKey(r.site));
+  if (!v) return `<p class="m">Store ${esc(r.site)} has no Target Break-Fix Continuity visits in the data file.</p>`;
+  return `<dl class="facts"><dt>DM</dt><dd>${esc(v.dm) || '<span class="m">None</span>'}</dd>${v.weeks
+    .map(w => `<dt>${esc(w.wave)}</dt><dd>${esc(w.rep)} <span class="m">· ${esc(w.status)}</span></dd>`)
+    .join('')}</dl>`;
 }
 
 function showEscalation(r, keep) {
@@ -2867,15 +2880,12 @@ function showEscalation(r, keep) {
  <h2 class="vn">Store ${esc(r.site)}</h2>${where ? `<div class="sid">${esc(where)}</div>` : ''}<div class="m ids">Work order #${esc(r.id)}</div></div>
  <div class="side"><button id="copy">Copy summary for email</button>${org ? `<div class="team">${org}</div>` : ''}</div></div>
  <div class="panel solo">${glance(r)}</div>
- ${collapsible('all', 'Full record', fullRecord(r), 'Every column of this work order in the Data file', false)}`;
+ ${collapsible('visits', 'Rep and visits', visitsCard(r), 'Last four weeks, from the data file')}
+ ${collapsible('all', 'Full record', fullRecord(r), 'Every column of this work order in the export file', false)}`;
   $('d').scrollTop = sc;
   draw();
 }
 
-// A visit's date: when it was scheduled, else its wave's end date.
-const visitDate = x => x.date || x.we;
-
-// ---- Visit data: up to two visit reports, last week's and this week's, indexed by store.
 // Store numbers are compared as plain numbers, so "0347", "347.0" and "T0347" all match store 347.
 function storeKey(v) {
   const x = clean(v);
@@ -2883,115 +2893,12 @@ function storeKey(v) {
   const m = x.match(/(\d+)(?:\.0+)?\s*$/);
   return m ? String(+m[1]) : x.toLowerCase();
 }
-// Each slot: its box, file input and which week's pivot report it takes.
-const VISIT_SLOTS = {
-  cur: ['vimp', 'vfile', "this week's"],
-  prev: ['pimp', 'pfile', "last week's"]
-};
-const importedVisits = { cur: { v: [], name: '' }, prev: { v: [], name: '' } };
-// File name of the People Report loaded into Store Visits.
-let peopleName = '';
-// File name of the current visits Store Visits read, shown on the button until a Data file is loaded.
-let storeVisitsName = '';
-const allImportedVisits = () => [...importedVisits.prev.v, ...importedVisits.cur.v];
-const VISITS = { byS: {}, byB: {}, srcs: [] };
-
-function indexVisits() {
-  VISITS.byS = {};
-  VISITS.byB = {};
-  VISITS.srcs = [];
-  const all = allImportedVisits();
-  all.forEach(x => {
-    if (x.store) (VISITS.byS[x.store] ??= []).push(x);
-    if (x.bds) (VISITS.byB[x.bds] ??= []).push(x);
-  });
-  const src = {};
-  all.forEach(x => {
-    const o = (src[x.src] ??= { name: x.src, n: 0, max: null });
-    o.n++;
-    const w = visitDate(x);
-    if (w && (!o.max || w > o.max)) o.max = w;
-  });
-  VISITS.srcs = Object.values(src);
-}
-const FIELDS = [
-  [
-    'store',
-    'Store #',
-    [
-      'chain store #',
-      'store #',
-      'bby store #',
-      'best buy store #',
-      'store number',
-      'store no',
-      'store',
-      'bby store'
-    ]
-  ],
-  ['bds', 'BDS store #', ['bds store id', 'bds store #', 'bds #', 'bds id', 'bds']],
-  [
-    'date',
-    'Visit date',
-    ['visit date scheduled', 'visit date', 'scheduled date', 'date scheduled', 'scheduled', 'date']
-  ],
-  ['rep', 'Rep', ['rep name', 'rep', 'representative', 'assigned rep', 'merchandiser']],
-  ['status', 'Status', ['status', 'visit status', 'call status']],
-  [
-    'form',
-    'Call form or project',
-    ['call form name', 'call form', 'project', 'wave name', 'visit name', 'program name']
-  ],
-  ['prog', 'Vendor or program', ['program', 'vendor', 'client', 'brand']],
-  ['reason', 'Visit reason or type', ['visit reason', 'visit type', 'reason', 'type']],
-  ['we', 'Due or wave end date', ['wave end date', 'due date', 'end date', 'deadline']],
-  ['tin', 'Time in', ['scheduled time in', 'time in', 'check in', 'arrival time', 'start time']],
-  ['tout', 'Time out', ['scheduled time out', 'time out', 'check out', 'departure time', 'end time']],
-  [
-    'hg',
-    'Scheduled hours',
-    ['in-store hours goal', 'scheduled hours', 'planned hours', 'hours goal', 'duration']
-  ],
-  ['ha', 'Actual hours', ['in-store hours actual', 'actual hours', 'hours actual', 'hours worked']],
-  ['had', 'Had parts or materials (Y/N)', ['had materials', 'had parts', 'parts placed', 'materials placed']],
-  ['mat', 'Parts or materials', ['materials description', 'parts description', 'parts', 'materials']],
-  [
-    'ship',
-    'Parts shipped to',
-    ['shipped to', 'ship to', 'shipping destination', 'deliver to', 'ship destination']
-  ]
-];
-const headingKey = x => norm(x).replace(/\s+/g, ' ');
-
-function guessCol(H, names) {
-  for (const n of names) {
-    const i = H.findIndex(h => headingKey(h) === n);
-    if (i >= 0) return i;
-  }
-  for (const n of names) {
-    const i = H.findIndex(h => headingKey(h).includes(n));
-    if (i >= 0) return i;
-  }
-  return -1;
-}
-
-function headerRow(A) {
-  let best = 0,
-    bs = -1;
-  for (let r = 0; r < Math.min(15, A.length); r++) {
-    const H = A[r] || [];
-    const sc = FIELDS.filter(f => guessCol(H, f[2]) >= 0).length;
-    if (sc > bs) {
-      bs = sc;
-      best = r;
-    }
-  }
-  return [best, bs];
-}
-let visitImport = null;
+// File names of the data and People Report files loaded into Store Visits and the Directory.
+let visitsName = '',
+  peopleName = '';
 
 // The spinners are CSS transform animations, so they keep turning while the file is parsed.
-// A box while its file is read: a spinner and "Opening…" under the report's name.
+// A box while its file is read: a spinner and "Opening…" under the file's name.
 function busyBtn(id, on, label) {
   const b = $(id);
   b.disabled = on;
@@ -3002,11 +2909,11 @@ function busyBtn(id, on, label) {
   } else btnState();
 }
 
-// Each import box names its report and says what goes in it until the file is loaded, then shows a check and the file name.
+// Each import box is named for the file it takes and says what that file fills in, until it is loaded; then it shows a check, the file name and a count.
+const FILE_COUNT = 3;
 let filesLoaded = 0;
 function btnState() {
-  const wok = !!rows.length,
-    ck = `<span class="okc">${ICONS.check}</span>`;
+  const ck = `<span class="okc">${ICONS.check}</span>`;
   let n = 0;
   const paint = (id, ok, what, okNote, emptyNote) => {
     const b = $(id);
@@ -3017,39 +2924,27 @@ function btnState() {
     b.innerHTML = `${ok ? ck : '<span class="nd"></span>'}<span class="ibt"><b>${what}</b><span>${esc(ok ? okNote : emptyNote)}</span></span>`;
     b.title = ok ? `${okNote}. Click or drop to import a different file.` : emptyNote;
   };
-  paint('imp', wok, 'Data', fileName, "Maximo's work order export (.xlsx)");
-  Object.entries(VISIT_SLOTS).forEach(([k, [id, , when]]) => {
-    const o = importedVisits[k],
-      vok = !!o.v.length || (k === 'cur' && !wok && !!storeVisitsName);
-    paint(
-      id,
-      vok,
-      `${when[0].toUpperCase() + when.slice(1)} pivot report`,
-      `${o.name || storeVisitsName}${o.v.length ? ` · ${o.v.length.toLocaleString()} visits` : ''}`,
-      k === 'prev' && !wok ? 'Load the Data file first' : `${when[0].toUpperCase() + when.slice(1)} Priority Pivot (.xlsx or .csv)`
-    );
-    // Not disabled: a disabled button would let a dropped file fall through to the page and load as the Data file.
-    $(id).setAttribute('aria-disabled', k === 'prev' && !wok);
-  });
-  paint('rimp', !!peopleName, 'People report', peopleName, 'Rep phone numbers and email (.xlsx)');
-  // The popup closes by itself once the last of the four files is in.
-  if (n === 4 && filesLoaded < 4 && !$('imports').hidden) setTimeout(closeImports, 900);
+  paint('imp', !!rows.length, 'export', `${fileName} · ${rows.length.toLocaleString()} CM work orders`, "Maximo's CM work orders. Fills the escalation list and each work order's details.");
+  paint('vimp', !!visitsName, 'data', visitsName, "Power BI's Target Break-Fix Continuity visits. Fills each store's rep, DM and whether the rep visited that week.");
+  paint('rimp', !!peopleName, 'People Report', peopleName, "The rep directory. Fills the Directory tab's rep details.");
+  // The popup closes by itself once the last of the files is in.
+  if (n === FILE_COUNT && filesLoaded < FILE_COUNT && !$('imports').hidden) setTimeout(closeImports, 900);
   filesLoaded = n;
   filesPill();
 }
-// The files pill counts loaded reports, with a spinner while one is being read.
+// The files pill counts loaded files, with a spinner while one is being read.
 function filesPill() {
   const busy = [...document.querySelectorAll('.imgrid .ib')].some(b => b.disabled),
-    all = filesLoaded === 4,
+    all = filesLoaded === FILE_COUNT,
     p = $('fpill');
   p.classList.toggle('done', all && !busy);
   p.classList.toggle('miss', !all || busy);
   p.innerHTML = busy
     ? '<span class="spin sm" aria-hidden="true"></span>Importing…'
     : all
-      ? `<span class="okc">${ICONS.check}</span>4 of 4 files imported`
-      : `${filesLoaded} of 4 files loaded`;
-  $('imcount').textContent = `${filesLoaded} of 4 files loaded`;
+      ? `<span class="okc">${ICONS.check}</span>${FILE_COUNT} of ${FILE_COUNT} files imported`
+      : `${filesLoaded} of ${FILE_COUNT} files loaded`;
+  $('imcount').textContent = `${filesLoaded} of ${FILE_COUNT} files loaded`;
 }
 function openImports(title) {
   $('imtitle').textContent = title;
@@ -3059,7 +2954,7 @@ function openImports(title) {
 function closeImports() {
   $('imports').hidden = true;
 }
-$('fpill').onclick = () => openImports('Import reports here');
+$('fpill').onclick = () => openImports('Import files here');
 $('imclose').onclick = closeImports;
 $('imports').addEventListener('click', e => {
   if (e.target.id === 'imports') closeImports();
@@ -3070,8 +2965,6 @@ document.addEventListener('keydown', e => {
 $('d').addEventListener('click', e => {
   if (e.target.id === 'openimp') openImports("Let's get started");
 });
-const visitsBusy = (slot, on, label) => busyBtn(VISIT_SLOTS[slot][0], on, label);
-
 // Skeleton lines: widths are percentages.
 const skLines = (...w) => w.map(x => `<div class="sk" style="width:${x}%"></div>`).join('');
 const skList = n => Array.from({ length: n }, (_, i) => `<div class="skit">${skLines(60 - (i % 3) * 10, 85)}</div>`).join('');
@@ -3081,180 +2974,6 @@ function busyCard(title, name, step) {
   return `<div id="loading" role="status" aria-live="polite"><p class="m lst"><span class="spin sm" aria-hidden="true"></span><b>${title}</b> · ${esc(name)} · <span id="vstep">${step}</span></p>
  <div class="top"><div class="sk h"></div>${skLines(30, 55, 40)}</div>
  ${[4, 3, 5].map(n => `<div class="skcard"><div class="sk" style="width:25%;height:16px"></div>${skLines(...[90, 70, 80, 60, 75].slice(0, n))}</div>`).join('')}</div>`;
-}
-
-// One visit file at a time: imports share visitImport and the detail pane, so a second one waits for the first.
-let visitQueue = Promise.resolve();
-function openVisits(f, slot) {
-  visitQueue = visitQueue.then(() => readVisitFile(f, slot));
-}
-async function readVisitFile(f, slot) {
-  const back = current,
-    prev = $('d').innerHTML;
-  visitsBusy(slot, true, 'Opening…');
-  $('d').innerHTML = busyCard(
-    'Opening visit file',
-    `${f.name} · ${(f.size / 1048576).toFixed(1)} MB`,
-    'Reading the file…'
-  );
-  try {
-    const b = await f.arrayBuffer();
-    $('vstep').textContent = 'Reading the sheets. Large files take a few seconds…';
-    await nextFrame();
-    const vb = XLSX.read(b, { type: 'array', cellDates: true });
-    $('vstep').textContent = 'Finding the columns…';
-    await nextFrame();
-    const sc = vb.SheetNames.map(n => {
-      const A = XLSX.utils.sheet_to_json(vb.Sheets[n], { header: 1, raw: true, defval: null });
-      return [n, headerRow(A)[1]];
-    }).sort((a, b) => b[1] - a[1]);
-    const data =
-      vb.SheetNames.find(n => /^data$/i.test(n.trim())) || vb.SheetNames.find(n => /data/i.test(n));
-    visitImport = { name: f.name, slot, wb: vb, back, sheet: data || sc[0][0] };
-    mapSheet();
-    // Import straight away when the store and date columns are recognized; only ask when they aren't.
-    if (
-      (visitImport.map.store >= 0 || visitImport.map.bds >= 0) &&
-      (visitImport.map.date >= 0 || visitImport.map.we >= 0)
-    ) {
-      $('vstep').textContent = 'Adding visits…';
-      await nextFrame();
-      commitVisits();
-      return;
-    }
-    mapView();
-    toast("Some columns weren't recognized. Check them below.");
-  } catch (e) {
-    $('d').innerHTML = prev;
-    toast("This file couldn't be opened. Use an .xlsx or .csv visit report.");
-  } finally {
-    visitsBusy(slot, false);
-  }
-}
-
-function mapSheet() {
-  const A = XLSX.utils.sheet_to_json(visitImport.wb.Sheets[visitImport.sheet], {
-      header: 1,
-      raw: true,
-      defval: null
-    }),
-    [h] = headerRow(A);
-  visitImport.A = A;
-  visitImport.h = h;
-  visitImport.H = (A[h] || []).map(x => clean(x));
-  let saved = {};
-  try {
-    saved = JSON.parse(loadSetting('bbVisMap:' + visitImport.H.join('|')) || '{}');
-  } catch (e) {}
-  visitImport.map = Object.fromEntries(
-    FIELDS.map(([k, , names]) => [k, k in saved ? saved[k] : guessCol(visitImport.H, names)])
-  );
-}
-const toDate = v => {
-  if (isDate(v)) return v;
-  if (v == null || v === '') return null;
-  const d = new Date(v);
-  return isNaN(d) ? null : d;
-};
-
-function buildVisits() {
-  const m = visitImport.map,
-    g = (row, k) => (m[k] >= 0 ? row[m[k]] : null),
-    out = [];
-  visitImport.A.slice(visitImport.h + 1).forEach(row => {
-    if (!row) return;
-    const store = storeKey(g(row, 'store')),
-      bds = storeKey(g(row, 'bds'));
-    if (!store && !bds) return;
-    out.push({
-      store,
-      bds,
-      date: toDate(g(row, 'date')),
-      we: toDate(g(row, 'we')),
-      rep: clean(g(row, 'rep')),
-      st: clean(g(row, 'status')),
-      form: clean(g(row, 'form')) || clean(g(row, 'prog')),
-      prog: clean(g(row, 'prog')),
-      reason: clean(g(row, 'reason')),
-      type: '',
-      tin: g(row, 'tin'),
-      tout: g(row, 'tout'),
-      hg: g(row, 'hg'),
-      ha: g(row, 'ha'),
-      had: clean(g(row, 'had')),
-      mat: clean(g(row, 'mat')),
-      nb: '',
-      ship: clean(g(row, 'ship')),
-      src: visitImport.name
-    });
-  });
-  return out;
-}
-
-function mapPreview() {
-  const v = buildVisits(),
-    S = new Set(rows.map(r => storeKey(r.site))),
-    hit = v.filter(x => S.has(x.store)).length,
-    dated = v.filter(x => visitDate(x)).length;
-  const need =
-    visitImport.map.store < 0 && visitImport.map.bds < 0
-      ? 'Pick the column with the store # or BDS #.'
-      : visitImport.map.date < 0 && visitImport.map.we < 0
-        ? 'Pick the column with the visit date.'
-        : '';
-  $('vprev').innerHTML = need
-    ? `<span class="bad">${need}</span>`
-    : `${v.length} visits found · <b>${hit}</b> are at stores in your work orders · ${dated} have a date.`;
-  $('vok').disabled = !!need || !v.length;
-}
-
-// The visit file's first non-empty data row, shown as an example next to each column choice.
-const firstDataRow = () =>
-  visitImport.A.slice(visitImport.h + 1).find(r => r && r.some(x => x != null && x !== '')) || [];
-
-function mapView() {
-  const ex = firstDataRow();
-  $('d').innerHTML =
-    `<div class="mapv"><h2>Import ${VISIT_SLOTS[visitImport.slot][2]} pivot report</h2><p class="m">${esc(visitImport.name)}. Check which column holds each piece of information. The page guessed from the column names.</p>
- ${visitImport.wb.SheetNames.length > 1 ? `<label class="msh">Sheet <select id="vsheet">${visitImport.wb.SheetNames.map(n => `<option${n === visitImport.sheet ? ' selected' : ''}>${esc(n)}</option>`).join('')}</select></label>` : ''}
- <div class="tw"><table class="mapt"><tr><th>Information</th><th>Column in your file</th><th>First row</th></tr>${FIELDS.map(
-   ([k, t]) => {
-     const c = visitImport.map[k],
-       x = c >= 0 ? ex[c] : '';
-     return `<tr><td>${t}${k === 'store' || k === 'date' ? ' <span class="m">(needed)</span>' : ''}</td><td><select data-map="${k}"><option value="-1">Not in this file</option>${visitImport.H.map((h, i) => (h ? `<option value="${i}"${i === c ? ' selected' : ''}>${esc(h)}</option>` : '')).join('')}</select></td><td class="m">${esc(isDate(x) ? fmtDate(x) : (x ?? ''))}</td></tr>`;
-   }
- ).join('')}</table></div>
- <p id="vprev" class="m"></p>
- <div class="mbtn"><button class="p" id="vok">Use these visits</button><button id="vcancel">Cancel</button></div></div>`;
-  mapPreview();
-}
-
-function commitVisits() {
-  const slot = visitImport.slot,
-    v = buildVisits();
-  importedVisits[slot] = { v, name: visitImport.name };
-  saveSetting('bbVisMap:' + visitImport.H.join('|'), JSON.stringify(visitImport.map));
-  indexVisits();
-  visitsBusy(slot, false);
-  toast(
-    `✓ Added ${v.length.toLocaleString()} visit${v.length === 1 ? '' : 's'} from ${visitImport.name}${visitImport.wb.SheetNames.length > 1 ? ` (${visitImport.sheet} sheet)` : ''} as ${VISIT_SLOTS[slot][2]} pivot report.`
-  );
-  const back = visitImport.back;
-  visitImport = null;
-  back ? showEscalation(back) : summaryView();
-}
-
-async function mapDone(ok) {
-  if (ok) {
-    $('vok').disabled = true;
-    $('vok').innerHTML = '<span class="spin sm on" aria-hidden="true"></span>Adding visits…';
-    visitsBusy(visitImport.slot, true, 'Adding…');
-    await nextFrame();
-    return commitVisits();
-  }
-  const back = visitImport.back;
-  visitImport = null;
-  back ? showEscalation(back) : summaryView();
 }
 
 const collapsible = (k, t, body, hint = '', open = true) =>
@@ -3267,23 +2986,7 @@ $('d').addEventListener(
   },
   true
 );
-$('d').addEventListener('change', e => {
-  const t = e.target;
-  if (!visitImport) return;
-  if (t.id === 'vsheet') {
-    visitImport.sheet = t.value;
-    mapSheet();
-    mapView();
-  } else if (t.dataset.map) {
-    visitImport.map[t.dataset.map] = +t.value;
-    mapPreview();
-    const ex = firstDataRow(),
-      x = +t.value >= 0 ? ex[+t.value] : '';
-    t.closest('tr').lastElementChild.textContent = isDate(x) ? fmtDate(x) : (x ?? '');
-  }
-});
-
-function filterFromPivot(tr) {
+function filterFromRow(tr) {
   FILTERS.forEach(([id]) => ($(id).value = ''));
   $('s').value = '';
   const el = $(tr.dataset.f);
@@ -3297,7 +3000,9 @@ function copyForEmail() {
     t = [
       `Target store ${r.site}${r.city || r.state ? ` (${[r.city, r.state].filter(Boolean).join(', ')})` : ''} - Work order ${r.id}`,
       `Status: ${statusLabel(r)} (${r.status})`,
+      `Problem Code: ${r.problem || 'none'}`,
       `Status Date: ${r.sd ? r.sd.shown : 'none'}`,
+      `Report Date: ${r.rd ? r.rd.shown : 'none'}`,
       `LOS Finish: ${r.los ? `${r.los.shown} (${dueText(r)})` : 'none'}`,
       `Vendor Work Validation: ${r.val || 'none'}`,
       `Region ${r.region} · Group ${r.group} · District ${r.district}`,
@@ -3323,7 +3028,7 @@ function copyForEmail() {
 }
 $('d').addEventListener('click', e => {
   const tr = e.target.closest('tr[data-f]');
-  if (tr) return filterFromPivot(tr);
+  if (tr) return filterFromRow(tr);
   const t = e.target.closest('button');
   if (!t) return;
   if (t.id === 'pvopen' || t.id === 'pvclose') {
@@ -3332,15 +3037,13 @@ $('d').addEventListener('click', e => {
       .forEach(d => (d.open = t.id === 'pvopen'));
     return;
   }
-  if (t.id === 'vok') return mapDone(1);
-  if (t.id === 'vcancel') return mapDone(0);
   if (t.id === 'copy') copyForEmail();
 });
 $('d').addEventListener('keydown', e => {
   const t = e.target;
   if (t.dataset.f && (e.key === 'Enter' || e.key === ' ')) {
     e.preventDefault();
-    filterFromPivot(t);
+    filterFromRow(t);
   }
 });
 $('q').addEventListener('click', e => {
@@ -3413,17 +3116,12 @@ $('clr').onclick = () => {
 };
 ['s', 'so', ...FILTERS.map(f => f[0])].forEach(i => $(i).addEventListener('input', draw));
 $('s').addEventListener('input', () => follow($('s').value));
-function importVisits(slot, f) {
-  if (slot === 'cur') {
-    pivotFile = f;
-    visFrame()
-      .loadPivot(f)
-      .then(ok => {
-        if (ok) storeVisitsName = f.name;
-        if (!rows.length) btnState();
-      });
-  }
-  if (rows.length) openVisits(f, slot);
+async function importVisits(f) {
+  busyBtn('vimp', true, 'Opening…');
+  const ok = await visFrame().loadVisits(f);
+  if (ok) visitsName = f.name;
+  busyBtn('vimp', false);
+  if (ok && current) showEscalation(current, true);
 }
 async function importPeople(f) {
   busyBtn('rimp', true, 'Opening…');
@@ -3433,20 +3131,18 @@ async function importPeople(f) {
 // A file dropped on the Store Visits or Directory tab. Re-wrapped so this page reads it as its own File.
 function importDropped(view, f) {
   f = new File([f], f.name, { type: f.type });
-  if (view === 'vis') importVisits('cur', f);
+  if (view === 'vis') importVisits(f);
   else importPeople(f);
 }
 // Import box id -> [its file input, what a picked or dropped file goes to].
 const IMPORTS = {
   imp: ['file', loadData],
-  vimp: ['vfile', f => importVisits('cur', f)],
-  pimp: ['pfile', f => importVisits('prev', f)],
+  vimp: ['vfile', importVisits],
   rimp: ['rfile', importPeople]
 };
 Object.entries(IMPORTS).forEach(([id, [fid, load]]) => {
   const b = $(id);
-  const off = () => b.getAttribute('aria-disabled') === 'true' && (toast('Load the Data file first.'), true);
-  b.onclick = () => off() || $(fid).click();
+  b.onclick = () => $(fid).click();
   $(fid).onchange = e => {
     const f = e.target.files[0];
     e.target.value = '';
@@ -3461,10 +3157,10 @@ Object.entries(IMPORTS).forEach(([id, [fid, load]]) => {
     e.preventDefault();
     e.stopPropagation();
     b.classList.remove('over');
-    if (!b.disabled && !off() && e.dataTransfer.files[0]) load(e.dataTransfer.files[0]);
+    if (!b.disabled && e.dataTransfer.files[0]) load(e.dataTransfer.files[0]);
   });
 });
-// A file dropped anywhere else on the page is taken as the Data file.
+// A file dropped anywhere else on the page is taken as the export file.
 addEventListener('dragover', e => e.preventDefault());
 addEventListener('drop', e => {
   e.preventDefault();
@@ -3551,9 +3247,7 @@ paintThemeToggle();
 // ---- V4: Escalations, Store Visits and Directory tabs. Store Visits and Directory are visits.html in a frame;
 // Escalations and Store Visits share one store search.
 const visFrame = () => $('visView').contentWindow;
-// The current visits file imported before the Data file; it is applied once a Data file is loaded.
-let pivotFile = null;
-// Store Visits has no imports of its own: the header's Current visits and People report buttons load it,
+// Store Visits has no imports of its own: the data and People Report boxes load it,
 // and it reports read errors here.
 function visitsFileError(t) {
   toast(t);
