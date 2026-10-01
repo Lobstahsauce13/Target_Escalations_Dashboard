@@ -1,5 +1,7 @@
 # Target Escalation Dashboard
 
+Live site: https://target-escalations-dashboard.zy8dcr9n7z.workers.dev
+
 Built on the Best Buy dashboard v4: same framework and styling. One page with three tabs:
 
 - **Escalations**: Target's CM work orders from Maximo (`index.html`). Read only for now.
