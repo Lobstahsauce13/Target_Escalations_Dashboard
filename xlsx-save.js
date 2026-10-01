@@ -192,7 +192,8 @@ function cellStyle(xml, ref) {
 
 // The dimension ref grows to take in rows added below it.
 function growDimension(xml, lastRow) {
-  return xml.replace(/<dimension ref="([A-Z]+)(\d+):([A-Z]+)(\d+)"\/>/, (m, c0, r0, c1, r1) =>
+  // Excel writes <dimension ref="A1:T20"/>; other tools put a space before the "/>".
+  return xml.replace(/<dimension ref="([A-Z]+)(\d+):([A-Z]+)(\d+)"\s*\/>/, (m, c0, r0, c1, r1) =>
     +r1 >= lastRow ? m : `<dimension ref="${c0}${r0}:${c1}${lastRow}"/>`
   );
 }

@@ -47,6 +47,7 @@
   --p3bg: #ebe6fc;
   --p4: #0e6674;
   --p4bg: #dcf1f4;
+  --cs1: #2a78d6;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
@@ -79,6 +80,7 @@
     --ok: #6fd49a;
     --okbg: #173a26;
     --chip: #2b2b2b;
+    --cs1: #3987e5;
     --chg: #3a3218;
     --chgb: #8a7030;
     --inp: #181818;
@@ -123,6 +125,7 @@
   --ok: #6fd49a;
   --okbg: #173a26;
   --chip: #2b2b2b;
+  --cs1: #3987e5;
   --chg: #3a3218;
   --chgb: #8a7030;
   --inp: #181818;
@@ -286,16 +289,19 @@ h1 {
 }
 /* Tight enough that the pills and both buttons fit one row at 1280px. */
 #sum,
+#nsum,
 #vsum {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
 }
 #sum:empty,
+#nsum:empty,
 #vsum:empty {
   display: none;
 }
 #sum button,
+#nsum button,
 #vsum .pl {
   display: flex;
   gap: 6px;
@@ -308,26 +314,31 @@ h1 {
   font-weight: 500;
 }
 #sum button b,
+#nsum button b,
 #vsum .pl b {
   font-size: 15px;
   font-weight: 700;
 }
 #sum .bad,
+#nsum .bad,
 #vsum .bad {
   background: var(--badbg);
   color: var(--bad);
 }
 #sum .warn,
+#nsum .warn,
 #vsum .warn {
   background: var(--warnbg);
   color: var(--warn);
 }
 #sum .ok,
+#nsum .ok,
 #vsum .ok {
   background: var(--okbg);
   color: var(--ok);
 }
 #sum .acc,
+#nsum .acc,
 #vsum .acc {
   background: var(--newbg);
   color: var(--new);
@@ -351,14 +362,16 @@ main {
   grid-template-columns: 370px 1fr;
   min-height: 0;
 }
-#q {
+#q,
+#nq {
   border-right: 1px solid var(--line);
   display: flex;
   flex-direction: column;
   min-height: 0;
   background: var(--pan);
 }
-#f {
+#f,
+#nf {
   padding: 10px 16px 8px;
   border-bottom: 1px solid var(--line);
   display: flex;
@@ -397,10 +410,12 @@ main {
 :root[data-theme='dark'] .sph small {
   color: #8a8a8a;
 }
-#s:not(:placeholder-shown) + .sph {
+#s:not(:placeholder-shown) + .sph,
+#ns:not(:placeholder-shown) + .sph {
   display: none;
 }
-#f input[type='search'] {
+#f input[type='search'],
+#nf input[type='search'] {
   flex: 1;
   min-width: 0;
   padding: 6px 9px;
@@ -408,7 +423,8 @@ main {
   border-color: transparent;
   border-radius: 10px;
 }
-#f input[type='search']:focus {
+#f input[type='search']:focus,
+#nf input[type='search']:focus {
   background: var(--inp);
   border-color: var(--acc);
   outline: none;
@@ -478,11 +494,13 @@ main {
 .fchip:hover {
   border-color: var(--acc);
 }
-#sum button.act {
+#sum button.act,
+#nsum button.act {
   border-color: currentColor;
   box-shadow: inset 0 0 0 1px currentColor;
 }
-#sum button:hover {
+#sum button:hover,
+#nsum button:hover {
   border-color: currentColor;
 }
 .sfil {
@@ -511,7 +529,8 @@ main {
 .fbar select {
   padding: 3px 5px;
 }
-#list {
+#list,
+#nlist {
   overflow: auto;
   flex: 1;
 }
@@ -640,11 +659,13 @@ main {
 .leg summary {
   cursor: pointer;
 }
-#d {
+#d,
+#nd {
   overflow: auto;
   padding: 16px 22px 60px;
 }
-#empty {
+#empty,
+.nsempty {
   margin: 12vh auto;
   text-align: center;
   max-width: 440px;
@@ -1701,6 +1722,7 @@ mark.trk {
   font-weight: 600;
 }
 #escView,
+#nsView,
 #visView {
   flex: 1;
   min-height: 0;
@@ -1708,12 +1730,18 @@ mark.trk {
   flex-direction: column;
 }
 #escView[hidden],
+#nsView[hidden],
 #visView[hidden] {
   display: none;
 }
 /* The bar shows the escalation counts on Escalations and the visit counts on Store Visits. */
 .on-vis #sum,
 .on-dir #sum,
+.on-ns #sum,
+body:not(.on-ns) #nsum,
+.on-vis #addesc,
+.on-dir #addesc,
+.on-ns #addesc,
 body:not(.on-vis):not(.on-dir) #vsum {
   display: none;
 }
@@ -2630,21 +2658,214 @@ button:focus-visible {
   main {
     display: block;
   }
-  #q {
+  #q,
+  #nq {
     border-right: 0;
     border-bottom: 1px solid var(--line);
   }
-  #list {
+  #list,
+  #nlist {
     max-height: 55vh;
   }
-  #d {
+  #d,
+  #nd {
     overflow: visible;
     padding: 12px 16px 60px;
   }
 }
+
+/* ---- Round 5b: Save, Add Escalation, the tracker form, the No Show tab. */
+header .tsave {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+header .tsave[hidden] {
+  display: none;
+}
+header .tsave:not([hidden]) + .fpill {
+  margin-left: 0;
+}
+#addesc {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.nsdiv {
+  width: 1px;
+  align-self: stretch;
+  background: var(--line);
+  margin: 2px 4px;
+}
+#addbox[hidden] {
+  display: none;
+}
+.addform {
+  width: min(640px, 100%);
+  overflow: auto;
+}
+.tform {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 6px 12px;
+  align-items: start;
+}
+.tform label {
+  padding-top: 6px;
+  font-size: 13px;
+  color: var(--mut);
+}
+.tform input,
+.tform select,
+.tform textarea {
+  width: 100%;
+  font: inherit;
+  padding: 5px 8px;
+}
+.tform input[type='date'],
+.tform input[type='datetime-local'],
+.tform select {
+  width: auto;
+}
+.nbox .tform textarea {
+  min-height: 0;
+  flex: none;
+  font: inherit;
+  padding: 5px 8px;
+}
+.tform .m {
+  display: block;
+  font-size: 12.5px;
+  margin-top: 2px;
+}
+.tag.unsaved {
+  background: var(--chg);
+  color: var(--ink);
+  box-shadow: inset 0 0 0 1px var(--chgb);
+}
+.tag.hand {
+  background: var(--p3bg);
+  color: var(--p3);
+}
+.aerr {
+  color: var(--bad);
+  margin: 0;
+}
+.aerr:empty {
+  display: none;
+}
+/* No Show: rows by month, the most repeated stores and reps, a row's links, the canned log notes. */
+.nsbars {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 6px;
+  align-items: end;
+  padding-top: 4px;
+}
+.nsbar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+}
+.nsbar .v {
+  font-size: 12px;
+  font-weight: 600;
+  min-height: 16px;
+}
+.nsbar .trk {
+  height: 120px;
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  border-bottom: 1px solid var(--line);
+}
+.nsbar i {
+  display: block;
+  width: 60%;
+  max-width: 30px;
+  background: var(--cs1);
+  border-radius: 4px 4px 0 0;
+}
+.nsbar small {
+  font-size: 11.5px;
+  color: var(--mut);
+  margin-top: 4px;
+}
+.nscols {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 0 12px;
+}
+.nsrank {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 4px;
+}
+.nsrank li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--pan2);
+  border-radius: 6px;
+  padding: 6px 10px;
+}
+.nsrank li .n {
+  margin-left: auto;
+  font-weight: 600;
+}
+.nsgo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  margin-top: 6px;
+}
+.nsrows {
+  display: grid;
+  gap: 4px;
+}
+.nsrows button {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  text-align: left;
+  background: var(--pan2);
+  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 6px 10px;
+  color: var(--ink);
+  font: inherit;
+  min-width: 0;
+}
+.nsrows button:hover {
+  border-color: var(--acc);
+}
+.nsrows .m {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.lognote {
+  background: var(--pan2);
+  border-radius: 6px;
+  padding: 8px 10px;
+  margin: 0 0 6px;
+}
+.lognote p {
+  margin: 4px 0 6px;
+  white-space: pre-line;
+}
 </style></head><body>
 <header><h1><svg class="logo" viewBox="0 0 28 28" role="img" aria-label="Target"><circle cx="14" cy="14" r="11.5" fill="none" stroke="#fff" stroke-width="4"/><circle cx="14" cy="14" r="4.5" fill="#fff"/></svg>Target Escalation Dashboard</h1>
-<nav id="apptabs" role="tablist"><button role="tab" data-app="esc" aria-selected="true">Escalations</button><button role="tab" data-app="vis" aria-selected="false">Store Visits</button><button role="tab" data-app="dir" aria-selected="false">Directory</button></nav>
+<nav id="apptabs" role="tablist"><button role="tab" data-app="esc" aria-selected="true">Escalations</button><button role="tab" data-app="ns" aria-selected="false">No Show</button><button role="tab" data-app="vis" aria-selected="false">Store Visits</button><button role="tab" data-app="dir" aria-selected="false">Directory</button></nav>
 <button id="tsave" class="p tsave" hidden></button><button id="fpill" class="fpill miss" aria-haspopup="dialog" title="Import Files">0 of 5 Files Loaded</button>
 <input id="file" type="file" accept=".xlsx" hidden><input id="vfile" type="file" accept=".xlsx" hidden><input id="pfile" type="file" accept=".xlsx" hidden><input id="tfile" type="file" accept=".xlsx" hidden><input id="xfile" type="file" accept=".xlsx" hidden></header>
 <div id="sumbar"><div id="sum"></div><div id="vsum"></div><div id="nsum"></div><div id="follow"></div><button id="addesc" class="p" type="button"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3v10M3 8h10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Add Escalation</button></div>
@@ -2666,6 +2887,15 @@ button:focus-visible {
 <p><b>Past Due:</b> New or Open, and its LOS Finish date has passed. <b>Due Within 48 Hours:</b> Its LOS Finish is in the next 48 hours.</p>
 <p>Only CM work orders are loaded. PM rows in the export file are skipped.</p></details><button id="thm" type="button"></button></div></section>
 <section id="d"><div id="empty"><h2>Import Files to Begin</h2><p class="m">Files are read in your browser only.</p><button class="p" id="openimp">Import Files</button></div></section>
+</main></div>
+<div id="nsView" hidden>
+<main>
+<section id="nq"><div id="nf">
+<div class="srow"><label class="sbox"><input id="ns" type="search" placeholder=" " aria-label="Search Store (Target #), Work Order # or Name"><span class="sph" aria-hidden="true">Search Store <small>(Target #)</small>, WO <small>#</small> or Name</span></label></div>
+<div class="fbar"><span id="ncnt" class="m"></span><span class="sp"></span><label class="m">Sort <select id="nso"><option value="new">Newest First</option><option value="old">Oldest First</option><option value="store">Store #</option></select></label>
+<button id="nclr" class="lnk">Clear</button></div></div>
+<div id="nlist"></div></section>
+<section id="nd"></section>
 </main></div>
 <iframe id="visView" src="visits.html" title="Store visits and directory" hidden></iframe>
 <footer class="contact" id="cta">Got problems? Email <a class="mail" href="mailto:kyle.didonato@channelpartners.com">kyle.didonato@channelpartners.com</a> or <a class="mail" href="https://teams.microsoft.com/l/chat/0/0?users=kyle.didonato@channelpartners.com" target="_blank" rel="noopener" id="ctalink">click here</a>.</footer>
@@ -3012,7 +3242,9 @@ async function importPresence(f) {
 
 // Dates in the tracker and parts files are read as Excel's serial day numbers, like the Presence file's.
 const serialDay = n => new Date(Date.UTC(1899, 11, 30) + n * 864e5);
-const fmtDay = d => d.toLocaleDateString([], { timeZone: 'UTC', dateStyle: 'medium' });
+// One formatter, made once: toLocaleDateString builds a new one on every call, which is slow over thousands of rows.
+const DAY_FMT = new Intl.DateTimeFormat([], { timeZone: 'UTC', dateStyle: 'medium' });
+const fmtDay = d => DAY_FMT.format(d);
 const dayText = v => (typeof v === 'number' ? fmtDay(serialDay(v)) : clean(v));
 // Headings are compared in lower case with runs of spaces and line breaks made one space ("Status\r\nEmailed-FOM").
 const headKey = h => norm(h).replace(/\s+/g, ' ');
@@ -3040,7 +3272,7 @@ const TRACKER_COLS = [
   ['rd', 'Report Date', h => h === 'report date', 'when'],
   ['los', 'LOS Finish', h => h === 'los finish', 'when'],
   ['comments', 'Comments', h => h === 'comments', 'long'],
-  ['action', 'Action on Maximo', h => h === 'action on maximo', 'text'],
+  ['action', 'Action on Maximo', h => h === 'action on maximo', 'long'],
   ['inMax', 'In Maximo', h => h === 'maximo', 'yn'],
   ['closed', 'Closed in Maximo', h => h === 'closed in maximo', 'yn'],
   ['rep', 'Rep', h => h === 'rep', 'long'],
@@ -3107,8 +3339,8 @@ function readTracker(wb) {
     const cols = Object.fromEntries(TRACKER_COLS.map(([k, , m]) => [k, H.findIndex(m)])),
       missing = TRACKER_COLS.filter(([k]) => cols[k] < 0).map(([, t]) => t);
     if (missing.length) throw new DataError(`The "${name}" sheet is missing columns: ${missing.join(', ')}. Nothing was loaded.`);
-    // "No show 9.7.20 - Present" -> "No show".
-    const sheet = name.replace(/\s*\d.*$/, ''),
+    // "No show 9.7.20 - Present" -> "No Show".
+    const sheet = name.replace(/\s*\d.*$/, '').replace(/\b\w/g, c => c.toUpperCase()),
       info = (file.sheets[name] = { sheet, cols: Object.fromEntries(Object.entries(cols).map(([k, i]) => [k, c0 + i])), last: r0 + 1 });
     A.forEach((a, i) => {
       if (!i) return;
@@ -3196,10 +3428,11 @@ function trackerForm(e) {
       const cur = clean(v),
         opts = ['', 'Y', 'N', ...(cur && !['Y', 'N'].includes(cur) ? [cur] : [])];
       input = `<select id="${id}" data-k="${k}">${opts.map(o => `<option value="${esc(o)}"${o === cur ? ' selected' : ''}>${o ? esc(o) : '(blank)'}</option>`).join('')}</select>`;
-    } else if (kind === 'date') {
+    } else if (kind === 'date' && (typeof v === 'number' || !clean(v))) {
+      // A date picker for an Excel date or an empty cell. A cell that holds text (often several dates, one per line) stays text.
       const d = typeof v === 'number' ? serialAt(v).toISOString().slice(0, 10) : '';
-      input = `<input id="${id}" data-k="${k}" type="date" value="${d}">${typeof v !== 'number' && clean(v) ? ` <span class="m">Was "${esc(v)}"</span>` : ''}`;
-    } else if (kind === 'long') input = `<textarea id="${id}" data-k="${k}" rows="${Math.min(6, Math.max(2, String(v ?? '').split('\n').length))}">${esc(String(v ?? ''))}</textarea>`;
+      input = `<input id="${id}" data-k="${k}" type="date" value="${d}">`;
+    } else if (kind === 'long' || kind === 'date') input = `<textarea id="${id}" data-k="${k}" rows="${Math.min(6, Math.max(2, String(v ?? '').split('\n').length))}">\n${esc(String(v ?? ''))}</textarea>`;
     else input = `<input id="${id}" data-k="${k}" type="text" value="${esc(String(v ?? ''))}">`;
     return `<label for="${id}">${t}</label><div>${input}</div>`;
   };
@@ -3207,7 +3440,7 @@ function trackerForm(e) {
 }
 // A form value as the cell value: a date becomes Excel's serial day number, text stays text.
 function formValue(k, el) {
-  if (COL[k][3] === 'date') return el.value ? (Date.parse(el.value + 'T00:00:00Z') - Date.UTC(1899, 11, 30)) / 864e5 : '';
+  if (el.type === 'date') return el.value ? (Date.parse(el.value + 'T00:00:00Z') - Date.UTC(1899, 11, 30)) / 864e5 : '';
   return el.value.replace(/\r\n/g, '\n');
 }
 function finishEdit(key) {
@@ -3217,9 +3450,10 @@ function finishEdit(key) {
     const k = el.dataset.k,
       nv = formValue(k, el),
       ov = e.v[k];
-    // An unchanged date keeps its number; text is compared as typed.
-    if ((typeof ov === 'number' ? ov : String(ov ?? '')) === nv) return;
-    if (COL[k][3] === 'date' && nv === '' && !clean(ov)) return;
+    // Unchanged fields keep their cell as it is: a date on the same day keeps its time, and text is compared with Excel's
+    // \r\n line breaks read as \n (a form field gives \n) and without spaces at either end ("Y " is still Y).
+    const same = x => String(x ?? '').replace(/\r\n/g, '\n').trim();
+    if (typeof ov === 'number' ? ov === nv || String(ov) === same(nv) || (typeof nv === 'number' && Math.floor(ov) === nv) : same(ov) === same(nv)) return;
     e.v[k] = nv;
     changed.push(k);
   });
@@ -3726,8 +3960,237 @@ function openWorkOrder(id) {
 // After a file loads, the open escalation and the Store Visits store are drawn again with it.
 function refreshViews() {
   if (current) showEscalation(current, true);
+  if (!$('nsView').hidden) nsDraw(true);
   visFrame().renderWork();
 }
+
+
+// ---- No Show: the BDS No Show and Data Review file on a tab of its own, from that file only (rep names link to the
+// Directory). Its rows, newest first, with pills for where each stands; a row opens with Maximo's fields and the notes
+// kept by hand, which edit and save like on Escalations. With no row open: rows by month, the most repeated stores and
+// reps, and the canned log notes from the Responses sheet.
+let nsSel = '',
+  nsSheet = '',
+  nsPill = '',
+  // The list shows this many rows, with a button for more: thousands of rows at once make every click slow.
+  nsLimit = 300;
+const NS_PILLS = [
+  ['open', 'Open in Maximo', 'warn', e => !ynYes(e.v.closed)],
+  ['unsent', 'Not Emailed', 'bad', e => !ynYes(e.v.emailed)],
+  ['waiting', 'Waiting on Response', 'acc', e => ynYes(e.v.emailed) && !clean(e.v.resp)],
+  ['answered', 'Responded', 'ok', e => !!clean(e.v.resp)]
+];
+// A row's Status Date as a UTC date, for sorting, the list and the month chart. Maximo's text is read as written.
+function nsDate(e) {
+  const v = e.v.sd;
+  if (typeof v === 'number') return serialAt(v);
+  const m = clean(v).match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{2})\s*([AP]M))?/i);
+  return m ? new Date(Date.UTC(+m[3], m[1] - 1, +m[2], m[4] ? (m[4] % 12) + (/p/i.test(m[6]) ? 12 : 0) : 0, +(m[5] ?? 0))) : null;
+}
+const nsTime = e => nsDate(e)?.getTime() ?? 0;
+const nsState = e => (clean(e.v.resp) ? ['ok', 'Responded'] : ynYes(e.v.emailed) ? ['st-new', 'Waiting on Response'] : ['', 'Not Emailed']);
+const nsMaximoTag = e => (ynYes(e.v.closed) ? '<span class="tag ok">Closed in Maximo</span>' : '<span class="tag st-open">Open in Maximo</span>');
+// The search: a work order number, a store number, or text in the rep, FOM, description, comments or response.
+function nsSearch(e) {
+  const q = $('ns').value.trim();
+  if (!q) return true;
+  if (/^\d{6,}$/.test(q)) return e.id === q;
+  if (/^t?\d{1,5}$/i.test(q)) return e.store === storeKey(q);
+  const t = q.toLowerCase();
+  return ['rep', 'fom', 'desc', 'comments', 'resp'].some(k => String(e.v[k] ?? '').toLowerCase().includes(t));
+}
+// The rows the search, sheet and pill leave; skip leaves out the sheet or the pill, so each pill counts what clicking it shows.
+const nsRows = (skip = '') =>
+  [...trackerRowsByKey.values()].filter(
+    e => nsSearch(e) && (skip === 'sheet' || !nsSheet || e.sheet === nsSheet) && (skip === 'pill' || !nsPill || NS_PILLS.find(p => p[0] === nsPill)[3](e))
+  );
+function nsPills() {
+  if (!trackerName) return ($('nsum').innerHTML = '');
+  const bySheet = nsRows('sheet'),
+    byPill = nsRows('pill'),
+    sheets = [...new Set(Object.values(trackerFile.sheets).map(x => x.sheet))];
+  $('nsum').innerHTML =
+    sheets
+      .map(
+        x =>
+          `<button class="${nsSheet === x ? 'act' : ''}" data-nsheet="${esc(x)}" aria-pressed="${nsSheet === x}"><b>${bySheet.filter(e => e.sheet === x).length.toLocaleString()}</b>${esc(x)}</button>`
+      )
+      .join('') +
+    '<span class="nsdiv"></span>' +
+    NS_PILLS.map(
+      ([k, t, tone, f]) =>
+        `<button class="${tone}${nsPill === k ? ' act' : ''}" data-npill="${k}" aria-pressed="${nsPill === k}"><b>${byPill.filter(f).length.toLocaleString()}</b>${t}</button>`
+    ).join('');
+}
+function nsDraw(keep) {
+  nsPills();
+  if (!trackerName) {
+    $('nlist').innerHTML = '';
+    $('ncnt').textContent = '';
+    $('nd').innerHTML = '<div class="nsempty"><h2>Import the Tracker</h2><p class="m">No Show is read from the BDS No Show and Data Review file.</p><button class="p" data-imp>Import Files</button></div>';
+    return;
+  }
+  const list = nsRows(),
+    t = new Map(list.map(e => [e, nsTime(e)])),
+    S = {
+      new: (a, b) => t.get(b) - t.get(a),
+      old: (a, b) => t.get(a) - t.get(b),
+      store: (a, b) => (+a.store || 1e9) - (+b.store || 1e9) || t.get(b) - t.get(a)
+    }[$('nso').value];
+  list.sort(S);
+  $('ncnt').textContent = `${list.length.toLocaleString()} of ${trackerRowsByKey.size.toLocaleString()}`;
+  const st = $('nlist').scrollTop;
+  $('nlist').innerHTML =
+    list
+      .slice(0, nsLimit)
+      .map(e => {
+        const d = nsDate(e),
+          [tone, label] = nsState(e);
+        return `<div class="it${e.key === nsSel ? ' sel' : ''}" data-k="${esc(e.key)}">
+ <div class="l1"><b>Store ${esc(clean(e.v.site))}</b><span class="m">${esc(e.sheet)}</span><span class="due">${d ? esc(fmtDay(d)) : ''}</span></div>
+ <div class="l2">${ynYes(e.v.closed) ? '' : '<span class="tag st-open">Open in Maximo</span>'}<span class="tag ${tone}">${label}</span>${trackerDirty.has(e.key) ? '<span class="tag unsaved">Unsaved</span>' : ''}<span class="txt">WO ${esc(e.id)} · ${esc(clean(e.v.desc))}</span></div></div>`;
+      })
+      .join('') +
+      (list.length > nsLimit ? `<p style="padding:12px"><button class="lnk" data-more>Show ${Math.min(300, list.length - nsLimit).toLocaleString()} more</button> <span class="m">of ${(list.length - nsLimit).toLocaleString()} not shown</span></p>` : '') || '<p class="m" style="padding:12px">No rows match.</p>';
+  $('nlist').scrollTop = st;
+  const sel = trackerRowsByKey.get(nsSel);
+  if (sel) nsShow(sel, keep);
+  else nsSummary(list, keep);
+}
+// Names typed in a Rep cell, one per person: split like the rep links are.
+const repNames = text =>
+  String(text ?? '')
+    .split(/\s*(?:\n|,|\/|&|;|\band\b)\s*/i)
+    .map(clean)
+    .filter(x => x.length > 2);
+function nsSummary(list, keep) {
+  const sc = keep ? $('nd').scrollTop : 0,
+    n0 = now(),
+    months = Array.from({ length: 12 }, (_, i) => {
+      const d = new Date(Date.UTC(n0.getFullYear(), n0.getMonth() - 11 + i, 1));
+      return { y: d.getUTCFullYear(), m: d.getUTCMonth(), n: 0, label: d.toLocaleDateString([], { timeZone: 'UTC', month: 'short' }), full: d.toLocaleDateString([], { timeZone: 'UTC', month: 'long', year: 'numeric' }) };
+    }),
+    start = Date.UTC(months[0].y, months[0].m, 1),
+    recent = list.filter(e => nsTime(e) >= start);
+  recent.forEach(e => {
+    const d = nsDate(e),
+      x = months.find(o => o.y === d.getUTCFullYear() && o.m === d.getUTCMonth());
+    if (x) x.n++;
+  });
+  const max = Math.max(1, ...months.map(x => x.n)),
+    peak = months.reduce((a, b) => (b.n > a.n ? b : a)),
+    count = (items, key) => {
+      const m = new Map();
+      items.forEach(x => {
+        const k = key(x).toLowerCase(),
+          o = m.get(k) ?? m.set(k, { name: key(x), n: 0 }).get(k);
+        o.n++;
+      });
+      return [...m.values()].sort((a, b) => b.n - a.n || a.name.localeCompare(b.name)).slice(0, 10);
+    },
+    stores = count(recent.filter(e => e.store), e => e.store),
+    reps = count(recent.flatMap(e => repNames(e.v.rep)), x => x),
+    tile = (t, v) => `<div><span>${t}</span><b>${v.toLocaleString()}</b></div>`,
+    rank = (items, f) => (items.length ? `<ol class="nsrank">${items.map(x => `<li>${f(x)}<span class="n">${x.n.toLocaleString()}</span></li>`).join('')}</ol>` : '<p class="m">None in the last 12 months.</p>');
+  $('nd').innerHTML = `<div class="pvh"><h2>No Show Summary</h2><p class="m">Counted from ${esc(trackerName)}${nsSheet || nsPill || $('ns').value.trim() ? ', for the rows the pills and search leave' : ''}. Click a row on the left to open it.</p></div>
+ <div class="tiles">${tile('Rows', list.length)}${tile('Last 12 Months', recent.length)}${tile('Stores, Last 12 Months', new Set(recent.map(e => e.store)).size)}${tile('Open in Maximo', list.filter(e => !ynYes(e.v.closed)).length)}${tile('Waiting on Response', list.filter(e => ynYes(e.v.emailed) && !clean(e.v.resp)).length)}</div>
+ ${card('Rows by Month', `<div class="nsbars" role="img" aria-label="Rows by Status Date, last 12 months">${months
+   .map(
+     (x, i) =>
+       `<div class="nsbar" title="${esc(x.full)}: ${x.n.toLocaleString()} row${x.n === 1 ? '' : 's'}"><span class="v">${x === peak || i === 11 ? x.n.toLocaleString() : ''}</span><span class="trk"><i style="height:${(x.n / max) * 100}%"></i></span><small>${esc(x.label)}</small></div>`
+   )
+   .join('')}</div>`, 'By Status Date, last 12 months; hover a bar for its count')}
+ <div class="nscols">${card('Repeat Stores', rank(stores, x => `<button class="lnk" data-nsq="${esc(x.name)}" title="Show this store's rows">Store ${esc(x.name)}</button>`), 'Most rows, last 12 months')}${card('Reps Named Most', rank(reps, x => trackerReps(x.name)), 'From the Rep column, last 12 months')}</div>
+ ${collapsible('nsnotes', 'Log Notes', nsNotes(), 'From the Responses sheet', false)}`;
+  $('nd').scrollTop = sc;
+}
+// The Responses sheet's canned log notes, each with a Copy button.
+function nsNotes() {
+  const rs = trackerFile.responses;
+  if (!rs.length) return '<p class="m">The file has no Responses sheet.</p>';
+  return rs
+    .map(
+      (x, i) =>
+        `<div class="lognote"><div><b>${esc(x.scenario)}</b> <span class="m">${esc(x.cat.replace(/\s*\n\s*/g, ' · '))}</span></div>${x.status ? `<div class="m">BDS status update: ${esc(x.status)}</div>` : ''}<p>${esc(x.note)}</p><button type="button" data-copy="${i}">Copy</button></div>`
+    )
+    .join('');
+}
+function nsShow(e, keep) {
+  const sc = keep ? $('nd').scrollTop : 0,
+    [tone, label] = nsState(e),
+    tile = (t, v) => `<div><span>${t}</span><b>${v ? esc(v) : '<em class="m">None</em>'}</b></div>`,
+    others = (trackerSites.get(e.store) ?? []).filter(x => x !== e).sort((a, b) => nsTime(b) - nsTime(a)),
+    desc = clean(e.v.desc);
+  $('nd').innerHTML = `<div class="top"><div class="hd">
+ <div class="chips"><span class="tag">${esc(e.sheet)}</span>${nsMaximoTag(e)}<span class="tag ${tone}">${label}</span></div>
+ <h2 class="vn">Store ${esc(clean(e.v.site))}</h2><div class="m ids">Work Order #${esc(e.id)}</div>
+ <div class="nsgo">${rows.some(r => r.id === e.id) ? '<button class="lnk" data-nsgo="esc">Open on Escalations</button>' : ''}${e.store ? '<button class="lnk" data-nsgo="vis">Open Store on Store Visits</button>' : ''}<button class="lnk" data-nsgo="back">Back to Summary</button></div></div></div>
+ <div class="panel solo">${desc ? `<div class="issw"><p class="issue">${esc(desc)}</p></div>` : ''}<div class="tiles">${tile('Problem Code', clean(e.v.problem))}${tile('Status', clean(e.v.status))}${tile('Status Date', trackerText('sd', e.v.sd))}${tile('Report Date', trackerText('rd', e.v.rd))}${tile('LOS Finish', trackerText('los', e.v.los))}${tile('Vendor Work Validation', clean(e.v.val))}</div></div>
+ ${card('Tracker Notes', trackerFacts(e, true), 'Kept by hand; Save at the top writes changes into the file')}
+ ${others.length ? card('Other Rows for This Store', `<div class="nsrows">${others.map(x => `<button type="button" data-nsk="${esc(x.key)}"><span class="tag">${esc(x.sheet)}</span><b>WO ${esc(x.id)}</b><span class="m">${nsDate(x) ? esc(fmtDay(nsDate(x))) + ' · ' : ''}${esc(clean(x.v.desc))}</span></button>`).join('')}</div>`, 'From the same file') : ''}
+ ${collapsible('nsnotes', 'Log Notes', nsNotes(), 'From the Responses sheet', false)}`;
+  $('nd').scrollTop = sc;
+}
+$('nlist').onclick = ev => {
+  if (ev.target.closest('[data-more]')) {
+    nsLimit += 300;
+    return nsDraw(true);
+  }
+  const it = ev.target.closest('[data-k]');
+  if (!it) return;
+  nsSel = it.dataset.k;
+  trackerEditing = '';
+  nsDraw();
+};
+$('nsum').onclick = ev => {
+  const b = ev.target.closest('[data-nsheet],[data-npill]');
+  if (!b) return;
+  if (b.dataset.nsheet) nsSheet = nsSheet === b.dataset.nsheet ? '' : b.dataset.nsheet;
+  else nsPill = nsPill === b.dataset.npill ? '' : b.dataset.npill;
+  nsReset();
+};
+// The pills, search, sort and Clear show a new list, from its top.
+function nsReset() {
+  nsLimit = 300;
+  $('nlist').scrollTop = 0;
+  nsDraw();
+}
+$('ns').addEventListener('input', () => {
+  nsSel = '';
+  nsReset();
+});
+$('nso').onchange = nsReset;
+$('nclr').onclick = () => {
+  $('ns').value = '';
+  nsSheet = nsPill = nsSel = '';
+  nsReset();
+};
+$('nd').addEventListener('click', ev => {
+  const t = ev.target.closest('[data-nsgo],[data-nsk],[data-nsq],[data-copy],[data-imp]');
+  if (!t) return;
+  const e = trackerRowsByKey.get(nsSel);
+  if (t.dataset.imp !== undefined) openImports("Let's Get Started");
+  else if (t.dataset.nsk) {
+    nsSel = t.dataset.nsk;
+    trackerEditing = '';
+    nsDraw();
+  } else if (t.dataset.nsq) {
+    $('ns').value = t.dataset.nsq;
+    nsReset();
+  } else if (t.dataset.copy)
+    navigator.clipboard.writeText(trackerFile.responses[+t.dataset.copy].note).then(
+      () => toast('✓ Copied the log note.'),
+      () => toast("Couldn't copy it. Select the text and copy it instead.")
+    );
+  else if (t.dataset.nsgo === 'esc') openWorkOrder(e.id);
+  else if (t.dataset.nsgo === 'vis') {
+    follow(e.store);
+    showApp('vis');
+  } else {
+    nsSel = '';
+    nsDraw();
+  }
+});
 
 // ---- Add escalation: a work order typed in by hand. It joins the list as New, marked Added by hand, and becomes a new
 // row on the tracker's No show or Data Review sheet (by its Problem Code), filled in like the rows before it.
@@ -3888,7 +4351,9 @@ $('imports').addEventListener('click', e => {
   if (e.target.id === 'imports') closeImports();
 });
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape' && !$('imports').hidden) closeImports();
+  if (e.key !== 'Escape') return;
+  if (!$('addbox').hidden) $('addbox').hidden = true;
+  else if (!$('imports').hidden) closeImports();
 });
 $('d').addEventListener('click', e => {
   if (e.target.id === 'openimp') openImports("Let's Get Started");
@@ -4243,11 +4708,14 @@ $('vsum').onclick = e => {
 };
 function showApp(k) {
   $('escView').hidden = k !== 'esc';
-  $('visView').hidden = k === 'esc';
+  $('nsView').hidden = k !== 'ns';
+  $('visView').hidden = k !== 'vis' && k !== 'dir';
   document.body.classList.toggle('on-vis', k === 'vis');
   document.body.classList.toggle('on-dir', k === 'dir');
+  document.body.classList.toggle('on-ns', k === 'ns');
   document.querySelectorAll('#apptabs [role=tab]').forEach(b => b.setAttribute('aria-selected', b.dataset.app === k));
-  if (k !== 'esc') visFrame().showView(k);
+  if (k === 'vis' || k === 'dir') visFrame().showView(k);
+  if (k === 'ns') nsDraw();
   if (k === 'vis') visFrame().showStore(followed);
   if (k === 'esc') openFollowedOnEscalations();
   saveSetting('bbV4App', k);
@@ -4267,7 +4735,7 @@ $('visView').addEventListener('load', () => {
   syncFrameTheme();
   paintThemeToggle();
   const k = loadSetting('bbV4App');
-  showApp(k === 'vis' || k === 'dir' ? k : 'esc');
+  showApp(['ns', 'vis', 'dir'].includes(k) ? k : 'esc');
 });
 btnState();
 openImports("Let's Get Started");
