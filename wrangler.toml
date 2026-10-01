@@ -1,3 +1,7 @@
-name = "bestbuy-escalations-v4"
-pages_build_output_dir = "."
-compatibility_date = "2026-09-29"
+# A Worker that only serves the site's files (no server code). Cloudflare's Git integration (Workers Builds)
+# deploys it on every push to main; the name must match that Worker. .assetsignore keeps repo files off the site.
+name = "target-escalations-dashboard"
+compatibility_date = "2026-10-01"
+
+[assets]
+directory = "."

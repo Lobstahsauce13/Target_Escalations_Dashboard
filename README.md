@@ -1,15 +1,14 @@
-# Best Buy Dashboard v4
+# Target Escalation Dashboard
 
-Live at https://bestbuy-escalations-v4.pages.dev (Cloudflare Pages).
+Built on the Best Buy dashboard v4: same framework and styling. One page with three tabs:
 
-One page with three tabs:
+- **Escalations**: Target's PM work orders from Maximo (`index.html`). Read only for now.
+- **Store Visits** and **Directory**: unchanged from v4 (`visits.html`, shown in a frame under the shared header).
 
-- **Escalations**: the v3 escalations dashboard (`index.html`).
-- **Store Visits**: the Store Work Lookup page (`visits.html`), shown in a frame under the shared header. Its left panel matches Escalations (store search, Filters, count, Clear) over a list of the stores they leave. The list narrows with each digit typed, matching the start of a BDS Store ID or chain store #. Picking a store, or narrowing to one, shows its header with the assignment status chart on the right and its call forms in the table below.
-- **Directory**: the rep lookup, in the same frame. Searching a rep by name or person ID, or picking one from the list, shows their contact details from the People report and all their assignments this week (Monday to Sunday).
+The banner holds the title, the three tabs and every import: Data, Current visits, Previous visits, People report.
 
-The banner holds the title, the three tabs and every import: FEDR, Current visits, Previous visits, People report. The bar under it holds the counts for the open tab (the escalation pills on Escalations, the assignment counts for the picked store or the whole list on Store Visits), Summary and Undo all my edits. Current visits (the Priority Pivot) feeds all three tabs; the People report feeds the Directory and the rep phone numbers in the tables. A store typed on Escalations carries over to Store Visits, and one typed on Store Visits carries back. There is no export.
+**Data** is Maximo's work order export. It's recognized by its column headings (`work_order_number`, `work_type`, `site`, ...), so the file name doesn't matter. Only PM rows are loaded; CM rows are skipped. Status codes: APPR = New, VDECWO = Open, VINPRG = Completed, VDECWC = Closed, not removed. A status code not on that list, a missing column, or a date not in Maximo's format (`09/30/2026 06:28 AM EDT`) stops the import with a message, and nothing is loaded. A work order is past due when its LOS Finish (`repair_by`) has passed and it's New or Open. The list is sorted by LOS Finish, oldest first.
 
-Everything is read in the browser. No workbook data is saved; only display preferences (theme, open tab, open filter panels, visit column mapping) are remembered.
+Everything is read in the browser. No workbook data is saved; only display preferences (theme, open tab, open filter panels, visit column mapping) are remembered. There is no export.
 
-Pushing to `main` publishes the site to Cloudflare Pages (`bestbuy-escalations-v4`) through `.github/workflows/deploy.yml`, which needs the repo secrets `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`.
+Pushing to `main` publishes the site to the Cloudflare Worker `target-escalations-dashboard`, through Cloudflare's Git integration (Workers Builds) on this repo. It serves `index.html`, `visits.html` and `xlsx.full.min.js`; `.assetsignore` keeps the other repo files off the site.
