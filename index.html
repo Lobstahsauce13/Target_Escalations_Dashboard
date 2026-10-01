@@ -19,6 +19,10 @@
   --s-ok: #23964f;
   --s-mut: #56626e;
   --hdr: #a00000;
+  --hdrline: #fff;
+  /* New and scheduled: blue in both themes, so they never read as the red of past due. */
+  --new: #0275b2;
+  --newbg: #e6f1f8;
   --btn: #015a8a;
   --hbg: #dce2e8;
   --zebra: #f1f3f5;
@@ -46,34 +50,37 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
     color-scheme: dark;
-    --ink: #e9edf1;
-    --mut: #9aa7b4;
-    --line: #2b3845;
-    --bg: #0d161e;
-    --pan: #1b2733;
-    --pan2: #223140;
-    --sel: #0f3350;
-    --acc: #4daee3;
-    --acch: #7cc4ec;
-    --onacc: #0d161e;
+    --ink: #ececec;
+    --mut: #a6a6a6;
+    --line: #343434;
+    --bg: #121212;
+    --pan: #1c1c1c;
+    --pan2: #242424;
+    --sel: #3b1716;
+    --acc: #f0716a;
+    --acch: #f59a95;
+    --onacc: #121212;
     --s-bad: var(--bad);
     --s-warn: var(--warn);
     --s-ok: var(--ok);
     --s-mut: var(--mut);
-    --hdr: #7a0000;
-    --btn: #0b3552;
-    --hbg: #16212b;
-    --zebra: #1f2b37;
+    --hdr: #6b0000;
+    --hdrline: #2b2b2b;
+    --new: #9cc3e4;
+    --newbg: #263038;
+    --btn: #7a0000;
+    --hbg: #1a1a1a;
+    --zebra: #212121;
     --bad: #ff8a80;
     --badbg: #4a1f1c;
     --warn: #f0b35a;
     --warnbg: #3d2e12;
     --ok: #6fd49a;
     --okbg: #173a26;
-    --chip: #27343f;
+    --chip: #2b2b2b;
     --chg: #3a3218;
     --chgb: #8a7030;
-    --inp: #14202a;
+    --inp: #181818;
     --c-csm: #5ec8dc;
     --c-dm: #b69cff;
     --c-patti: #f0b35a;
@@ -87,34 +94,37 @@
 }
 :root[data-theme='dark'] {
   color-scheme: dark;
-  --ink: #e9edf1;
-  --mut: #9aa7b4;
-  --line: #2b3845;
-  --bg: #0d161e;
-  --pan: #1b2733;
-  --pan2: #223140;
-  --sel: #0f3350;
-  --acc: #4daee3;
-  --acch: #7cc4ec;
-  --onacc: #0d161e;
+  --ink: #ececec;
+  --mut: #a6a6a6;
+  --line: #343434;
+  --bg: #121212;
+  --pan: #1c1c1c;
+  --pan2: #242424;
+  --sel: #3b1716;
+  --acc: #f0716a;
+  --acch: #f59a95;
+  --onacc: #121212;
   --s-bad: var(--bad);
   --s-warn: var(--warn);
   --s-ok: var(--ok);
   --s-mut: var(--mut);
-  --hdr: #7a0000;
-  --btn: #0b3552;
-  --hbg: #16212b;
-  --zebra: #1f2b37;
+  --hdr: #6b0000;
+  --hdrline: #2b2b2b;
+  --new: #9cc3e4;
+  --newbg: #263038;
+  --btn: #7a0000;
+  --hbg: #1a1a1a;
+  --zebra: #212121;
   --bad: #ff8a80;
   --badbg: #4a1f1c;
   --warn: #f0b35a;
   --warnbg: #3d2e12;
   --ok: #6fd49a;
   --okbg: #173a26;
-  --chip: #27343f;
+  --chip: #2b2b2b;
   --chg: #3a3218;
   --chgb: #8a7030;
-  --inp: #14202a;
+  --inp: #181818;
   --c-csm: #5ec8dc;
   --c-dm: #b69cff;
   --c-patti: #f0b35a;
@@ -196,7 +206,7 @@ header {
   padding: 10px 16px;
   background: var(--hdr);
   color: #fff;
-  border-bottom: 3px solid #fff;
+  border-bottom: 3px solid var(--hdrline);
 }
 header button {
   background: transparent;
@@ -318,8 +328,8 @@ h1 {
 }
 #sum .acc,
 #vsum .acc {
-  background: var(--sel);
-  color: var(--acc);
+  background: var(--newbg);
+  color: var(--new);
 }
 #vsum button.pl {
   cursor: pointer;
@@ -380,11 +390,11 @@ main {
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) .sph small {
-    color: #6f7c89;
+    color: #8a8a8a;
   }
 }
 :root[data-theme='dark'] .sph small {
-  color: #6f7c89;
+  color: #8a8a8a;
 }
 #s:not(:placeholder-shown) + .sph {
   display: none;
@@ -606,8 +616,8 @@ main {
 }
 /* Maximo status: New, Open and Completed. Closed, not removed stays plain. */
 .tag.st-new {
-  background: var(--sel);
-  color: var(--acc);
+  background: var(--newbg);
+  color: var(--new);
 }
 .tag.st-open {
   background: var(--warnbg);
@@ -697,6 +707,133 @@ h2 {
   color: var(--mut);
   font-size: 12.5px;
   margin-left: 6px;
+}
+/* Cards that are always open: a plain heading in place of the dropdown's summary line. */
+.card.open {
+  padding-bottom: 14px;
+}
+.card .ch {
+  margin: 0;
+  padding: 10px 0;
+  font-size: 1em;
+  font-weight: 650;
+}
+/* Problem Code in the store header. */
+.tag.pcode {
+  background: var(--chip);
+  color: var(--ink);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+/* Reply: a button that opens a two-item menu below it. */
+.reply {
+  position: relative;
+}
+#reply {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+}
+#replymenu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 4px);
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  min-width: 140px;
+  padding: 4px;
+  background: var(--pan);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+}
+#replymenu[hidden] {
+  display: none;
+}
+#replymenu button {
+  border: 0;
+  text-align: left;
+  background: none;
+}
+#replymenu button:hover {
+  background: var(--sel);
+}
+/* Rep's answers: visit date, present and working side by side, then the displays answered No. */
+.pstats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+.pstats div {
+  background: var(--pan2);
+  border-radius: 6px;
+  padding: 6px 10px;
+}
+.pstats span {
+  display: block;
+  font-size: 12.5px;
+  color: var(--mut);
+}
+.pgh {
+  margin: 12px 0 4px;
+  font-size: 13px;
+}
+.plist {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 4px;
+}
+.plist li {
+  background: var(--pan2);
+  border-radius: 6px;
+  padding: 6px 10px;
+}
+.plist li b {
+  font-weight: 600;
+  margin-right: 4px;
+}
+.tfacts dd {
+  white-space: pre-line;
+}
+.vfail {
+  color: var(--bad);
+  font-weight: 600;
+}
+/* Parts orders. */
+.ptab {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+}
+.ptab th {
+  text-align: left;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--mut);
+  padding: 4px 8px;
+  border-bottom: 1px solid var(--line);
+}
+.ptab td {
+  padding: 7px 8px;
+  vertical-align: top;
+  border-bottom: 1px solid var(--line);
+}
+.ptab tr:last-child td {
+  border-bottom: 0;
+}
+.ptab a {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.pnote {
+  margin-top: 3px;
+  font-size: 12.5px;
+  font-style: italic;
 }
 .issue {
   white-space: pre-line;
@@ -1604,6 +1741,30 @@ body:not(.on-vis):not(.on-dir) #vsum {
   width: 14px;
   height: 14px;
 }
+/* A box whose file is being read stays fully readable; its spinner says it's busy. */
+.ib:disabled {
+  opacity: 1;
+  cursor: progress;
+}
+/* The data box while its file is read: rows read so far and a bar for how much of the file is done. */
+.ib .ibt {
+  flex: 1;
+}
+.ibar {
+  display: block;
+  height: 6px;
+  margin-top: 6px;
+  border-radius: 3px;
+  background: var(--line);
+  overflow: hidden;
+}
+.ibar i {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: var(--acc);
+  transition: width 0.15s linear;
+}
 /* Files pill at the top right: how many of the files are loaded; opens the popup. */
 .fpill {
   margin-left: auto;
@@ -2382,15 +2543,6 @@ button:focus-visible {
   flex: 1;
   min-width: 0;
 }
-#cpy {
-  width: 100%;
-  margin: 8px 0;
-  padding: 8px;
-  font:
-    13px/1.4 ui-monospace,
-    Consolas,
-    monospace;
-}
 @media (prefers-reduced-motion: reduce) {
   #toast {
     transition: none;
@@ -2419,14 +2571,14 @@ button:focus-visible {
 </style></head><body>
 <header><h1><svg class="logo" viewBox="0 0 28 28" role="img" aria-label="Target"><circle cx="14" cy="14" r="11.5" fill="none" stroke="#fff" stroke-width="4"/><circle cx="14" cy="14" r="4.5" fill="#fff"/></svg>Target Escalation Dashboard</h1>
 <nav id="apptabs" role="tablist"><button role="tab" data-app="esc" aria-selected="true">Escalations</button><button role="tab" data-app="vis" aria-selected="false">Store Visits</button><button role="tab" data-app="dir" aria-selected="false">Directory</button></nav>
-<button id="fpill" class="fpill miss" aria-haspopup="dialog" title="Import files">0 of 4 files loaded</button>
-<input id="file" type="file" accept=".xlsx" hidden><input id="vfile" type="file" accept=".xlsx" hidden><input id="pfile" type="file" accept=".xlsx" hidden><input id="rfile" type="file" accept=".xlsx,.xls" hidden></header>
+<button id="fpill" class="fpill miss" aria-haspopup="dialog" title="Import files">0 of 6 files loaded</button>
+<input id="file" type="file" accept=".xlsx" hidden><input id="vfile" type="file" accept=".xlsx" hidden><input id="pfile" type="file" accept=".xlsx" hidden><input id="rfile" type="file" accept=".xlsx,.xls" hidden><input id="tfile" type="file" accept=".xlsx" hidden><input id="xfile" type="file" accept=".xlsx" hidden></header>
 <div id="sumbar"><div id="sum"></div><div id="vsum"></div><div id="follow"></div></div>
 <div id="escView">
 <main>
 <section id="q"><div id="f">
-<div class="srow"><label class="sbox"><input id="s" type="search" placeholder=" " aria-label="Search Store (Target #)"><span class="sph" aria-hidden="true">Search Store <small>(Target #)</small></span></label><button id="ftog" type="button" aria-expanded="false" aria-controls="fpanel"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 5h14M6 10h8M8.5 15h3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Filters<span id="fcount"></span></button></div>
-<div id="fpanel" hidden><div class="g2"><select id="fd"></select><select id="fs"></select><select id="fr"></select><select id="fg"></select><select id="fm"></select><select id="fst"></select></div></div>
+<div class="srow"><label class="sbox"><input id="s" type="search" placeholder=" " aria-label="Search Store (Target #) or work order #"><span class="sph" aria-hidden="true">Search Store <small>(Target #)</small> or WO <small>#</small></span></label><button id="ftog" type="button" aria-expanded="false" aria-controls="fpanel"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 5h14M6 10h8M8.5 15h3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Filters<span id="fcount"></span></button></div>
+<div id="fpanel" hidden><div class="g2"><select id="fd"></select><select id="fs"></select><select id="fst"></select></div></div>
 <div id="chips"></div>
 <div class="fbar"><span id="cnt" class="m"></span><span class="sp"></span><label class="m">Sort <select id="so">
 <option value="urg">LOS Finish</option><option value="new">Newest first</option><option value="old">Oldest first</option><option value="store">Store #</option></select></label>
@@ -2445,7 +2597,7 @@ button:focus-visible {
 <footer class="contact" id="cta">Got problems? Email <a class="mail" href="mailto:kyle.didonato@channelpartners.com">kyle.didonato@channelpartners.com</a> or <a class="mail" href="https://teams.microsoft.com/l/chat/0/0?users=kyle.didonato@channelpartners.com" target="_blank" rel="noopener" id="ctalink">click here</a>.</footer>
 <div id="imports" class="ovl" hidden><div class="nbox imbox" role="dialog" aria-modal="true" aria-labelledby="imtitle"><h2 id="imtitle">Let's get started</h2>
 <p class="m">Drop each file on its box, or click a box to pick the file. Files are read in your browser only.</p>
-<div class="imgrid"><button id="imp" class="ib miss"></button><button id="vimp" class="ib miss"></button><button id="pimp" class="ib miss"></button><button id="rimp" class="ib miss"></button></div>
+<div class="imgrid"><button id="imp" class="ib miss"></button><button id="vimp" class="ib miss"></button><button id="pimp" class="ib miss"></button><button id="rimp" class="ib miss"></button><button id="timp" class="ib miss"></button><button id="ximp" class="ib miss"></button></div>
 <div class="mbtn"><span id="imcount" class="m"></span><span class="sp" style="flex:1"></span><button id="imclose">Close</button></div></div></div>
 <div id="toast"></div>
 <script>
@@ -2459,7 +2611,8 @@ const ICONS = {
   x: drawIcon('M4 4l8 8M12 4l-8 8'),
   dash: drawIcon('M4 8h8'),
   circle: drawIcon('M8 2.5a5.5 5.5 0 1 1 0 11a5.5 5.5 0 1 1 0-11z'),
-  ext: drawIcon('M6 3H3v10h10v-3M9 3h4v4M13 3L7 9')
+  ext: drawIcon('M6 3H3v10h10v-3M9 3h4v4M13 3L7 9'),
+  mail: drawIcon('M2 4h12v8H2zM2 4l6 5 6-5')
 };
 const $ = id => document.getElementById(id);
 
@@ -2761,12 +2914,143 @@ async function importPresence(f) {
   if (current) showEscalation(current, true);
 }
 
+// Dates in the tracker and parts files are read as Excel's serial day numbers, like the Presence file's.
+const serialDay = n => new Date(Date.UTC(1899, 11, 30) + n * 864e5);
+const fmtDay = d => d.toLocaleDateString([], { timeZone: 'UTC', dateStyle: 'medium' });
+const dayText = v => (typeof v === 'number' ? fmtDay(serialDay(v)) : clean(v));
+// Headings are compared in lower case with runs of spaces and line breaks made one space ("Status\r\nEmailed-FOM").
+const headKey = h => norm(h).replace(/\s+/g, ' ');
+// Work order numbers are compared as digits, so "9120347906.0" (a number the tracker stored as text) matches 9120347906.
+const woKey = v => {
+  const m = clean(v).match(/^(\d+)(?:\.0+)?$/);
+  return m ? m[1] : '';
+};
+
+// ---- The BDS No Show and Data Review file: the tracker kept by hand. Its No show and Data Review sheets each have a row
+// per work order with what was done about it. Any sheet with Work Order and "Response from FOM or PML" headings is read;
+// the Responses sheet of canned notes has neither and is skipped. A missing heading on a tracker sheet stops the import.
+const TRACKER_COLS = [
+  ['Comments', h => h === 'comments'],
+  ['Action on Maximo', h => h === 'action on maximo'],
+  ['In Maximo', h => h === 'maximo'],
+  ['Closed in Maximo', h => h === 'closed in maximo'],
+  ['Rep', h => h === 'rep'],
+  ['FOM (DM)', h => h.startsWith('fom')],
+  ['Update to FOM & PML', h => h === 'date of update to fom & pml'],
+  ['Status emailed to FOM', h => h.startsWith('status emailed')],
+  ['Response from FOM or PML', h => h === 'response from fom or pml']
+];
+let tracker = new Map(),
+  trackerName = '',
+  trackerRows = 0;
+
+function readTracker(wb) {
+  const out = new Map();
+  let n = 0,
+    sheets = 0;
+  for (const name of wb.SheetNames) {
+    const A = XLSX.utils.sheet_to_json(wb.Sheets[name], { header: 1, raw: true, defval: '' }),
+      H = (A[0] ?? []).map(headKey),
+      wo = H.indexOf('work order');
+    if (wo < 0 || !H.includes('response from fom or pml')) continue;
+    sheets++;
+    const cols = TRACKER_COLS.map(([t, m]) => [t, H.findIndex(m)]),
+      missing = cols.filter(([, i]) => i < 0).map(([t]) => t);
+    if (missing.length) throw new DataError(`The "${name}" sheet is missing columns: ${missing.join(', ')}. Nothing was loaded.`);
+    // "No show 9.7.20 - Present" -> "No show".
+    const sheet = name.replace(/\s*\d.*$/, '');
+    A.slice(1).forEach(a => {
+      const id = woKey(a[wo]);
+      if (!id) return;
+      n++;
+      (out.get(id) ?? out.set(id, []).get(id)).push({ sheet, facts: cols.map(([t, i]) => [t, dayText(a[i])]) });
+    });
+  }
+  if (!sheets)
+    throw new DataError('This file has no sheet with Work Order and "Response from FOM or PML" columns. Import the BDS No Show and Data Review file.');
+  return { orders: out, n };
+}
+
+async function importTracker(f) {
+  busyBtn('timp', true, 'Opening…');
+  try {
+    const d = readTracker(XLSX.read(await readFile(f), { type: 'array', dense: true }));
+    tracker = d.orders;
+    trackerRows = d.n;
+    trackerName = f.name;
+    toast(`✓ Loaded ${d.n.toLocaleString()} tracker rows for ${d.orders.size.toLocaleString()} work orders from ${f.name}.`);
+  } catch (e) {
+    toast(e instanceof DataError ? e.message : "This file couldn't be opened as a workbook. Import the BDS No Show and Data Review file (.xlsx).");
+  }
+  busyBtn('timp', false);
+  if (current) showEscalation(current, true);
+}
+
+// ---- The Parts Orders Detail file: parts ordered for Target stores, with their shipping and tracking. Its Ticket ID is
+// not a Maximo work order number, so orders are matched by store (Chain Store Number, the site without its "T").
+const PARTS_COLS = {
+  store: 'Chain Store Number',
+  part: 'Part Name',
+  number: 'Part Number',
+  display: 'Parts Display',
+  reason: 'Reason',
+  stock: 'Stock Status Name',
+  type: 'Issue Type',
+  created: 'Order Created Date',
+  track: 'Tracking Number',
+  carrier: 'Shipping Provider Name',
+  shipped: 'Ship Date',
+  sent: 'Transmission Status',
+  placed: 'Placement Status Name',
+  notes: 'Status Notes'
+};
+// Where each carrier's tracking page takes a tracking number. Another carrier's number is shown without a link.
+const TRACKING_URL = { fedex: 'https://www.fedex.com/fedextrack/?trknbr=' };
+let parts = new Map(),
+  partsName = '',
+  partsOrders = 0;
+
+function readParts(wb) {
+  const ws = wb.Sheets['Parts Orders Detail'];
+  if (!ws) throw new DataError('This file has no "Parts Orders Detail" sheet. Import the Parts Orders Detail file.');
+  const A = XLSX.utils.sheet_to_json(ws, { header: 1, raw: true, defval: '' }),
+    H = (A[0] ?? []).map(headKey),
+    col = Object.fromEntries(Object.entries(PARTS_COLS).map(([k, t]) => [k, H.indexOf(headKey(t))])),
+    missing = Object.keys(PARTS_COLS).filter(k => col[k] < 0);
+  if (missing.length) throw new DataError(`This file is missing columns: ${missing.map(k => PARTS_COLS[k]).join(', ')}. Nothing was loaded.`);
+  const out = new Map();
+  let n = 0;
+  A.slice(1).forEach(a => {
+    const store = storeKey(a[col.store]);
+    if (!store) return;
+    n++;
+    const o = Object.fromEntries(Object.keys(PARTS_COLS).map(k => [k, k === 'created' || k === 'shipped' ? a[col[k]] : clean(a[col[k]])]));
+    o.state = /cancel/i.test(o.sent) || /cancel/i.test(o.placed) ? 'Canceled' : o.track ? 'Shipped' : /troubleshoot/i.test(o.type) ? 'Troubleshooting only' : 'Ordered';
+    (out.get(store) ?? out.set(store, []).get(store)).push(o);
+  });
+  if (!n) throw new DataError('This file has no parts orders. Nothing was loaded.');
+  out.forEach(l => l.sort((x, y) => (+y.created || 0) - (+x.created || 0)));
+  return { stores: out, n };
+}
+
+async function importParts(f) {
+  busyBtn('ximp', true, 'Opening…');
+  try {
+    const d = readParts(XLSX.read(await readFile(f), { type: 'array', dense: true, sheets: ['Parts Orders Detail'] }));
+    parts = d.stores;
+    partsOrders = d.n;
+    partsName = f.name;
+    toast(`✓ Loaded ${d.n.toLocaleString()} parts orders for ${d.stores.size.toLocaleString()} stores from ${f.name}.`);
+  } catch (e) {
+    toast(e instanceof DataError ? e.message : "This file couldn't be opened as a workbook. Import the Parts Orders Detail file (.xlsx).");
+  }
+  busyBtn('ximp', false);
+  if (current) showEscalation(current, true);
+}
+
 const FILTERS = [
   ['fd', 'When', r => DUE_LABELS[dueState(r)]],
   ['fs', 'Status', statusLabel],
-  ['fr', 'Region', r => r.region || '(none)'],
-  ['fg', 'Group', r => r.group || '(none)'],
-  ['fm', 'District', r => r.district || '(none)'],
   ['fst', 'State', r => r.state || '(none)']
 ];
 const filterValue = Object.fromEntries(FILTERS.map(([id, , f]) => [id, f]));
@@ -2797,12 +3081,18 @@ function filters() {
   });
 }
 
-// Every filter and the store search, except the filters in skip.
+// The work order whose number is typed in the search box, if any.
+const searchedOrder = () => {
+  const q = $('s').value.trim();
+  return q ? rows.find(r => r.id === q) : undefined;
+};
+// Every filter and the search (a store, or one work order by its number), except the filters in skip.
 function matches(r, skip) {
-  const q = storeKey($('s').value);
+  const wo = searchedOrder(),
+    q = storeKey($('s').value);
   return (
     FILTERS.every(([id, , f]) => skip.has(id) || !$(id).value || f(r) === $(id).value) &&
-    (!q || storeKey(r.site) === q)
+    (wo ? r === wo : !q || storeKey(r.site) === q)
   );
 }
 
@@ -2827,20 +3117,21 @@ function summary() {
 }
 
 // With no work order open: counts by status, region, group and district, and how many of each are past due.
+// Only the status table filters the list when a row is clicked; region, group and district have no filter.
 const SUMMARY_TABLES = [
-  ['status', 'fs'],
-  ['region', 'fr'],
-  ['group', 'fg'],
-  ['district', 'fm']
+  ['status', statusLabel, 'fs'],
+  ['region', r => r.region || '(none)'],
+  ['group', r => r.group || '(none)'],
+  ['district', r => r.district || '(none)']
 ];
 
 function summaryView() {
   current = null;
   const late = r => dueState(r) === 'late',
-    tbl = SUMMARY_TABLES.map(([t, id]) => {
+    tbl = SUMMARY_TABLES.map(([t, f, id]) => {
       const m = {};
       rows.forEach(r => {
-        const o = (m[filterValue[id](r)] ??= [0, 0]);
+        const o = (m[f(r)] ??= [0, 0]);
         o[0]++;
         o[1] += late(r);
       });
@@ -2852,12 +3143,12 @@ function summaryView() {
       return `<details class="pv"><summary><h3>Work orders by ${t}</h3><span class="m">${body.length}</span></summary><table><thead><tr><th>${t[0].toUpperCase() + t.slice(1)}</th><th class="n">Work orders</th><th>Past due</th></tr></thead><tbody>${body
         .map(
           ([k, [n, l]]) =>
-            `<tr data-f="${id}" data-v="${esc(k)}" tabindex="0" title="Show these in the list"><td>${esc(k)}</td><td class="n">${n.toLocaleString()}</td><td class="n${l ? ' bad' : ''}">${l.toLocaleString()}</td></tr>`
+            `<tr${id ? ` data-f="${id}" data-v="${esc(k)}" tabindex="0" title="Show these in the list"` : ''}><td>${esc(k)}</td><td class="n">${n.toLocaleString()}</td><td class="n${l ? ' bad' : ''}">${l.toLocaleString()}</td></tr>`
         )
         .join('')}</tbody><tfoot><tr><td>Grand Total</td><td>${rows.length.toLocaleString()}</td><td>${rows.filter(late).length.toLocaleString()}</td></tr></tfoot></table></details>`;
     }).join('');
   $('d').innerHTML =
-    `<div class="pvh"><h2>Summary</h2><p class="m">Counted from ${esc(fileName)}. Click a title to open or close a table, or a row to show those work orders in the list.</p>
+    `<div class="pvh"><h2>Summary</h2><p class="m">Counted from ${esc(fileName)}. Click a title to open or close a table, or a status to show those work orders in the list.</p>
  <p class="pvt"><button class="lnk" id="pvopen">Open all</button> · <button class="lnk" id="pvclose">Close all</button></p></div>
  <div class="pvg">${tbl}</div>`;
   draw();
@@ -2911,11 +3202,13 @@ function timeline(r) {
     .join('')}</ul>`;
 }
 
-// The tracker's first block: the description, then Maximo's fields for this work order.
+// The tracker's first block: the description, then Maximo's fields for this work order. Problem Code is a pill in the
+// header instead. Vendor Work Validation shows only when it isn't Pass (Fail in red), since Pass is the usual answer.
 function glance(r) {
-  const fact = (t, v) => `<dt>${t}</dt><dd>${v || '<span class="m">None</span>'}</dd>`;
+  const fact = (t, v) => `<dt>${t}</dt><dd>${v || '<span class="m">None</span>'}</dd>`,
+    val = /^pass\.?$/i.test(r.val) || !r.val ? '' : fact('Vendor Work Validation', `<span class="${/^fail/i.test(r.val) ? 'vfail' : ''}">${esc(r.val)}</span>`);
   return `${r.desc ? `<div class="issw"><p class="issue">${esc(r.desc)}</p></div>` : ''}
- <dl class="facts">${fact('Status', `${esc(statusLabel(r))} <span class="m">· ${esc(r.status)}</span>`)}${fact('Problem Code', esc(r.problem))}${fact('Status Date', r.sd && esc(r.sd.shown))}${fact('Report Date', r.rd && esc(r.rd.shown))}${fact('LOS Finish', r.los && esc(r.los.shown))}${fact('Vendor Work Validation', esc(r.val))}${fact('Work Order', esc(r.id))}${fact('Site', esc(r.site))}</dl>
+ <dl class="facts">${fact('Status', `${esc(statusLabel(r))} <span class="m">· ${esc(r.status)}</span>`)}${fact('Status Date', r.sd && esc(r.sd.shown))}${fact('Report Date', r.rd && esc(r.rd.shown))}${fact('LOS Finish', r.los && esc(r.los.shown))}${val}${fact('Work Order', esc(r.id))}${fact('Site', esc(r.site))}</dl>
  <h3 class="tlh">Timeline</h3>${timeline(r)}`;
 }
 
@@ -2938,29 +3231,78 @@ function visitsCard(r) {
     .join('')}</dl>`;
 }
 
-// What the rep answered for this store: the visit date, how many displays are present and working, and every display
-// answered No with the reason given. A display whose DPCI number the work order names is listed first and marked.
+// What the rep answered for this store: the visit date, how many displays are present and working, then each display
+// answered No, under Not present or Not working, with its DPCI number and the reason given. A display whose DPCI number
+// the work order names is listed first and marked.
 function presenceCard(r) {
   if (!presenceName) return '<p class="m">Import the Presence and Functionality file to see what the rep answered for this store.</p>';
   const rs = presence.get(storeKey(r.site));
   if (!rs) return `<p class="m">Store ${esc(r.site)} isn't in the Presence and Functionality file.</p>`;
   const named = x => (r.desc.match(/\d{3}-\d{2}-\d{4}/g) ?? []).some(d => x.display.includes(d)),
     asked = rs.filter(x => x.working !== null),
-    bad = rs.filter(x => !x.present || x.working === false).sort((a, b) => named(b) - named(a) || a.display.localeCompare(b.display)),
-    last = new Date(Math.max(...rs.map(x => +x.at)));
-  return `<dl class="facts"><dt>Visit date</dt><dd>${esc(last.toLocaleDateString([], { timeZone: 'UTC', dateStyle: 'medium' }))}</dd><dt>Present</dt><dd>${rs.filter(x => x.present).length} of ${rs.length}</dd><dt>Working</dt><dd>${asked.filter(x => x.working).length} of ${asked.length} present displays</dd>${bad
+    last = new Date(Math.max(...rs.map(x => +x.at))),
+    stat = (t, v) => `<div><span>${t}</span><b>${v}</b></div>`,
+    group = (t, list) =>
+      list.length
+        ? `<h4 class="pgh">${t} <span class="m">${list.length}</span></h4><ul class="plist">${list
+            .sort((a, b) => named(b) - named(a) || a.display.localeCompare(b.display))
+            .map(x => {
+              const m = x.display.match(/^(.*?)\s*[-–]?\s*(DPCI\s*[\d-]+)\s*$/i);
+              return `<li>${named(x) ? '<span class="tag st-open">Named in this work order</span> ' : ''}${m ? `<b>${esc(m[2])}</b> ${esc(m[1])}` : esc(x.display)}${x.why ? ` <span class="m">· ${esc(x.why)}</span>` : ''}</li>`;
+            })
+            .join('')}</ul>`
+        : '',
+    notPresent = rs.filter(x => !x.present),
+    notWorking = rs.filter(x => x.present && x.working === false);
+  return `<div class="pstats">${stat('Visit date', esc(fmtDay(last)))}${stat('Present', `${rs.length - notPresent.length} of ${rs.length}`)}${stat('Working', `${asked.filter(x => x.working).length} of ${asked.length}`)}</div>${group('Not present', notPresent)}${group('Not working', notWorking)}${notPresent.length + notWorking.length ? '' : '<p class="m">Every display is present and working.</p>'}`;
+}
+
+// What the tracker kept by hand says about this work order: one block per tracker row (No show or Data Review).
+function trackerCard(r) {
+  if (!trackerName) return '<p class="m">Import the BDS No Show and Data Review file to see the notes kept on this work order.</p>';
+  const es = tracker.get(r.id);
+  if (!es) return `<p class="m">Work order ${esc(r.id)} isn't in the tracker file yet.</p>`;
+  return es
+    .map(e => {
+      const filled = e.facts.filter(([, v]) => v);
+      return `${es.length > 1 ? `<h4 class="pgh">${esc(e.sheet)}</h4>` : ''}${filled.length ? `<dl class="facts tfacts">${filled.map(([t, v]) => `<dt>${esc(t)}</dt><dd>${esc(v)}</dd>`).join('')}</dl>` : '<p class="m">Nothing entered yet.</p>'}`;
+    })
+    .join('');
+}
+
+// This store's parts orders, newest first: the part, why it was ordered, where it stands, and its tracking number.
+const PART_STATE = { Shipped: 'st-done', Ordered: 'st-open', Canceled: '', 'Troubleshooting only': '' };
+function partsCard(r) {
+  if (!partsName) return '<p class="m">Import the Parts Orders Detail file to see this store\'s parts orders.</p>';
+  const os = parts.get(storeKey(r.site));
+  if (!os) return `<p class="m">Store ${esc(r.site)} has no parts orders in the parts file.</p>`;
+  const track = o => {
+    const u = TRACKING_URL[norm(o.carrier)];
+    return o.track
+      ? `${u ? `<a href="${u}${encodeURIComponent(o.track)}" target="_blank" rel="noopener">${esc(o.track)} ${ICONS.ext}</a>` : esc(o.track)}<div class="m">${esc(o.carrier)}${typeof o.shipped === 'number' ? ` · shipped ${esc(fmtDay(serialDay(o.shipped)))}` : ''}</div>`
+      : '<span class="m">None yet</span>';
+  };
+  return `<table class="ptab"><thead><tr><th>Part</th><th>Reason</th><th>Ordered</th><th>Status</th><th>Tracking</th></tr></thead><tbody>${os
     .map(
-      x =>
-        `<dt>${x.present ? 'Not working' : 'Not present'}</dt><dd>${named(x) ? '<span class="tag st-open">Named in this work order</span> ' : ''}${esc(x.display)}${x.why ? ` <span class="m">· ${esc(x.why)}</span>` : ''}</dd>`
+      o => `<tr><td><b>${esc(o.part || o.type)}</b>${o.number ? ` <span class="m">${esc(o.number)}</span>` : ''}${o.display ? `<div class="m">${esc(o.display)}</div>` : ''}${o.notes ? `<div class="pnote">${esc(o.notes)}</div>` : ''}</td><td>${esc(o.reason) || '<span class="m">None</span>'}${o.stock ? `<div class="m">${esc(o.stock)}</div>` : ''}</td><td>${typeof o.created === 'number' ? esc(fmtDay(serialDay(o.created))) : ''}</td><td><span class="tag ${PART_STATE[o.state]}">${esc(o.state)}</span></td><td>${track(o)}</td></tr>`
     )
-    .join('')}</dl>${bad.length ? '' : '<p class="m">Every display is present and working.</p>'}`;
+    .join('')}</tbody></table>`;
+}
+
+// A panel that is always open: a title, a hint, and its body.
+const card = (t, body, hint) => `<section class="card open"><h3 class="ch">${t}<span class="hint">${hint}</span></h3>${body}</section>`;
+
+// The store's street address from the data file, or Maximo's city and state until that file is in.
+function storeAddress(r) {
+  const a = visitsName && visFrame().weeksFor(storeKey(r.site))?.address;
+  return a ? [a.street, a.city, [a.state, a.zip].filter(Boolean).join(' ')].filter(Boolean).join(', ') : [r.city, r.state].filter(Boolean).join(', ');
 }
 
 function showEscalation(r, keep) {
   current = r;
   const s = dueState(r),
     sc = keep ? $('d').scrollTop : 0,
-    where = [r.city, r.state].filter(Boolean).join(', '),
+    where = storeAddress(r),
     org = [
       ['Region', r.region],
       ['Group', r.group],
@@ -2970,12 +3312,14 @@ function showEscalation(r, keep) {
       .map(([t, v]) => `<span><em>${t}</em>${esc(v)}</span>`)
       .join('');
   $('d').innerHTML = `<div class="top"><div class="hd">
- <div class="chips">${statusTag(r)}<span class="due ${s}">${esc(dueText(r))}</span></div>${r.los ? `<div class="m dln">LOS Finish ${esc(r.los.shown)}</div>` : ''}
+ <div class="chips">${statusTag(r)}${r.problem ? `<span class="tag pcode" title="Problem Code">${esc(r.problem)}</span>` : ''}<span class="due ${s}">${esc(dueText(r))}</span></div>${r.los ? `<div class="m dln">LOS Finish ${esc(r.los.shown)}</div>` : ''}
  <h2 class="vn">Store ${esc(r.site)}</h2>${where ? `<div class="sid">${esc(where)}</div>` : ''}<div class="m ids">Work order #${esc(r.id)}</div></div>
- <div class="side"><button id="copy">Copy summary for email</button>${org ? `<div class="team">${org}</div>` : ''}</div></div>
+ <div class="side"><div class="reply"><button id="reply" class="p" aria-haspopup="menu" aria-expanded="false">${ICONS.mail}Reply</button><div id="replymenu" role="menu" hidden><button role="menuitem" data-to="dm">To DM</button><button role="menuitem" data-to="pml">To PML</button></div></div>${org ? `<div class="team">${org}</div>` : ''}</div></div>
  <div class="panel solo">${glance(r)}</div>
- ${collapsible('visits', 'Rep and visits', visitsCard(r), 'Last four weeks, from the data file')}
- ${collapsible('presence', "Rep's answers", presenceCard(r), 'Displays present and working, from the Presence and Functionality file')}
+ ${card('Rep and visits', visitsCard(r), 'Last four weeks, from the data file')}
+ ${card("Rep's answers", presenceCard(r), 'Displays present and working, from the Presence and Functionality file')}
+ ${card('Tracker notes', trackerCard(r), 'Kept by hand, from the BDS No Show and Data Review file')}
+ ${card('Parts', partsCard(r), "This store's parts orders, from the Parts Orders Detail file")}
  ${collapsible('all', 'Full record', fullRecord(r), 'Every column of this work order in the export file', false)}`;
   $('d').scrollTop = sc;
   draw();
@@ -3005,7 +3349,7 @@ function busyBtn(id, on, label) {
 }
 
 // Each import box is named for the file it takes and says what that file fills in, until it is loaded; then it shows a check, the file name and a count.
-const FILE_COUNT = 4;
+const FILE_COUNT = 6;
 let filesLoaded = 0;
 function btnState() {
   const ck = `<span class="okc">${ICONS.check}</span>`;
@@ -3023,6 +3367,8 @@ function btnState() {
   paint('vimp', !!visitsName, 'data', visitsName, "Power BI's Target Break-Fix Continuity visits. Fills each store's rep, DM and whether the rep visited that week.");
   paint('pimp', !!presenceName, 'Interactives Program Presence and Functionality', `${presenceName} · ${presenceChecks.toLocaleString()} display checks`, "What each rep answered for each store's interactive displays. Fills the Rep's answers card on each escalation.");
   paint('rimp', !!peopleName, 'People Report', peopleName, "The rep directory. Fills the Directory tab's rep details.");
+  paint('timp', !!trackerName, 'BDS No Show and Data Review', `${trackerName} · ${trackerRows.toLocaleString()} tracker rows`, 'The tracker kept by hand. Fills the Tracker notes card on each escalation.');
+  paint('ximp', !!partsName, 'Parts Orders Detail', `${partsName} · ${partsOrders.toLocaleString()} parts orders`, "Parts ordered for Target stores, with tracking numbers. Fills the Parts card on each escalation.");
   // The popup closes by itself once the last of the files is in.
   if (n === FILE_COUNT && filesLoaded < FILE_COUNT && !$('imports').hidden) setTimeout(closeImports, 900);
   filesLoaded = n;
@@ -3091,37 +3437,37 @@ function filterFromRow(tr) {
   toast(`Showing ${n.toLocaleString()} work order${n === 1 ? '' : 's'} in the list.`);
 }
 
-function copyForEmail() {
-  const r = current,
-    t = [
-      `Target store ${r.site}${r.city || r.state ? ` (${[r.city, r.state].filter(Boolean).join(', ')})` : ''} - Work order ${r.id}`,
-      `Status: ${statusLabel(r)} (${r.status})`,
+// Reply opens an email draft in the mail app, To line blank, with this work order's facts. The DM's draft adds the rep
+// assigned each week; the PML is Target's contact, so theirs gives the visits without rep names.
+function replyLink(r, to) {
+  const v = visitsName ? visFrame().weeksFor(storeKey(r.site)) : null,
+    lines = [
+      'Hi,',
+      '',
+      `Target work order ${r.id} for store ${r.site}:`,
+      '',
+      `Store: ${r.site}, ${storeAddress(r)}`,
       `Problem Code: ${r.problem || 'none'}`,
-      `Status Date: ${r.sd ? r.sd.shown : 'none'}`,
+      `Status: ${statusLabel(r)} (${r.status})`,
       `Report Date: ${r.rd ? r.rd.shown : 'none'}`,
       `LOS Finish: ${r.los ? `${r.los.shown} (${dueText(r)})` : 'none'}`,
-      `Vendor Work Validation: ${r.val || 'none'}`,
-      `Region ${r.region} · Group ${r.group} · District ${r.district}`,
       `Description: ${r.desc}`
-    ].join('\n');
-  const fb = () => {
-    let a = $('cpy');
-    if (!a) {
-      a = document.createElement('textarea');
-      a.id = 'cpy';
-      a.rows = 10;
-      $('d').querySelector('.top').after(a);
-    }
-    a.value = t;
-    a.select();
-    toast('Select the text below and copy it with Ctrl+C.');
-  };
-  try {
-    navigator.clipboard.writeText(t).then(() => toast('Summary copied. Paste it into your email.'), fb);
-  } catch (e) {
-    fb();
+    ];
+  if (v) {
+    if (to === 'dm') lines.push(`DM: ${v.dm || 'none'}`);
+    lines.push('', 'Visits, last four weeks:', ...v.weeks.map(w => `${w.wave}: ${to === 'dm' ? `${w.rep}, ` : ''}${w.status}`));
   }
+  return `mailto:?subject=${encodeURIComponent(`Target WO ${r.id} - Store ${r.site} - ${r.problem}`)}&body=${encodeURIComponent(lines.join('\n') + '\n\n')}`;
 }
+function toggleReplyMenu(open) {
+  const m = $('replymenu');
+  if (!m) return;
+  m.hidden = !open;
+  $('reply').setAttribute('aria-expanded', open);
+}
+document.addEventListener('click', e => {
+  if (!e.target.closest('.reply')) toggleReplyMenu(false);
+});
 $('d').addEventListener('click', e => {
   const tr = e.target.closest('tr[data-f]');
   if (tr) return filterFromRow(tr);
@@ -3133,7 +3479,11 @@ $('d').addEventListener('click', e => {
       .forEach(d => (d.open = t.id === 'pvopen'));
     return;
   }
-  if (t.id === 'copy') copyForEmail();
+  if (t.id === 'reply') toggleReplyMenu($('replymenu').hidden);
+  if (t.dataset.to) {
+    toggleReplyMenu(false);
+    location.href = replyLink(current, t.dataset.to);
+  }
 });
 $('d').addEventListener('keydown', e => {
   const t = e.target;
@@ -3211,10 +3561,26 @@ $('clr').onclick = () => {
   draw();
 };
 ['s', 'so', ...FILTERS.map(f => f[0])].forEach(i => $(i).addEventListener('input', draw));
-$('s').addEventListener('input', () => follow($('s').value));
+// A work order number opens that work order, and its store is the one followed.
+$('s').addEventListener('input', () => {
+  const wo = searchedOrder();
+  follow(wo ? storeKey(wo.site) : $('s').value);
+  if (wo) showEscalation(wo);
+});
+// How long the data file can take to read, shown while it is read. A 150,000-row export took 11–14 s in testing; this leaves room for a slower laptop.
+const DATA_SECONDS = 30;
+// The data box while its file is read: the row it's on, about how many there are, how many are kept, and a bar.
+function dataProgress(seen, kept, frac) {
+  const b = $('vimp'),
+    about = frac > 0.02 ? Math.max(seen, Math.round(seen / frac / 1000) * 1000) : 0;
+  b.querySelector('.ibt span').textContent =
+    `Reading row ${seen.toLocaleString()}${about ? ` of about ${about.toLocaleString()}` : ''} · ${kept.toLocaleString()} Target Break-Fix Continuity rows kept. This can take up to ${DATA_SECONDS} seconds.`;
+  b.querySelector('.ibar i').style.width = Math.round(frac * 100) + '%';
+}
 async function importVisits(f) {
-  busyBtn('vimp', true, 'Opening…');
-  const ok = await visFrame().loadVisits(f);
+  busyBtn('vimp', true, `Opening… This can take up to ${DATA_SECONDS} seconds.`);
+  $('vimp').querySelector('.ibt').insertAdjacentHTML('beforeend', '<span class="ibar"><i></i></span>');
+  const ok = await visFrame().loadVisits(f, dataProgress);
   if (ok) visitsName = f.name;
   busyBtn('vimp', false);
   if (ok && current) showEscalation(current, true);
@@ -3235,7 +3601,9 @@ const IMPORTS = {
   imp: ['file', loadData],
   vimp: ['vfile', importVisits],
   pimp: ['pfile', importPresence],
-  rimp: ['rfile', importPeople]
+  rimp: ['rfile', importPeople],
+  timp: ['tfile', importTracker],
+  ximp: ['xfile', importParts]
 };
 Object.entries(IMPORTS).forEach(([id, [fid, load]]) => {
   const b = $(id);
