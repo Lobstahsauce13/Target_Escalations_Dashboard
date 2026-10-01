@@ -1,6 +1,7 @@
-# A Worker that only serves the site's files (no server code), deployed by .github/workflows/deploy.yml.
-name = "target-escalations"
+# A Worker that only serves the site's files (no server code). Cloudflare's Git integration (Workers Builds)
+# deploys it on every push to main; the name must match that Worker. .assetsignore keeps repo files off the site.
+name = "target-escalations-dashboard"
 compatibility_date = "2026-10-01"
 
 [assets]
-directory = "./_site"
+directory = "."
