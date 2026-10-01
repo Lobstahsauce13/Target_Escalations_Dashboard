@@ -1,3 +1,3 @@
-name = "bestbuy-escalations-v4"
+name = "target-escalations"
 pages_build_output_dir = "."
-compatibility_date = "2026-09-29"
+compatibility_date = "2026-10-01"
