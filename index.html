@@ -2419,8 +2419,8 @@ button:focus-visible {
 </style></head><body>
 <header><h1><svg class="logo" viewBox="0 0 28 28" role="img" aria-label="Target"><circle cx="14" cy="14" r="11.5" fill="none" stroke="#fff" stroke-width="4"/><circle cx="14" cy="14" r="4.5" fill="#fff"/></svg>Target Escalation Dashboard</h1>
 <nav id="apptabs" role="tablist"><button role="tab" data-app="esc" aria-selected="true">Escalations</button><button role="tab" data-app="vis" aria-selected="false">Store Visits</button><button role="tab" data-app="dir" aria-selected="false">Directory</button></nav>
-<button id="fpill" class="fpill miss" aria-haspopup="dialog" title="Import files">0 of 3 files loaded</button>
-<input id="file" type="file" accept=".xlsx" hidden><input id="vfile" type="file" accept=".xlsx" hidden><input id="rfile" type="file" accept=".xlsx,.xls" hidden></header>
+<button id="fpill" class="fpill miss" aria-haspopup="dialog" title="Import files">0 of 4 files loaded</button>
+<input id="file" type="file" accept=".xlsx" hidden><input id="vfile" type="file" accept=".xlsx" hidden><input id="pfile" type="file" accept=".xlsx" hidden><input id="rfile" type="file" accept=".xlsx,.xls" hidden></header>
 <div id="sumbar"><div id="sum"></div><div id="vsum"></div><div id="follow"></div></div>
 <div id="escView">
 <main>
@@ -2445,7 +2445,7 @@ button:focus-visible {
 <footer class="contact" id="cta">Got problems? Email <a class="mail" href="mailto:kyle.didonato@channelpartners.com">kyle.didonato@channelpartners.com</a> or <a class="mail" href="https://teams.microsoft.com/l/chat/0/0?users=kyle.didonato@channelpartners.com" target="_blank" rel="noopener" id="ctalink">click here</a>.</footer>
 <div id="imports" class="ovl" hidden><div class="nbox imbox" role="dialog" aria-modal="true" aria-labelledby="imtitle"><h2 id="imtitle">Let's get started</h2>
 <p class="m">Drop each file on its box, or click a box to pick the file. Files are read in your browser only.</p>
-<div class="imgrid"><button id="imp" class="ib miss"></button><button id="vimp" class="ib miss"></button><button id="rimp" class="ib miss"></button></div>
+<div class="imgrid"><button id="imp" class="ib miss"></button><button id="vimp" class="ib miss"></button><button id="pimp" class="ib miss"></button><button id="rimp" class="ib miss"></button></div>
 <div class="mbtn"><span id="imcount" class="m"></span><span class="sp" style="flex:1"></span><button id="imclose">Close</button></div></div></div>
 <div id="toast"></div>
 <script>
@@ -2685,6 +2685,82 @@ async function loadData(f) {
   }
 }
 
+// ---- The Presence and Functionality file: what the rep answered for each of a store's interactive displays.
+// Only the "Presence and Functionality" sheet is read, from the row headed Visit Date down. A missing heading or an answer
+// that isn't Yes or No stops the import, so no display is shown with a guessed answer.
+const PRESENCE_COLS = {
+  date: 'Visit Date',
+  store: 'Store #',
+  display: 'Display Name',
+  present: 'Present?',
+  working: 'Functional? (Are ALL interactive elements of the display functional?)',
+  whyNot: 'Reason display is not Present',
+  whyBroken: 'Reason display is not Functional'
+};
+let presence = new Map(),
+  presenceName = '',
+  presenceChecks = 0;
+
+function readPresenceRows(wb) {
+  const ws = wb.Sheets['Presence and Functionality'];
+  if (!ws) throw new DataError('This file has no "Presence and Functionality" sheet. Import the Interactives Program Presence and Functionality file.');
+  const A = XLSX.utils.sheet_to_json(ws, { header: 1, raw: true, defval: null }),
+    h = A.findIndex(r => norm(r[0]) === 'visit date');
+  if (h < 0) throw new DataError('This file has no Visit Date heading on its Presence and Functionality sheet. Nothing was loaded.');
+  const H = A[h].map(norm),
+    col = Object.fromEntries(Object.entries(PRESENCE_COLS).map(([k, t]) => [k, H.indexOf(norm(t))])),
+    missing = Object.keys(PRESENCE_COLS).filter(k => col[k] < 0);
+  if (missing.length)
+    throw new DataError(`This file is missing columns: ${missing.map(k => PRESENCE_COLS[k]).join(', ')}. Nothing was loaded.`);
+  const yesNo = (v, n, what, blankOk) => {
+      const x = norm(v);
+      if (/^yes/.test(x)) return true;
+      if (/^no/.test(x)) return false;
+      if (x === '' && blankOk) return null;
+      throw new DataError(`Row ${n}: ${what} is "${v ?? ''}", not Yes or No. Nothing was loaded.`);
+    },
+    out = new Map();
+  let checks = 0;
+  A.slice(h + 1).forEach((a, i) => {
+    const site = storeKey(a[col.store]);
+    if (!site) return;
+    const n = h + i + 2,
+      at = a[col.date];
+    if (typeof at !== 'number') throw new DataError(`Row ${n}: the Visit Date isn't a date. Nothing was loaded.`);
+    const present = yesNo(a[col.present], n, 'Present?', false);
+    checks++;
+    (out.get(site) ?? out.set(site, []).get(site)).push({
+      at: new Date(Date.UTC(1899, 11, 30) + at * 864e5),
+      display: clean(a[col.display]),
+      present,
+      working: yesNo(a[col.working], n, 'Functional?', true),
+      why: clean(present ? a[col.whyBroken] : a[col.whyNot])
+    });
+  });
+  if (!checks) throw new DataError('This file has no display answers under its Visit Date heading. Nothing was loaded.');
+  return { stores: out, checks };
+}
+
+async function importPresence(f) {
+  busyBtn('pimp', true, 'Opening…');
+  try {
+    const wb = XLSX.read(await readFile(f), { type: 'array', dense: true, cellDates: false, cellFormula: false, cellHTML: false, cellText: false, cellNF: false, cellStyles: false, sheets: ['Presence and Functionality'] }),
+      d = readPresenceRows(wb);
+    presence = d.stores;
+    presenceChecks = d.checks;
+    presenceName = f.name;
+    toast(`✓ Loaded ${d.checks.toLocaleString()} display answers for ${d.stores.size.toLocaleString()} stores from ${f.name}.`);
+  } catch (e) {
+    toast(
+      e instanceof DataError
+        ? e.message
+        : "This file couldn't be opened as a workbook. Import the Interactives Program Presence and Functionality file (.xlsx)."
+    );
+  }
+  busyBtn('pimp', false);
+  if (current) showEscalation(current, true);
+}
+
 const FILTERS = [
   ['fd', 'When', r => DUE_LABELS[dueState(r)]],
   ['fs', 'Status', statusLabel],
@@ -2862,6 +2938,24 @@ function visitsCard(r) {
     .join('')}</dl>`;
 }
 
+// What the rep answered for this store: the visit date, how many displays are present and working, and every display
+// answered No with the reason given. A display whose DPCI number the work order names is listed first and marked.
+function presenceCard(r) {
+  if (!presenceName) return '<p class="m">Import the Presence and Functionality file to see what the rep answered for this store.</p>';
+  const rs = presence.get(storeKey(r.site));
+  if (!rs) return `<p class="m">Store ${esc(r.site)} isn't in the Presence and Functionality file.</p>`;
+  const named = x => (r.desc.match(/\d{3}-\d{2}-\d{4}/g) ?? []).some(d => x.display.includes(d)),
+    asked = rs.filter(x => x.working !== null),
+    bad = rs.filter(x => !x.present || x.working === false).sort((a, b) => named(b) - named(a) || a.display.localeCompare(b.display)),
+    last = new Date(Math.max(...rs.map(x => +x.at)));
+  return `<dl class="facts"><dt>Visit date</dt><dd>${esc(last.toLocaleDateString([], { timeZone: 'UTC', dateStyle: 'medium' }))}</dd><dt>Present</dt><dd>${rs.filter(x => x.present).length} of ${rs.length}</dd><dt>Working</dt><dd>${asked.filter(x => x.working).length} of ${asked.length} present displays</dd>${bad
+    .map(
+      x =>
+        `<dt>${x.present ? 'Not working' : 'Not present'}</dt><dd>${named(x) ? '<span class="tag st-open">Named in this work order</span> ' : ''}${esc(x.display)}${x.why ? ` <span class="m">· ${esc(x.why)}</span>` : ''}</dd>`
+    )
+    .join('')}</dl>${bad.length ? '' : '<p class="m">Every display is present and working.</p>'}`;
+}
+
 function showEscalation(r, keep) {
   current = r;
   const s = dueState(r),
@@ -2881,6 +2975,7 @@ function showEscalation(r, keep) {
  <div class="side"><button id="copy">Copy summary for email</button>${org ? `<div class="team">${org}</div>` : ''}</div></div>
  <div class="panel solo">${glance(r)}</div>
  ${collapsible('visits', 'Rep and visits', visitsCard(r), 'Last four weeks, from the data file')}
+ ${collapsible('presence', "Rep's answers", presenceCard(r), 'Displays present and working, from the Presence and Functionality file')}
  ${collapsible('all', 'Full record', fullRecord(r), 'Every column of this work order in the export file', false)}`;
   $('d').scrollTop = sc;
   draw();
@@ -2910,7 +3005,7 @@ function busyBtn(id, on, label) {
 }
 
 // Each import box is named for the file it takes and says what that file fills in, until it is loaded; then it shows a check, the file name and a count.
-const FILE_COUNT = 3;
+const FILE_COUNT = 4;
 let filesLoaded = 0;
 function btnState() {
   const ck = `<span class="okc">${ICONS.check}</span>`;
@@ -2926,6 +3021,7 @@ function btnState() {
   };
   paint('imp', !!rows.length, 'export', `${fileName} · ${rows.length.toLocaleString()} CM work orders`, "Maximo's CM work orders. Fills the escalation list and each work order's details.");
   paint('vimp', !!visitsName, 'data', visitsName, "Power BI's Target Break-Fix Continuity visits. Fills each store's rep, DM and whether the rep visited that week.");
+  paint('pimp', !!presenceName, 'Interactives Program Presence and Functionality', `${presenceName} · ${presenceChecks.toLocaleString()} display checks`, "What each rep answered for each store's interactive displays. Fills the Rep's answers card on each escalation.");
   paint('rimp', !!peopleName, 'People Report', peopleName, "The rep directory. Fills the Directory tab's rep details.");
   // The popup closes by itself once the last of the files is in.
   if (n === FILE_COUNT && filesLoaded < FILE_COUNT && !$('imports').hidden) setTimeout(closeImports, 900);
@@ -3138,6 +3234,7 @@ function importDropped(view, f) {
 const IMPORTS = {
   imp: ['file', loadData],
   vimp: ['vfile', importVisits],
+  pimp: ['pfile', importPresence],
   rimp: ['rfile', importPeople]
 };
 Object.entries(IMPORTS).forEach(([id, [fid, load]]) => {
