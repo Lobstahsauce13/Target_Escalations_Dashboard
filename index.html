@@ -2644,31 +2644,31 @@ button:focus-visible {
 </style></head><body>
 <header><h1><svg class="logo" viewBox="0 0 28 28" role="img" aria-label="Target"><circle cx="14" cy="14" r="11.5" fill="none" stroke="#fff" stroke-width="4"/><circle cx="14" cy="14" r="4.5" fill="#fff"/></svg>Target Escalation Dashboard</h1>
 <nav id="apptabs" role="tablist"><button role="tab" data-app="esc" aria-selected="true">Escalations</button><button role="tab" data-app="vis" aria-selected="false">Store Visits</button><button role="tab" data-app="dir" aria-selected="false">Directory</button></nav>
-<button id="fpill" class="fpill miss" aria-haspopup="dialog" title="Import files">0 of 5 files loaded</button>
+<button id="fpill" class="fpill miss" aria-haspopup="dialog" title="Import Files">0 of 5 Files Loaded</button>
 <input id="file" type="file" accept=".xlsx" hidden><input id="vfile" type="file" accept=".xlsx" hidden><input id="pfile" type="file" accept=".xlsx" hidden><input id="tfile" type="file" accept=".xlsx" hidden><input id="xfile" type="file" accept=".xlsx" hidden></header>
 <div id="sumbar"><div id="sum"></div><div id="vsum"></div><div id="follow"></div></div>
 <div id="escView">
 <main>
 <section id="q"><div id="f">
-<div class="srow"><label class="sbox"><input id="s" type="search" placeholder=" " aria-label="Search Store (Target #) or work order #"><span class="sph" aria-hidden="true">Search Store <small>(Target #)</small> or WO <small>#</small></span></label><button id="ftog" type="button" aria-expanded="false" aria-controls="fpanel"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 5h14M6 10h8M8.5 15h3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Filters<span id="fcount"></span></button></div>
+<div class="srow"><label class="sbox"><input id="s" type="search" placeholder=" " aria-label="Search Store (Target #) or Work Order #"><span class="sph" aria-hidden="true">Search Store <small>(Target #)</small> or WO <small>#</small></span></label><button id="ftog" type="button" aria-expanded="false" aria-controls="fpanel"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 5h14M6 10h8M8.5 15h3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Filters<span id="fcount"></span></button></div>
 <div id="fpanel" hidden><div class="g2"><select id="fd"></select><select id="fs"></select><select id="fst"></select></div></div>
 <div id="chips"></div>
 <div class="fbar"><span id="cnt" class="m"></span><span class="sp"></span><label class="m">Sort <select id="so">
-<option value="urg">LOS Finish</option><option value="new">Newest first</option><option value="old">Oldest first</option><option value="store">Store #</option></select></label>
+<option value="urg">LOS Finish</option><option value="new">Newest First</option><option value="old">Oldest First</option><option value="store">Store #</option></select></label>
 <button id="clr" class="lnk">Clear</button></div></div>
 <div id="list"></div>
-<div class="foot"><details class="leg"><summary>Status guide</summary>
+<div class="foot"><details class="leg"><summary>Status Guide</summary>
 <p><b>New:</b> Maximo status APPR, a new escalation.</p>
 <p><b>Open:</b> VDECWO, a work order that is still open.</p>
 <p><b>Completed:</b> VINPRG, a work order that has been completed.</p>
-<p><b>Closed, not removed:</b> VDECWC, a work order that has been closed but not removed.</p>
-<p><b>Past due:</b> New or Open, and its LOS Finish date has passed. <b>Due within 48 hours:</b> its LOS Finish is in the next 48 hours.</p>
+<p><b>Closed, Not Removed:</b> VDECWC, a work order that has been closed but not removed.</p>
+<p><b>Past Due:</b> New or Open, and its LOS Finish date has passed. <b>Due Within 48 Hours:</b> Its LOS Finish is in the next 48 hours.</p>
 <p>Only CM work orders are loaded. PM rows in the export file are skipped.</p></details><button id="thm" type="button"></button></div></section>
-<section id="d"><div id="empty"><h2>Import files to begin</h2><p class="m">Files are read in your browser only.</p><button class="p" id="openimp">Import files</button></div></section>
+<section id="d"><div id="empty"><h2>Import Files to Begin</h2><p class="m">Files are read in your browser only.</p><button class="p" id="openimp">Import Files</button></div></section>
 </main></div>
 <iframe id="visView" src="visits.html" title="Store visits and directory" hidden></iframe>
 <footer class="contact" id="cta">Got problems? Email <a class="mail" href="mailto:kyle.didonato@channelpartners.com">kyle.didonato@channelpartners.com</a> or <a class="mail" href="https://teams.microsoft.com/l/chat/0/0?users=kyle.didonato@channelpartners.com" target="_blank" rel="noopener" id="ctalink">click here</a>.</footer>
-<div id="imports" class="ovl" hidden><div class="nbox imbox" role="dialog" aria-modal="true" aria-labelledby="imtitle"><h2 id="imtitle">Let's get started</h2>
+<div id="imports" class="ovl" hidden><div class="nbox imbox" role="dialog" aria-modal="true" aria-labelledby="imtitle"><h2 id="imtitle">Let's Get Started</h2>
 <p class="m">Click a square to pick its file. Files are read in your browser only.</p>
 <div class="imgrid"><button id="imp" class="ib miss"></button><button id="vimp" class="ib miss"></button><button id="pimp" class="ib miss"></button><button id="timp" class="ib miss"></button><button id="ximp" class="ib miss"></button></div>
 <div class="mbtn"><span id="imcount" class="m"></span><span class="sp" style="flex:1"></span><button id="imclose">Close</button></div></div></div>
@@ -2713,7 +2713,7 @@ const STATUSES = {
   APPR: 'New',
   VDECWO: 'Open',
   VINPRG: 'Completed',
-  VDECWC: 'Closed, not removed'
+  VDECWC: 'Closed, Not Removed'
 };
 const DONE = new Set(['VINPRG', 'VDECWC']);
 const STATUS_TAG = { APPR: 'st-new', VDECWO: 'st-open', VINPRG: 'st-done', VDECWC: '' };
@@ -2785,9 +2785,9 @@ const dueState = r => {
   return h < 0 ? 'late' : h < 48 ? 'soon' : 'later';
 };
 const DUE_LABELS = {
-  late: 'Past due',
-  soon: 'Due within 48 hours',
-  later: 'Due later',
+  late: 'Past Due',
+  soon: 'Due Within 48 Hours',
+  later: 'Due Later',
   none: 'No LOS Finish',
   done: 'Done'
 };
@@ -3013,7 +3013,7 @@ const TRACKER_COLS = [
   ['Rep', h => h === 'rep'],
   ['FOM (DM)', h => h.startsWith('fom')],
   ['Update to FOM & PML', h => h === 'date of update to fom & pml'],
-  ['Status emailed to FOM', h => h.startsWith('status emailed')],
+  ['Status Emailed to FOM', h => h.startsWith('status emailed')],
   ['Response from FOM or PML', h => h === 'response from fom or pml']
 ];
 let tracker = new Map(),
@@ -3156,7 +3156,7 @@ function filters() {
         );
     // A bare number (a region, group or district) shows with its filter's name, so a picked choice still says what it is.
     el.innerHTML =
-      `<option value="">${t}: all</option>` +
+      `<option value="">${t}: All</option>` +
       ks
         .map(x => `<option value="${esc(x)}">${esc(/^\d+$/.test(x) ? `${t} ${x}` : x)} (${c[x].toLocaleString()})</option>`)
         .join('');
@@ -3183,9 +3183,9 @@ function matches(r, skip) {
 const PILLS = [
   ['New', 'fs', 'acc'],
   ['Open', 'fs', 'warn'],
-  ['Past due', 'fd', 'bad'],
+  ['Past Due', 'fd', 'bad'],
   ['Completed', 'fs', 'ok'],
-  ['Closed, not removed', 'fs', '']
+  ['Closed, Not Removed', 'fs', '']
 ];
 const pillOn = ([t, id]) => $(id).value === t && !$(id === 'fs' ? 'fd' : 'fs').value;
 
@@ -3196,7 +3196,7 @@ function summary() {
     PILLS.map(
       (p, i) =>
         `<button class="${p[2]}${pillOn(p) ? ' act' : ''}" data-b="${i}" aria-pressed="${pillOn(p)}"><b>${base.filter(r => filterValue[p[1]](r) === p[0]).length.toLocaleString()}</b>${p[0]}</button>`
-    ).join('') + (narrowed ? '<span class="sfil">Counts match your filters</span>' : '');
+    ).join('') + (narrowed ? '<span class="sfil">Counts Match Your Filters</span>' : '');
 }
 
 // With no work order open: counts by status, region, group and district, and how many of each are past due.
@@ -3223,7 +3223,7 @@ function summaryView() {
           ? (a, b) => FILTER_ORDER[id].indexOf(a[0]) - FILTER_ORDER[id].indexOf(b[0])
           : (a, b) => b[1][1] - a[1][1] || b[1][0] - a[1][0] || a[0].localeCompare(b[0], undefined, { numeric: true })
       );
-      return `<details class="pv"><summary><h3>Work orders by ${t}</h3><span class="m">${body.length}</span></summary><table><thead><tr><th>${t[0].toUpperCase() + t.slice(1)}</th><th class="n">Work orders</th><th>Past due</th></tr></thead><tbody>${body
+      return `<details class="pv"><summary><h3>Work Orders by ${t[0].toUpperCase() + t.slice(1)}</h3><span class="m">${body.length}</span></summary><table><thead><tr><th>${t[0].toUpperCase() + t.slice(1)}</th><th class="n">Work Orders</th><th>Past Due</th></tr></thead><tbody>${body
         .map(
           ([k, [n, l]]) =>
             `<tr${id ? ` data-f="${id}" data-v="${esc(k)}" tabindex="0" title="Show these in the list"` : ''}><td>${esc(k)}</td><td class="n">${n.toLocaleString()}</td><td class="n${l ? ' bad' : ''}">${l.toLocaleString()}</td></tr>`
@@ -3232,7 +3232,7 @@ function summaryView() {
     }).join('');
   $('d').innerHTML =
     `<div class="pvh"><h2>Summary</h2><p class="m">Counted from ${esc(fileName)}. Click a title to open or close a table, or a status to show those work orders in the list.</p>
- <p class="pvt"><button class="lnk" id="pvopen">Open all</button> · <button class="lnk" id="pvclose">Close all</button></p></div>
+ <p class="pvt"><button class="lnk" id="pvopen">Open All</button> · <button class="lnk" id="pvclose">Close All</button></p></div>
  <div class="pvg">${tbl}</div>`;
   draw();
 }
@@ -3357,13 +3357,13 @@ function presenceCard(store, desc) {
             .sort((a, b) => named(b) - named(a) || a.display.localeCompare(b.display))
             .map(x => {
               const m = x.display.match(/^(.*?)\s*[-–]?\s*(DPCI\s*[\d-]+)\s*$/i);
-              return `<li><div class="dpci">${named(x) ? '<span class="tag st-open">Named in this work order</span> ' : ''}${m ? esc(m[2]) : ''}</div><b class="dname">${esc(m ? m[1] : x.display)}</b>${x.why ? `<div class="m">${esc(x.why)}</div>` : ''}</li>`;
+              return `<li><div class="dpci">${named(x) ? '<span class="tag st-open">Named in This Work Order</span> ' : ''}${m ? esc(m[2]) : ''}</div><b class="dname">${esc(m ? m[1] : x.display)}</b>${x.why ? `<div class="m">${esc(x.why)}</div>` : ''}</li>`;
             })
             .join('')}</ul>`
         : '',
     notPresent = rs.filter(x => !x.present),
     notWorking = rs.filter(x => x.present && x.working === false);
-  return `<div class="pstats">${stat('Visit date', esc(fmtDay(last)))}${stat('Present', `${rs.length - notPresent.length} of ${rs.length}`)}${stat('Working', `${asked.filter(x => x.working).length} of ${asked.length}`)}</div>${group('Not present', notPresent)}${group('Not working', notWorking)}${notPresent.length + notWorking.length ? '' : '<p class="m">Every display is present and working.</p>'}`;
+  return `<div class="pstats">${stat('Visit Date', esc(fmtDay(last)))}${stat('Present', `${rs.length - notPresent.length} of ${rs.length}`)}${stat('Working', `${asked.filter(x => x.working).length} of ${asked.length}`)}</div>${group('Not Present', notPresent)}${group('Not Working', notWorking)}${notPresent.length + notWorking.length ? '' : '<p class="m">Every display is present and working.</p>'}`;
 }
 
 // What the tracker kept by hand says about this work order: one block per tracker row (No show or Data Review).
@@ -3400,7 +3400,7 @@ function partsCard(store) {
     const u = TRACKING_URL[norm(o.carrier)];
     return o.track
       ? `${u ? `<a href="${u}${encodeURIComponent(o.track)}" target="_blank" rel="noopener">${esc(o.track)} ${ICONS.ext}</a>` : esc(o.track)}<div class="m">${esc(o.carrier)}${typeof o.shipped === 'number' ? ` · shipped ${esc(fmtDay(serialDay(o.shipped)))}` : ''}</div>`
-      : '<span class="m">None yet</span>';
+      : '<span class="m">None Yet</span>';
   };
   return `<table class="ptab"><thead><tr><th>Part</th><th>Reason</th><th>Ordered</th><th>Status</th><th>Tracking</th></tr></thead><tbody>${os
     .map(
@@ -3436,14 +3436,14 @@ function showEscalation(r, keep) {
       .join('');
   $('d').innerHTML = `<div class="top"><div class="hd">
  <div class="chips">${statusTag(r)}${r.problem ? `<span class="tag pcode" title="Problem Code">${esc(r.problem)}</span>` : ''}<span class="due ${s}">${esc(dueText(r))}</span></div>${r.los ? `<div class="m dln">LOS Finish ${esc(r.los.shown)}</div>` : ''}
- <h2 class="vn">Store ${esc(r.site)}</h2>${where ? `<div class="sid">${mapsLink(where)}</div>` : ''}<div class="m ids">Work order #${esc(r.id)}</div></div>
+ <h2 class="vn">Store ${esc(r.site)}</h2>${where ? `<div class="sid">${mapsLink(where)}</div>` : ''}<div class="m ids">Work Order #${esc(r.id)}</div></div>
  <div class="side"><div class="reply"><button id="reply" class="p" aria-haspopup="menu" aria-expanded="false">${ICONS.mail}Reply</button><div id="replymenu" role="menu" hidden><button role="menuitem" data-to="dm">To DM</button><button role="menuitem" data-to="pml">To PML</button></div></div>${org ? `<div class="team">${org}</div>` : ''}</div></div>
  <div class="panel solo">${glance(r)}</div>
- ${card('Rep and visits', visitsCard(store), 'Last four weeks, from the data file')}
- ${card("Rep's answers", presenceCard(store, r.desc), 'Displays present and working, from the Presence and Functionality file')}
- ${card('Tracker notes', trackerCard(r), 'Kept by hand, from the BDS No Show and Data Review file')}
+ ${card('Rep & Visits', visitsCard(store), 'Last four weeks, from the data file')}
+ ${card("Rep's Answers", presenceCard(store, r.desc), 'Displays present and working, from the Presence and Functionality file')}
+ ${card('Tracker Notes', trackerCard(r), 'Kept by hand, from the BDS No Show and Data Review file')}
  ${card('Parts', partsCard(store), "This store's parts orders, from the Parts Orders Detail file")}
- ${collapsible('all', 'Full record', fullRecord(r), 'Every column of this work order in the export file', false)}`;
+ ${collapsible('all', 'Full Record', fullRecord(r), 'Every column of this work order in the export file', false)}`;
   $('d').scrollTop = sc;
   draw();
 }
@@ -3464,7 +3464,7 @@ function complianceTiles(store) {
   if (!list) return `<p class="m">Store ${esc(store)} isn't in the Presence and Functionality file.</p>`;
   const t = pfStats(list),
     tile = (label, n, tone) => `<div class="${tone}"><b>${n.toLocaleString()}</b><span>${label}</span></div>`;
-  return `<h2>Display compliance</h2><div class="ctiles">${tile('Present', t.present, 'ok')}${tile('Not present', t.n - t.present, t.n - t.present ? 'bad' : '')}${tile('Working', t.working, 'ok')}${tile('Not working', t.asked - t.working, t.asked - t.working ? 'bad' : '')}</div>`;
+  return `<h2>Display Compliance</h2><div class="ctiles">${tile('Present', t.present, 'ok')}${tile('Not Present', t.n - t.present, t.n - t.present ? 'bad' : '')}${tile('Working', t.working, 'ok')}${tile('Not Working', t.asked - t.working, t.asked - t.working ? 'bad' : '')}</div>`;
 }
 // Presence and functionality % for the nation and each region, as two bars per row. Shown only when no store is picked;
 // a picked store shows just its own display compliance counts in the header.
@@ -3496,12 +3496,12 @@ function storeOrdersCard(store) {
 function storeOverview(store) {
   return (
     (store
-      ? card("Rep's answers", presenceCard(store, ''), 'Displays present and working, from the Presence and Functionality file') +
-        card('Rep and visits', visitsCard(store), 'Last four weeks, from the data file') +
+      ? card("Rep's Answers", presenceCard(store, ''), 'Displays present and working, from the Presence and Functionality file') +
+        card('Rep & Visits', visitsCard(store), 'Last four weeks, from the data file') +
         card('Escalations', storeOrdersCard(store), "This store's CM work orders, from the export file") +
-        card('Tracker notes', storeTrackerCard(store), 'Kept by hand, from the BDS No Show and Data Review file') +
+        card('Tracker Notes', storeTrackerCard(store), 'Kept by hand, from the BDS No Show and Data Review file') +
         card('Parts', partsCard(store), "This store's parts orders and tracking, from the Parts Orders Detail file")
-      : card('Presence and functionality', pfCard(), 'Nationwide and by region, from the Presence and Functionality file'))
+      : card('Presence & Functionality', pfCard(), 'Nationwide and by region, from the Presence and Functionality file'))
   );
 }
 // A work order picked on the store overview opens on Escalations.
@@ -3556,11 +3556,11 @@ function btnState() {
     b.innerHTML = `${ok ? ck : '<span class="nd"></span>'}<span class="ibt"><b>${what}</b><span>${esc(ok ? okNote : emptyNote)}</span></span>`;
     b.title = ok ? `${okNote}. Click to import a different file.` : title;
   };
-  paint('imp', !!rows.length, 'export', `${fileName} · ${rows.length.toLocaleString()} CM work orders`, 'Fills the escalation list', "Maximo's CM work orders. Fills the escalation list and each work order's details.");
-  paint('vimp', !!visitsName, 'data', visitsName, 'Fills reps, DMs and visits', "Power BI's Target visits. Fills each store's rep, DM and whether the rep visited that week, and the Directory.");
-  paint('pimp', !!presenceName, 'Interactives Program Presence and Functionality', `${presenceName} · ${presenceChecks.toLocaleString()} display checks`, "Fills Rep's answers", "What each rep answered for each store's interactive displays. Fills the Rep's answers card and the Store Visits compliance counts and graphs.");
-  paint('timp', !!trackerName, 'BDS No Show and Data Review', `${trackerName} · ${trackerRows.toLocaleString()} tracker rows`, 'Fills Tracker notes', 'The tracker kept by hand. Fills the Tracker notes card on each escalation and store.');
-  paint('ximp', !!partsName, 'Parts Orders Detail', `${partsName} · ${partsOrders.toLocaleString()} parts orders`, 'Fills Parts and tracking', 'Parts ordered for Target stores, with tracking numbers. Fills the Parts card on each escalation and store.');
+  paint('imp', !!rows.length, 'export', `${fileName} · ${rows.length.toLocaleString()} CM work orders`, 'Fills the Escalation List', "Maximo's CM work orders. Fills the escalation list and each work order's details.");
+  paint('vimp', !!visitsName, 'data', visitsName, 'Fills Reps, DMs & Visits', "Power BI's Target visits. Fills each store's rep, DM and whether the rep visited that week, and the Directory.");
+  paint('pimp', !!presenceName, 'Interactives Program Presence and Functionality', `${presenceName} · ${presenceChecks.toLocaleString()} display checks`, "Fills Rep's Answers", "What each rep answered for each store's interactive displays. Fills the Rep's answers card and the Store Visits compliance counts and graphs.");
+  paint('timp', !!trackerName, 'BDS No Show and Data Review', `${trackerName} · ${trackerRows.toLocaleString()} tracker rows`, 'Fills Tracker Notes', 'The tracker kept by hand. Fills the Tracker notes card on each escalation and store.');
+  paint('ximp', !!partsName, 'Parts Orders Detail', `${partsName} · ${partsOrders.toLocaleString()} parts orders`, 'Fills Parts & Tracking', 'Parts ordered for Target stores, with tracking numbers. Fills the Parts card on each escalation and store.');
   // The popup closes by itself once the last of the files is in.
   if (n === FILE_COUNT && filesLoaded < FILE_COUNT && !$('imports').hidden) setTimeout(closeImports, 900);
   filesLoaded = n;
@@ -3576,9 +3576,9 @@ function filesPill() {
   p.innerHTML = busy
     ? '<span class="spin sm" aria-hidden="true"></span>Importing…'
     : all
-      ? `<span class="okc">${ICONS.check}</span>${FILE_COUNT} of ${FILE_COUNT} files imported`
-      : `${filesLoaded} of ${FILE_COUNT} files loaded`;
-  $('imcount').textContent = `${filesLoaded} of ${FILE_COUNT} files loaded`;
+      ? `<span class="okc">${ICONS.check}</span>${FILE_COUNT} of ${FILE_COUNT} Files Imported`
+      : `${filesLoaded} of ${FILE_COUNT} Files Loaded`;
+  $('imcount').textContent = `${filesLoaded} of ${FILE_COUNT} Files Loaded`;
 }
 function openImports(title) {
   $('imtitle').textContent = title;
@@ -3588,7 +3588,7 @@ function openImports(title) {
 function closeImports() {
   $('imports').hidden = true;
 }
-$('fpill').onclick = () => openImports('Import files here');
+$('fpill').onclick = () => openImports('Import Files');
 $('imclose').onclick = closeImports;
 $('imports').addEventListener('click', e => {
   if (e.target.id === 'imports') closeImports();
@@ -3597,7 +3597,7 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape' && !$('imports').hidden) closeImports();
 });
 $('d').addEventListener('click', e => {
-  if (e.target.id === 'openimp') openImports("Let's get started");
+  if (e.target.id === 'openimp') openImports("Let's Get Started");
 });
 // Skeleton lines: widths are percentages.
 const skLines = (...w) => w.map(x => `<div class="sk" style="width:${x}%"></div>`).join('');
@@ -3912,7 +3912,7 @@ let followed = '';
 function follow(q) {
   followed = String(q ?? '').trim();
   $('follow').innerHTML = followed
-    ? `<button class="fchip" id="unfollow" title="Stop following this store">Following store <b>${esc(followed)}</b> ${ICONS.x}</button>`
+    ? `<button class="fchip" id="unfollow" title="Stop Following This Store">Following Store <b>${esc(followed)}</b> ${ICONS.x}</button>`
     : '';
 }
 $('follow').onclick = e => {
@@ -3976,5 +3976,5 @@ $('visView').addEventListener('load', () => {
   showApp(k === 'vis' || k === 'dir' ? k : 'esc');
 });
 btnState();
-openImports("Let's get started");
+openImports("Let's Get Started");
 </script></body></html>
