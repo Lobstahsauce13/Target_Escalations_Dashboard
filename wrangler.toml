@@ -5,3 +5,6 @@ compatibility_date = "2026-10-01"
 
 [assets]
 directory = "."
+
+# Preview builds (non-main branches) run "wrangler preview", which refuses to run without this block. Empty = inherit the settings above.
+[previews]
