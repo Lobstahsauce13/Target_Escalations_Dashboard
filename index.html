@@ -2919,8 +2919,6 @@ const PRESENCE_COLS = {
   date: 'Visit Date',
   store: 'Store #',
   region: 'Region',
-  group: 'Group',
-  district: 'District',
   display: 'Display Name',
   present: 'Present?',
   working: 'Functional? (Are ALL interactive elements of the display functional?)',
@@ -2962,8 +2960,6 @@ function readPresenceRows(wb) {
     (out.get(site) ?? out.set(site, []).get(site)).push({
       at: new Date(Date.UTC(1899, 11, 30) + at * 864e5),
       region: clean(a[col.region]),
-      group: clean(a[col.group]),
-      district: clean(a[col.district]),
       display: clean(a[col.display]),
       present,
       working: yesNo(a[col.working], n, 'Functional?', true),
@@ -3470,23 +3466,12 @@ function complianceTiles(store) {
     tile = (label, n, tone) => `<div class="${tone}"><b>${n.toLocaleString()}</b><span>${label}</span></div>`;
   return `<h2>Display compliance</h2><div class="ctiles">${tile('Present', t.present, 'ok')}${tile('Not present', t.n - t.present, t.n - t.present ? 'bad' : '')}${tile('Working', t.working, 'ok')}${tile('Not working', t.asked - t.working, t.asked - t.working ? 'bad' : '')}</div>`;
 }
-// Presence and functionality %, one row per area, as two bars each: for a store, the store next to its district, group,
-// region and the nation; with no store picked, the nation and each region.
-function pfCard(store) {
+// Presence and functionality % for the nation and each region, as two bars per row. Shown only when no store is picked;
+// a picked store shows just its own display compliance counts in the header.
+function pfCard() {
   if (!presenceName) return '<p class="m">Import the Presence and Functionality file to see presence and functionality.</p>';
   const all = [...presence.values()].flat(),
-    mine = store && presence.get(store);
-  if (store && !mine) return `<p class="m">Store ${esc(store)} isn't in the Presence and Functionality file.</p>`;
-  const of = (k, v) => all.filter(x => x[k] === v),
-    areas = mine
-      ? [
-          [`Store ${store}`, mine],
-          [`District ${mine[0].district}`, of('district', mine[0].district)],
-          [`Group ${mine[0].group}`, of('group', mine[0].group)],
-          [`Region ${mine[0].region}`, of('region', mine[0].region)],
-          ['Nationwide', all]
-        ]
-      : [['Nationwide', all], ...[...new Set(all.map(x => x.region))].sort((a, b) => a.localeCompare(b, undefined, { numeric: true })).map(r => [`Region ${r}`, of('region', r)])],
+    areas = [['Nationwide', all], ...[...new Set(all.map(x => x.region))].sort((a, b) => a.localeCompare(b, undefined, { numeric: true })).map(r => [`Region ${r}`, all.filter(x => x.region === r)])],
     bar = (k, label, a, b) =>
       `<div class="pfbar ${k}" title="${label}: ${a.toLocaleString()} of ${b.toLocaleString()} displays"><span class="trk"><i style="width:${pct(a, b)}%"></i></span><span>${pct(a, b)}%</span></div>`;
   return `<div class="pflegend"><span><i class="pfsw p"></i>Presence</span><span><i class="pfsw f"></i>Functionality</span></div><div class="pfgrid">${areas
@@ -3510,14 +3495,13 @@ function storeOrdersCard(store) {
 }
 function storeOverview(store) {
   return (
-    card('Presence and functionality', pfCard(store), store ? 'This store next to its district, group, region and the nation, from the Presence and Functionality file' : 'Nationwide and by region, from the Presence and Functionality file') +
     (store
       ? card("Rep's answers", presenceCard(store, ''), 'Displays present and working, from the Presence and Functionality file') +
         card('Rep and visits', visitsCard(store), 'Last four weeks, from the data file') +
         card('Escalations', storeOrdersCard(store), "This store's CM work orders, from the export file") +
         card('Tracker notes', storeTrackerCard(store), 'Kept by hand, from the BDS No Show and Data Review file') +
         card('Parts', partsCard(store), "This store's parts orders and tracking, from the Parts Orders Detail file")
-      : '')
+      : card('Presence and functionality', pfCard(), 'Nationwide and by region, from the Presence and Functionality file'))
   );
 }
 // A work order picked on the store overview opens on Escalations.
