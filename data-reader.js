@@ -3,7 +3,9 @@
 // half a minute and could run Chrome out of memory. Here the sheet is unzipped as a stream and each row is dropped
 // unless it matches, so memory stays small and the page can show progress.
 //
-// In:  { file, sheet, keep: { column: regex source } }. A row is kept when every named column matches its pattern.
+// In:  { file, sheet, keep: { column: regex source }, extra: { match: { column: regex source }, date: column, from, to } }.
+//      A row is kept when every keep column matches its pattern, or when every extra.match column matches and its extra.date
+//      cell is an Excel serial day number from `from` up to (not including) `to`.
 // Out: { progress: [rows read, rows kept, fraction of the file read] } now and then, then { header, rows } or { error }.
 // Cell values come out as SheetJS's sheet_to_json(raw: true, defval: '') gives them: numbers as numbers, text as text, blanks as ''.
 
@@ -110,7 +112,7 @@ function cells(row, shared) {
   return out;
 }
 
-self.onmessage = async ({ data: { file, sheet, keep } }) => {
+self.onmessage = async ({ data: { file, sheet, keep, extra } }) => {
   try {
     const u8 = new Uint8Array(await file.arrayBuffer()),
       zip = zipEntries(u8),
@@ -119,6 +121,8 @@ self.onmessage = async ({ data: { file, sheet, keep } }) => {
       shared = sst ? (await wholeText(u8, sst)).match(/<(?:\w+:)?si>[\s\S]*?<\/(?:\w+:)?si>/g)?.map(textOf) ?? [] : [];
     let header = null,
       tests = null,
+      extraTests = null,
+      extraDate = -1,
       seen = 0,
       done = 0,
       lastPost = 0,
@@ -128,12 +132,16 @@ self.onmessage = async ({ data: { file, sheet, keep } }) => {
       const c = cells(xml, shared);
       if (!header) {
         header = c.map(h => String(h).trim());
-        tests = Object.entries(keep).map(([k, rx]) => [header.indexOf(k), new RegExp(rx, 'i')]);
+        const testsOf = m => Object.entries(m).map(([k, rx]) => [header.indexOf(k), new RegExp(rx, 'i')]);
+        tests = testsOf(keep);
+        extraTests = testsOf(extra.match);
+        extraDate = header.indexOf(extra.date);
         return;
       }
       if (!c.some(x => x !== '')) return;
       seen++;
-      if (tests.every(([i, rx]) => i >= 0 && rx.test(String(c[i] ?? '')))) {
+      const all = ts => ts.every(([i, rx]) => i >= 0 && rx.test(String(c[i] ?? '')));
+      if (all(tests) || (all(extraTests) && typeof c[extraDate] === 'number' && c[extraDate] >= extra.from && c[extraDate] < extra.to)) {
         while (c.length < header.length) c.push('');
         kept.push(c);
       }
