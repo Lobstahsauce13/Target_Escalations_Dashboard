@@ -74,7 +74,7 @@ button.lnk{border:0;background:none;padding:0;color:var(--acc);text-decoration:u
 .donut b{position:absolute;inset:0;z-index:1;display:grid;place-items:center;font-size:13px}
 /* Store header: display compliance counts (Present, Not present, Working, Not working) on the right. */
 .comp{flex:none}.comp h2{font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--mut);margin:0 0 4px}.comp .m{color:var(--mut);font-size:12.5px;max-width:260px;margin:0}
-.ctiles{display:grid;grid-template-columns:repeat(4,minmax(92px,auto));gap:6px}.ctiles div{background:var(--pan);border:1px solid var(--line);border-radius:8px;padding:5px 10px}.ctiles b{display:block;font-size:18px;line-height:1.2}.ctiles span{font-size:12px;color:var(--mut)}.ctiles .ok b{color:var(--ok)}.ctiles .bad b{color:var(--bad)}
+.ctiles{display:grid;grid-template-columns:repeat(4,minmax(92px,auto));gap:6px}.ctiles div{background:var(--pan);border:1px solid var(--line);border-radius:8px;padding:5px 10px}.ctiles div{display:flex;flex-direction:column}.ctiles b{font-size:24px;font-weight:750;line-height:1.15}.ctiles span{font-size:12px;font-weight:600;color:var(--mut)}.ctiles small{font-size:12px;color:var(--mut)}.comp h2 .cday{margin-left:6px;letter-spacing:0;text-transform:none;font-size:13px;font-weight:650;color:var(--ink)}.ctiles .ok b{color:var(--ok)}.ctiles .bad b{color:var(--bad)}
 /* A rep's name: opens them on the Directory. */
 .replink{border:0;background:none;padding:0;font:inherit;color:var(--acc);text-decoration:underline;text-underline-offset:2px;cursor:pointer}.replink:hover{color:var(--acch)}
 /* The store overview: the same cards as on Escalations, from the parent page. */
@@ -83,12 +83,16 @@ button.lnk{border:0;background:none;padding:0;color:var(--acc);text-decoration:u
 #storeOverview .ch{margin:0;padding:10px 0;font-size:1em;font-weight:650}#storeOverview .hint{font-weight:400;color:var(--mut);font-size:12.5px;margin-left:6px}
 #storeOverview .tag{display:inline-block;margin:0 4px 0 0;padding:0 7px;border-radius:10px;font-size:12px;background:var(--chip);color:var(--ink)}#storeOverview .tag.st-new{background:var(--newbg);color:var(--new)}#storeOverview .tag.st-open{background:var(--warnbg);color:var(--warn)}#storeOverview .tag.st-done{background:var(--okbg);color:var(--ok)}
 #storeOverview .due{font-size:12px;white-space:nowrap;padding:0 7px;border-radius:10px;background:var(--chip)}#storeOverview .due.late{background:var(--badbg);color:var(--bad)}#storeOverview .due.soon{background:var(--warnbg);color:var(--warn)}#storeOverview .due.done{background:var(--okbg);color:var(--ok)}
-#storeOverview .pstats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}#storeOverview .pstats div{background:var(--pan2);border-radius:6px;padding:6px 10px}#storeOverview .pstats span{display:block;font-size:12.5px;color:var(--mut)}
+#storeOverview .pcards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;align-items:start}#storeOverview .pcnt{display:inline-block;min-width:22px;margin-left:4px;padding:0 7px;border-radius:10px;background:var(--chip);font-size:12px;text-align:center}#storeOverview .pcnt.bad{background:var(--badbg);color:var(--bad)}
 #storeOverview .pgh{margin:12px 0 4px;font-size:13px}
 #storeOverview .plist{margin:0;padding:0;list-style:none;display:grid;gap:4px}#storeOverview .plist li{background:var(--pan2);border-radius:6px;padding:6px 10px}#storeOverview .plist .dpci{font-size:12.5px;color:var(--mut)}#storeOverview .plist .dname{display:block;font-weight:650}
 #storeOverview .facts{display:grid;grid-template-columns:max-content 1fr;gap:4px;margin:0}#storeOverview .facts dt,#storeOverview .facts dd{background:var(--pan2);padding:6px 10px;border-radius:6px}#storeOverview .facts dt{color:var(--mut);font-size:12.5px;padding-top:7px}#storeOverview .facts dd{margin:0;overflow-wrap:anywhere;min-width:0}#storeOverview .tfacts dd{white-space:pre-line}
 #storeOverview .ptab{width:100%;border-collapse:collapse;font-size:13.5px;white-space:normal}#storeOverview .ptab th{position:static;background:none;text-align:left;font-size:12px;font-weight:600;color:var(--mut);padding:4px 8px;border-bottom:1px solid var(--line)}#storeOverview .ptab td{padding:7px 8px;vertical-align:top;border-bottom:1px solid var(--line)}#storeOverview .ptab tr:last-child td{border-bottom:0}
 #storeOverview .tabcard{padding:0;overflow:hidden}#storeOverview .ctabs{display:flex;align-items:flex-end;gap:2px;padding:8px 10px 0;background:var(--tbar)}#storeOverview .ctabs [role=tab]{border:0;border-radius:8px 8px 0 0;padding:7px 16px 8px;background:transparent;color:rgba(255,255,255,.85);cursor:pointer}#storeOverview .ctabs [role=tab]:hover:not([aria-selected=true]){background:rgba(255,255,255,.12)}#storeOverview .ctabs [role=tab][aria-selected=true]{background:var(--pan);color:var(--ink);font-weight:600}#storeOverview .ctpane{padding:4px 14px 14px}#storeOverview .ctpane>.hint{margin:4px 0 10px;font-size:12.5px;color:var(--mut)}
+/* Parts orders: a clicked row stays highlighted; the pencil edits it in place (the parent page does the work). */
+#storeOverview .ptab tr[data-pid]{cursor:pointer}#storeOverview .ptab tr[data-pid]:hover td{background:var(--zebra)}#storeOverview .ptab tr.sel td{background:var(--sel)}#storeOverview .ptab tr.sel td:first-child{box-shadow:inset 3px 0 0 var(--acc)}
+#storeOverview .ptab .pen,#storeOverview .pfbtn button{border:1px solid var(--line);background:var(--pan);border-radius:6px;cursor:pointer}#storeOverview .ptab .pen{padding:3px 6px;line-height:0}#storeOverview .ptab .pen svg{width:14px;height:14px}#storeOverview .tag.unsaved{background:var(--warnbg);color:var(--warn)}
+#storeOverview .pedit td{background:var(--pan2)}#storeOverview .pform{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px 12px;align-items:end}#storeOverview .pform label{display:grid;gap:3px;font-size:12px;font-weight:600;color:var(--mut)}#storeOverview .pform .wide{grid-column:span 3}#storeOverview .pfbtn{display:flex;gap:8px;justify-content:flex-end}#storeOverview .pfbtn button{padding:6px 12px}#storeOverview .pfbtn button.p{background:var(--acc);border-color:var(--acc);color:var(--onacc)}
 #storeOverview .ptab .tag{white-space:nowrap}#storeOverview .tag.hand{background:var(--p3bg);color:var(--p3)}#storeOverview .ptab a{display:inline-flex;align-items:center;gap:4px;color:var(--acc)}#storeOverview .pnote{margin-top:3px;font-size:12.5px;font-style:italic}
 #storeOverview .pwhen{margin:2px 0 6px;font-size:12.5px;color:var(--mut)}#storeOverview .pwhen b{color:var(--ink);font-weight:600}#storeOverview .pgo{margin:6px 0 10px}#storeOverview .lnk{border:0;background:none;padding:0;font:inherit;font-size:13px;color:var(--acc);text-decoration:underline;text-underline-offset:2px;cursor:pointer}#storeOverview .tdet{margin:4px 0}#storeOverview .tdet>summary{cursor:pointer;color:var(--ink);font-weight:600;font-size:13px;padding:4px 0}#storeOverview .tdet[open]>summary{margin-bottom:4px}#storeOverview .tdet>summary .m{font-weight:400;color:var(--mut)}
 #storeOverview .olist{display:grid;gap:4px}#storeOverview .esclink{display:flex;align-items:baseline;gap:6px;width:100%;text-align:left;background:var(--pan2);border:1px solid transparent;border-radius:6px;padding:6px 10px;font:inherit;color:var(--ink);cursor:pointer;min-width:0}#storeOverview .esclink:hover{border-color:var(--acc)}#storeOverview .esclink .m{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -100,12 +104,6 @@ button.lnk{border:0;background:none;padding:0;color:var(--acc);text-decoration:u
 .sl1{fill:var(--cs1);background:var(--cs1)}.sl2{fill:var(--cs2);background:var(--cs2)}.sl3{fill:var(--cs3);background:var(--cs3)}.sl4{fill:var(--cs4);background:var(--cs4)}.sl5{fill:var(--cs5);background:var(--cs5)}.sl0{fill:var(--c-mut);background:var(--c-mut)}
 #storeOverview .watches{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}#storeOverview .watch>.m{margin:-6px 0 8px;font-size:12px}#storeOverview .watch ol{margin:0;padding:0;list-style:none;display:grid;gap:4px}#storeOverview .watch li{display:flex;align-items:baseline;justify-content:space-between;gap:8px;font-size:13px}
 
-/* Theme switch, the same one as on the Escalations panel */
-.foot{display:flex;justify-content:flex-end;padding:8px 16px 5px;border-top:1px solid var(--line)}
-#thm{width:40px;height:22px;padding:0;border-radius:999px;background:var(--chip);border:1px solid var(--line);position:relative;cursor:pointer}#thm[aria-checked="true"]{background:var(--acc);border-color:var(--acc)}
-#thm .knob{position:absolute;top:1px;left:1px;width:18px;height:18px;border-radius:50%;background:var(--pan);color:var(--mut);display:flex;align-items:center;justify-content:center;box-shadow:0 1px 2px rgba(0,0,0,.25);transition:transform .15s}
-#thm[aria-checked="true"] .knob{transform:translateX(18px);color:var(--acc)}#thm .knob svg{width:11px;height:11px}
-@media(prefers-reduced-motion:reduce){#thm .knob{transition:none}}
 /* Table */
 .bar{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:baseline}.bar h2{margin:0 0 10px}
 .counts{font-size:12.5px;color:var(--mut)}
@@ -159,7 +157,7 @@ details summary{cursor:pointer;color:var(--acc);font-weight:600}
 <div id="dfp" class="g2" hidden><select id="ddm" aria-label="DM"><option value="">All DMs</option></select><select id="dsup" aria-label="Manager"><option value="">All Managers</option></select></div>
 <div class="fbar"><span id="rcnt" class="muted"></span><span class="sp"></span><button id="rclr" type="button" class="lnk">Clear</button></div></div>
 <div id="reps" class="list" aria-label="Reps"></div></div>
-<div class="foot"><button id="thm" type="button"></button></div></aside>
+</aside>
 <section id="d"><div id="visMain"><div id="empty" class="intro"><h2>Import the Data File to Begin</h2><p>Drop the data file here, or use the files button at the top right. The file is read in your browser only.</p></div>
 <div id="storeTop" class="top" hidden><div id="storeInfo" class="hd"></div><div id="compliance" class="comp"></div></div>
 <div id="storeOverview"></div>
@@ -278,14 +276,13 @@ for(let [id] of FILTERS)$(id).addEventListener('change',renderWork);
 $('search').addEventListener('input',()=>{parent.setStoreSearch($('search').value);renderWork(200)});
 // A store's number for the other tabs: its chain store number, which is the Target store number Maximo's site is built from, else its BDS Store ID.
 const storeId=r=>val(r,'Chain Store #')||val(r,'BDS Store ID');
-$('storeOverview').addEventListener('click',e=>{let t=e.target.closest('[data-ctab]');if(t)return parent.pickCardTab(t);let b=e.target.closest('[data-pickstore]');if(!b)return;let r=work.find(x=>num(val(x,'Chain Store #'))===b.dataset.pickstore);if(!r)return;selStore=storeKey(r);parent.follow(storeId(r));renderWork();document.querySelector('#stores .sel')?.scrollIntoView({block:'nearest'})});
+$('storeOverview').addEventListener('submit',e=>parent.partSubmit(e));
+$('storeOverview').addEventListener('click',e=>{parent.partClick(e);let t=e.target.closest('[data-ctab]');if(t)return parent.pickCardTab(t);let b=e.target.closest('[data-pickstore]');if(!b)return;let r=work.find(x=>num(val(x,'Chain Store #'))===b.dataset.pickstore);if(!r)return;selStore=storeKey(r);parent.follow(storeId(r));renderWork();document.querySelector('#stores .sel')?.scrollIntoView({block:'nearest'})});
 $('stores').addEventListener('click',e=>{let b=e.target.closest('[data-store]');if(b){selStore=b.dataset.store;parent.follow(storeId(work.find(r=>storeKey(r)===selStore)));renderWork()}});
 // The parent page calls this when its own store search changes and when Store Visits opens.
 function showStore(q){$('search').value=q;renderWork()}
 $('clr').onclick=()=>{for(let [id] of FILTERS)$(id).value='';selStore='';showStore('');parent.setStoreSearch('')};
 {const setFilters=o=>{$('fpanel').hidden=!o;$('ftog').setAttribute('aria-expanded',o);try{localStorage.setItem('bbVisFiltOpen',o?'1':'')}catch(e){}};let saved=null;try{saved=localStorage.getItem('bbVisFiltOpen')}catch(e){}setFilters(saved==='1');$('ftog').onclick=()=>setFilters($('fpanel').hidden)}
-// The parent page paints this switch to match the one on the Escalations panel, which owns the setting.
-$('thm').onclick=()=>parent.document.getElementById('thm').click();
 // Picking an assignment row also makes its store the one Escalations and Store Visits open to.
 function selectRow(tr){if(!tr)return;selectedKey=tr.dataset.key;let r=work.find(x=>x.__rowKey===selectedKey);if(r)parent.follow(storeId(r));for(let row of document.querySelectorAll('tr[data-key]'))row.classList.toggle('selected',row.dataset.key===selectedKey)}
 // The Directory: every rep with a Target visit in the data file, their continuity visits plus this week's projects.

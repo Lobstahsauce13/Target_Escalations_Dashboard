@@ -922,21 +922,27 @@ h2 {
 .sid a:hover {
   color: var(--acc);
 }
-/* Rep's answers: visit date, present and working side by side, then the displays answered No. */
-.pstats {
+/* Rep's answers: the displays answered No, Not Present and Not Working side by side. */
+.pcards,
+.pgrid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 6px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  align-items: start;
 }
-.pstats div {
-  background: var(--pan2);
-  border-radius: 6px;
-  padding: 6px 10px;
+.pcnt {
+  display: inline-block;
+  min-width: 22px;
+  margin-left: 4px;
+  padding: 0 7px;
+  border-radius: 10px;
+  background: var(--chip);
+  font-size: 12px;
+  text-align: center;
 }
-.pstats span {
-  display: block;
-  font-size: 12.5px;
-  color: var(--mut);
+.pcnt.bad {
+  background: var(--badbg);
+  color: var(--bad);
 }
 .pgh {
   margin: 12px 0 4px;
@@ -990,6 +996,57 @@ h2 {
 }
 .ptab .tag {
   white-space: nowrap;
+}
+/* A clicked order stays highlighted; the pencil edits it in place. */
+.ptab tr[data-pid] {
+  cursor: pointer;
+}
+.ptab tr[data-pid]:hover td {
+  background: var(--zebra);
+}
+.ptab tr.sel td {
+  background: var(--sel);
+}
+.ptab tr.sel td:first-child {
+  box-shadow: inset 3px 0 0 var(--acc);
+}
+.ptab .pen {
+  padding: 3px 6px;
+  line-height: 0;
+}
+.pedit td {
+  background: var(--pan2);
+}
+.pform {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px 12px;
+  align-items: end;
+}
+.pform label {
+  display: grid;
+  gap: 3px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--mut);
+}
+.pform input,
+.pform select {
+  background: var(--inp);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 5px 8px;
+  min-height: 34px;
+  font-weight: 400;
+  color: var(--ink);
+}
+.pform .wide {
+  grid-column: span 3;
+}
+.pfbtn {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
 }
 /* The Parts tab's Store column: the store number alone, a size up. */
 .ptab .pstore {
@@ -1204,7 +1261,9 @@ table.vis {
   opacity: 1;
 }
 .contact {
-  text-align: right;
+  display: flex;
+  align-items: center;
+  gap: 14px;
   font-size: 11.5px;
   color: var(--mut);
   padding: 5px 16px;
@@ -2258,21 +2317,38 @@ header .fpill.done:hover {
     transform: scaleX(var(--to));
   }
 }
-.foot {
+.contact .sp {
+  flex: 1;
+}
+/* The Status Guide opens as a popup above the footer link. */
+.sg {
   position: relative;
-  border-top: 1px solid var(--line);
 }
-.foot .leg {
-  border-top: 0;
-  padding-top: 9px;
+.sg summary {
+  cursor: pointer;
+  color: var(--acc);
+  text-decoration: underline;
+  list-style: none;
 }
-.foot .leg summary {
-  padding-right: 60px;
+.sg summary::-webkit-details-marker {
+  display: none;
 }
-.foot #thm {
+.sgpop {
   position: absolute;
-  right: 16px;
-  top: 8px;
+  left: 0;
+  bottom: calc(100% + 10px);
+  width: 420px;
+  padding: 10px 14px;
+  background: var(--pan);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18);
+  font-size: 12.5px;
+  color: var(--mut);
+  z-index: 25;
+}
+.sgpop p {
+  margin: 4px 0;
 }
 #thm {
   width: 40px;
@@ -2987,14 +3063,35 @@ header .tsave:not([hidden]) + .fpill {
   border-radius: 8px;
   padding: 5px 10px;
 }
+.ctiles div {
+  display: flex;
+  flex-direction: column;
+}
 .ctiles b {
-  display: block;
-  font-size: 18px;
-  line-height: 1.2;
+  font-size: 24px;
+  font-weight: 750;
+  line-height: 1.15;
 }
 .ctiles span {
   font-size: 12px;
+  font-weight: 600;
   color: var(--mut);
+}
+.ctiles small {
+  font-size: 12px;
+  color: var(--mut);
+}
+.comp h2 .cday {
+  margin-left: 6px;
+  letter-spacing: 0;
+  text-transform: none;
+  font-size: 13px;
+  font-weight: 650;
+  color: var(--ink);
+}
+/* Inside the work order's Rep's Answers card. */
+.comp.in {
+  margin: 0 0 6px;
 }
 .ctiles .ok b {
   color: var(--ok);
@@ -3065,13 +3162,7 @@ header .tsave:not([hidden]) + .fpill {
 <option value="urg">LOS Finish</option><option value="new">Newest First</option><option value="old">Oldest First</option><option value="store">Store #</option></select></label>
 <button id="clr" class="lnk">Clear</button></div></div>
 <div id="list"></div>
-<div class="foot"><details class="leg"><summary>Status Guide</summary>
-<p><b>New:</b> Maximo status APPR, a new escalation.</p>
-<p><b>Open:</b> VDECWO, a work order that is still open.</p>
-<p><b>Completed:</b> VINPRG, a work order that has been completed.</p>
-<p><b>Closed, Not Removed:</b> VDECWC, a work order that has been closed but not removed.</p>
-<p><b>Past Due:</b> New or Open, and its LOS Finish date has passed. <b>Due Within 48 Hours:</b> Its LOS Finish is in the next 48 hours.</p>
-<p>Only CM work orders are loaded. PM rows in the export file are skipped.</p></details><button id="thm" type="button"></button></div></section>
+</section>
 <section id="d"><div id="empty"><h2>Import Files to Begin</h2><p class="m">Files are read in your browser only.</p><button class="p" id="openimp">Import Files</button></div></section>
 </main></div>
 <div id="nsView" hidden>
@@ -3088,7 +3179,13 @@ header .tsave:not([hidden]) + .fpill {
 <div class="pfil"><label class="sbox"><input id="ps" type="search" placeholder=" " aria-label="Search Store, Part, Part # or Tracking #"><span class="sph" aria-hidden="true">Search Store <small>(Target #)</small>, Part or Tracking <small>#</small></span></label><select id="preason" aria-label="Reason"></select><select id="pdisp" aria-label="Display"></select><span class="sp"></span><span id="pcnt" class="m"></span><button id="pclr" class="lnk">Clear</button></div>
 <div id="pbody"></div></div>
 <iframe id="visView" src="visits.html" title="Store visits and directory" hidden></iframe>
-<footer class="contact" id="cta">Got problems? Email <a class="mail" href="mailto:kyle.didonato@channelpartners.com">kyle.didonato@channelpartners.com</a> or <a class="mail" href="https://teams.microsoft.com/l/chat/0/0?users=kyle.didonato@channelpartners.com" target="_blank" rel="noopener" id="ctalink">click here</a>.</footer>
+<footer class="contact"><button id="thm" type="button"></button><details class="sg"><summary>Status Guide</summary><div class="sgpop">
+<p><b>New:</b> Maximo status APPR, a new escalation.</p>
+<p><b>Open:</b> VDECWO, a work order that is still open.</p>
+<p><b>Completed:</b> VINPRG, a work order that has been completed.</p>
+<p><b>Closed, Not Removed:</b> VDECWC, a work order that has been closed but not removed.</p>
+<p><b>Past Due:</b> New or Open, and its LOS Finish date has passed. <b>Due Within 48 Hours:</b> Its LOS Finish is in the next 48 hours.</p>
+<p>Only CM work orders are loaded. PM rows in the export file are skipped.</p></div></details><span class="sp"></span><span id="cta">Got problems? Email <a class="mail" href="mailto:kyle.didonato@channelpartners.com">kyle.didonato@channelpartners.com</a> or <a class="mail" href="https://teams.microsoft.com/l/chat/0/0?users=kyle.didonato@channelpartners.com" target="_blank" rel="noopener" id="ctalink">click here</a>.</span></footer>
 <div id="imports" class="ovl" hidden><div class="nbox imbox" role="dialog" aria-modal="true" aria-labelledby="imtitle"><h2 id="imtitle">Let's Get Started</h2>
 <p class="m">Click a square to pick its file. Files are read in your browser only.</p>
 <div class="imgrid"><button id="imp" class="ib miss"></button><button id="vimp" class="ib miss"></button><button id="pimp" class="ib miss"></button><button id="timp" class="ib miss"></button><button id="ximp" class="ib miss"></button></div>
@@ -3730,6 +3827,7 @@ async function saveTracker() {
 // ---- The Parts Orders Detail file: parts ordered for Target stores, with their shipping and tracking. Its Ticket ID is
 // not a Maximo work order number, so orders are matched by store (Chain Store Number, the site without its "T").
 const PARTS_COLS = {
+  id: 'Parts Order ID',
   store: 'Chain Store Number',
   part: 'Part Name',
   number: 'Part Number',
@@ -3766,6 +3864,7 @@ function readParts(wb) {
     if (!store) return;
     n++;
     const o = Object.fromEntries(Object.keys(PARTS_COLS).map(k => [k, k === 'created' || k === 'shipped' ? a[col[k]] : clean(a[col[k]])]));
+    o.id = String(o.id);
     o.store = store;
     o.state = /cancel/i.test(o.sent) || /cancel/i.test(o.placed) ? 'Canceled' : o.track ? 'Shipped' : /troubleshoot/i.test(o.type) ? 'Troubleshooting Only' : 'Ordered';
     (out.get(store) ?? out.set(store, []).get(store)).push(o);
@@ -3783,6 +3882,7 @@ async function importParts(f) {
     partsOrders = d.n;
     partsName = f.name;
     dropFiledHandParts();
+    dropFiledPartEdits();
     toast(`✓ Loaded ${d.n.toLocaleString()} parts orders for ${d.stores.size.toLocaleString()} stores from ${f.name}.`);
   } catch (e) {
     toast(e instanceof DataError ? e.message : "This file couldn't be opened as a workbook. Import the Parts Orders Detail file (.xlsx).");
@@ -3791,6 +3891,22 @@ async function importParts(f) {
   refreshViews();
 }
 
+// An email draft opens through a hidden frame: going to a mailto: address from the page itself would trip the
+// "Leave site?" guard that keeps loaded files and unsaved edits, and the page stays where it is either way.
+function openMail(url) {
+  const f = document.createElement('iframe');
+  f.hidden = true;
+  f.src = url;
+  document.body.append(f);
+  setTimeout(() => f.remove(), 5000);
+}
+document.addEventListener('click', e => {
+  const a = e.target.closest('a[href^="mailto:"]');
+  if (!a) return;
+  e.preventDefault();
+  openMail(a.href);
+});
+
 // ---- New Part Order: the page can't place an order, so it opens an email with the order filled in and keeps the
 // request in this browser, listed as Requested by Hand, until a Parts Orders Detail file has an order for the same
 // store and part (by Part # when one was typed, else by Part Name).
@@ -3798,14 +3914,82 @@ let handParts = [];
 try {
   handParts = JSON.parse(loadSetting('bbHandParts') ?? '[]');
 } catch (e) {}
+handParts.forEach((h, i) => (h.id ??= `hand-${h.created}-${i}`));
 const saveHandParts = () => saveSetting('bbHandParts', JSON.stringify(handParts));
 function dropFiledHandParts() {
   const same = (a, b) => !!a && norm(a) === norm(b);
   handParts = handParts.filter(h => !(parts.get(h.store) ?? []).some(o => (h.number ? same(h.number, o.number) : same(h.part, o.part)) && +o.created >= h.created));
   saveHandParts();
 }
-// A store's orders, from the file and by hand, newest first.
-const ordersFor = store => [...(parts.get(store) ?? []), ...handParts.filter(o => o.store === store)].sort((a, b) => (+b.created || 0) - (+a.created || 0));
+// A store's orders, from the file and by hand, with this browser's edits, newest first.
+const ordersFor = store => [...(parts.get(store) ?? []), ...handParts.filter(o => o.store === store)].map(edited).sort((a, b) => (+b.created || 0) - (+a.created || 0));
+
+// ---- Editing a parts order: the Parts file is an export the page can't write back to, so a changed Status, Tracking #,
+// Carrier, Ship Date or Notes is kept in this browser by Parts Order ID and shown over the file's values, marked Edited.
+// An edit drops off once an imported file shows the same values.
+const PART_EDIT_KEYS = ['state', 'track', 'carrier', 'shipped', 'notes'];
+let partEdits = {},
+  pEditing = '',
+  pSel = '';
+try {
+  partEdits = JSON.parse(loadSetting('bbPartEdits') ?? '{}');
+} catch (e) {}
+const savePartEdits = () => saveSetting('bbPartEdits', JSON.stringify(partEdits));
+const edited = o => (partEdits[o.id] ? { ...o, ...partEdits[o.id], edited: true } : o);
+function dropFiledPartEdits() {
+  const byId = new Map([...parts.values()].flat().map(o => [o.id, o]));
+  for (const [id, e] of Object.entries(partEdits)) {
+    const o = byId.get(id);
+    if (o && PART_EDIT_KEYS.every(k => String(o[k] ?? '') === String(e[k] ?? ''))) delete partEdits[id];
+  }
+  savePartEdits();
+}
+// The inline form for one order, in place of its row.
+function partForm(o, span) {
+  const states = [...Object.keys(PART_STATE).filter(t => t !== 'Requested by Hand'), ...(o.hand ? ['Requested by Hand'] : [])],
+    day = typeof o.shipped === 'number' ? serialDay(o.shipped).toISOString().slice(0, 10) : '';
+  return `<tr class="pedit" data-pid="${esc(o.id)}"><td colspan="${span}"><form class="pform">
+<label>Status<select name="state">${states.map(t => `<option${t === o.state ? ' selected' : ''}>${esc(t)}</option>`).join('')}</select></label>
+<label>Tracking #<input name="track" value="${esc(o.track)}"></label>
+<label>Carrier<input name="carrier" value="${esc(o.carrier)}" placeholder="FedEx"></label>
+<label>Ship Date<input name="shipped" type="date" value="${day}"></label>
+<label class="wide">Notes<input name="notes" value="${esc(o.notes)}"></label>
+<div class="pfbtn"><button type="button" data-pcancel>Cancel</button><button class="p" type="submit">Save</button></div></form></td></tr>`;
+}
+function savePartEdit(form) {
+  const id = form.closest('[data-pid]').dataset.pid,
+    v = n => form.elements[n].value.trim(),
+    d = form.elements.shipped.value;
+  partEdits[id] = { state: v('state'), track: v('track'), carrier: v('carrier'), shipped: d ? Math.round((Date.parse(d) - Date.UTC(1899, 11, 30)) / 864e5) : '', notes: v('notes') };
+  savePartEdits();
+  pEditing = '';
+  refreshViews();
+  toast('✓ Saved the order in this browser.');
+}
+// A row click highlights it (again clears it); the pencil opens the row's form. On the Parts tab and every Parts card;
+// Store Visits passes its own clicks and submits here.
+function partClick(e) {
+  const pen = e.target.closest('[data-pedit]');
+  if (pen) {
+    pEditing = pSel = pen.dataset.pedit;
+    return refreshViews();
+  }
+  if (e.target.closest('[data-pcancel]')) {
+    pEditing = '';
+    return refreshViews();
+  }
+  const tr = e.target.closest('.ptab tr[data-pid]:not(.pedit)');
+  if (!tr || e.target.closest('a, button')) return;
+  pSel = pSel === tr.dataset.pid ? '' : tr.dataset.pid;
+  tr.ownerDocument.querySelectorAll('.ptab tr[data-pid]').forEach(r => r.classList.toggle('sel', r.dataset.pid === pSel));
+}
+function partSubmit(e) {
+  if (!e.target.matches('.pform')) return;
+  e.preventDefault();
+  savePartEdit(e.target);
+}
+document.addEventListener('click', partClick);
+document.addEventListener('submit', partSubmit);
 function openPartOrder() {
   if (!partsName) return toast('Import the Parts Orders Detail file first: a new order is listed with the orders in it.');
   $('partbox').querySelector('form').reset();
@@ -3838,14 +4022,14 @@ function addPartOrder(ev) {
     bad = !/^\d{1,5}$/.test(st) ? 'Type the store number.' : !v('o-display') ? 'Type or pick the display.' : !v('o-part') ? 'Type the part name.' : '';
   if (bad) return ($('o-err').textContent = bad);
   const t = new Date(),
-    o = { store: st, display: v('o-display'), part: v('o-part'), number: v('o-number'), reason: $('o-reason').value, notes: v('o-notes'), created: Math.floor((Date.UTC(t.getFullYear(), t.getMonth(), t.getDate()) - Date.UTC(1899, 11, 30)) / 864e5), state: 'Requested by Hand', hand: true },
+    o = { store: st, display: v('o-display'), part: v('o-part'), number: v('o-number'), reason: $('o-reason').value, notes: v('o-notes'), created: Math.floor((Date.UTC(t.getFullYear(), t.getMonth(), t.getDate()) - Date.UTC(1899, 11, 30)) / 864e5), state: 'Requested by Hand', hand: true, id: `hand-${Date.now()}` },
     lines = ['Hi,', '', `Please order this part for Target store ${st}:`, '', `Store: ${st}`, `Display: ${o.display}`, `Part: ${o.part}${o.number ? ` (${o.number})` : ''}`, `Reason: ${o.reason}`, ...(o.notes ? [`Notes: ${o.notes}`] : [])];
   handParts.push(o);
   saveHandParts();
   $('partbox').hidden = true;
   partsDraw();
   toast(`✓ Listed ${o.part} for store ${st} as Requested by Hand.`);
-  location.href = `mailto:?subject=${encodeURIComponent(`Part Order - Target Store ${st} - ${o.part}`)}&body=${encodeURIComponent(lines.join('\n') + '\n\n')}`;
+  openMail(`mailto:?subject=${encodeURIComponent(`Part Order - Target Store ${st} - ${o.part}`)}&body=${encodeURIComponent(lines.join('\n') + '\n\n')}`);
 }
 $('addpart').onclick = openPartOrder;
 $('o-cancel').onclick = () => ($('partbox').hidden = true);
@@ -4063,31 +4247,45 @@ document.addEventListener('click', e => {
   if (b) openRepInDirectory(b.dataset.repid);
 });
 
-// What the rep answered for this store: the visit date, how many displays are present and working, then each display
-// answered No, under Not present or Not working, with its DPCI number and the reason given. A display whose DPCI number
+// What the rep answered for this store at the last visit: each display answered No, under Not Present or Not Working,
+// with its DPCI number and the reason given. A display whose DPCI number
 // the work order names is listed first and marked.
 // desc is the work order's description, or '' on the Store Visits store overview.
-function presenceCard(store, desc) {
-  if (!presenceName) return '<p class="m">Import the Presence and Functionality file to see what the rep answered for this store.</p>';
+function presenceGroups(store, desc) {
+  if (!presenceName) return { msg: '<p class="m">Import the Presence and Functionality file to see what the rep answered for this store.</p>' };
   const rs = presence.get(store);
-  if (!rs) return `<p class="m">Store ${esc(store)} isn't in the Presence and Functionality file.</p>`;
+  if (!rs) return { msg: `<p class="m">Store ${esc(store)} isn't in the Presence and Functionality file.</p>` };
   const named = x => (desc.match(/\d{3}-\d{2}-\d{4}/g) ?? []).some(d => x.display.includes(d)),
-    asked = rs.filter(x => x.working !== null),
-    last = new Date(Math.max(...rs.map(x => +x.at))),
-    stat = (t, v) => `<div><span>${t}</span><b>${v}</b></div>`,
-    group = (t, list) =>
+    list = (list, none) =>
       list.length
-        ? `<h4 class="pgh">${t} <span class="m">${list.length}</span></h4><ul class="plist">${list
+        ? `<ul class="plist">${list
             .sort((a, b) => named(b) - named(a) || a.display.localeCompare(b.display))
             .map(x => {
               const m = x.display.match(/^(.*?)\s*[-–]?\s*(DPCI\s*[\d-]+)\s*$/i);
               return `<li><div class="dpci">${named(x) ? '<span class="tag st-open">Named in This Work Order</span> ' : ''}${m ? esc(m[2]) : ''}</div><b class="dname">${esc(m ? m[1] : x.display)}</b>${x.why ? `<div class="m">${esc(x.why)}</div>` : ''}</li>`;
             })
             .join('')}</ul>`
-        : '',
+        : `<p class="m">${none}</p>`,
     notPresent = rs.filter(x => !x.present),
     notWorking = rs.filter(x => x.present && x.working === false);
-  return `<div class="pstats">${stat('Visit Date', esc(fmtDay(last)))}${stat('Present', `${rs.length - notPresent.length} of ${rs.length}`)}${stat('Working', `${asked.filter(x => x.working).length} of ${asked.length}`)}</div>${group('Not Present', notPresent)}${group('Not Working', notWorking)}${notPresent.length + notWorking.length ? '' : '<p class="m">Every display is present and working.</p>'}`;
+  return {
+    groups: [
+      ['Not Present', notPresent.length, list(notPresent, 'Every display is present.')],
+      ['Not Working', notWorking.length, list(notWorking, 'Every display that is present is working.')]
+    ]
+  };
+}
+// On a store overview: Not Present and Not Working as two cards side by side (the header has the counts).
+function presenceCards(store) {
+  const g = presenceGroups(store, '');
+  return g.msg
+    ? card("Rep's Answers", g.msg, 'From the Presence and Functionality file')
+    : `<div class="pcards">${g.groups.map(([t, n, body]) => card(`${t} <span class="pcnt${n ? ' bad' : ''}">${n}</span>`, body, "The rep's answers at the last visit")).join('')}</div>`;
+}
+// On a work order: the compliance counts, then Not Present and Not Working side by side, in one card.
+function presenceCard(store, desc) {
+  const g = presenceGroups(store, desc);
+  return g.msg ?? `<div class="comp in">${complianceTiles(store)}</div><div class="pgrid">${g.groups.map(([t, n, body]) => `<div><h4 class="pgh">${t} <span class="pcnt${n ? ' bad' : ''}">${n}</span></h4>${body}</div>`).join('')}</div>`;
 }
 
 // What the tracker kept by hand says about this work order: one block per tracker row (No show or Data Review).
@@ -4128,7 +4326,7 @@ function prevOrders(es) {
 }
 
 // This store's parts orders, newest first: the part, why it was ordered, where it stands, and its tracking number.
-const PART_STATE = { Shipped: 'st-done', Ordered: 'st-open', Canceled: '', 'Troubleshooting Only': '', 'Requested by Hand': 'hand' };
+const PART_STATE = { Ordered: 'st-open', Shipped: 'st-done', Delivered: 'st-done', Canceled: '', 'Troubleshooting Only': '', 'Requested by Hand': 'hand' };
 function partsCard(store) {
   if (!partsName) return '<p class="m">Import the Parts Orders Detail file to see this store\'s parts orders.</p>';
   const os = ordersFor(store);
@@ -4145,9 +4343,9 @@ function partsTable(os, withStore) {
       ? `${u ? `<a href="${u}${encodeURIComponent(o.track)}" target="_blank" rel="noopener">${esc(o.track)} ${ICONS.ext}</a>` : esc(o.track)}<div class="m">${esc(o.carrier)}${typeof o.shipped === 'number' ? ` · shipped ${esc(fmtDay(serialDay(o.shipped)))}` : ''}</div>`
       : '<span class="m">None Yet</span>';
   };
-  return `<table class="ptab"><thead><tr>${withStore ? '<th>Store</th>' : ''}<th>Part</th><th>Reason</th><th>Ordered</th><th>Status</th><th>Tracking</th></tr></thead><tbody>${os
+  return `<table class="ptab"><thead><tr>${withStore ? '<th>Store</th>' : ''}<th>Part</th><th>Reason</th><th>Ordered</th><th>Status</th><th>Tracking</th><th></th></tr></thead><tbody>${os
     .map(
-      o => `<tr>${withStore ? `<td><button class="lnk pstore" data-partstore="${esc(o.store)}" title="Open Store ${esc(o.store)} on Store Visits">${esc(o.store)}</button>${escStores.has(o.store) ? '<div><span class="tag st-open">Has Escalations</span></div>' : ''}</td>` : ''}<td><b>${esc(o.part || o.type)}</b>${o.number ? ` <span class="m">${esc(o.number)}</span>` : ''}${o.display ? `<div class="m">${esc(o.display)}</div>` : ''}${o.notes ? `<div class="pnote">${esc(o.notes)}</div>` : ''}</td><td>${o.reason ? `<b>${esc(o.reason)}</b>` : '<span class="m">None</span>'}${o.stock ? `<div class="m">${esc(o.stock)}</div>` : ''}</td><td>${typeof o.created === 'number' ? esc(fmtDay(serialDay(o.created))) : ''}</td><td><span class="tag ${PART_STATE[o.state]}">${esc(o.state)}</span></td><td>${track(o)}</td></tr>`
+      o => o.id === pEditing ? partForm(o, withStore ? 7 : 6) : `<tr data-pid="${esc(o.id)}"${o.id === pSel ? ' class="sel"' : ''}>${withStore ? `<td><button class="lnk pstore" data-partstore="${esc(o.store)}" title="Open Store ${esc(o.store)} on Store Visits">${esc(o.store)}</button>${escStores.has(o.store) ? '<div><span class="tag st-open">Has Escalations</span></div>' : ''}</td>` : ''}<td><b>${esc(o.part || o.type)}</b>${o.number ? ` <span class="m">${esc(o.number)}</span>` : ''}${o.display ? `<div class="m">${esc(o.display)}</div>` : ''}${o.notes ? `<div class="pnote">${esc(o.notes)}</div>` : ''}</td><td>${o.reason ? `<b>${esc(o.reason)}</b>` : '<span class="m">None</span>'}${o.stock ? `<div class="m">${esc(o.stock)}</div>` : ''}</td><td>${typeof o.created === 'number' ? esc(fmtDay(serialDay(o.created))) : ''}</td><td><span class="tag ${PART_STATE[o.state]}">${esc(o.state)}</span>${o.edited ? '<div><span class="tag unsaved" title="Changed in this browser, not in the Parts file">Edited</span></div>' : ''}</td><td>${track(o)}</td><td><button class="pen" data-pedit="${esc(o.id)}" title="Edit this order" aria-label="Edit this order">${ICONS.edit}</button></td></tr>`
     )
     .join('')}</tbody></table>`;
 }
@@ -4159,6 +4357,7 @@ let pPill = '';
 const P_PILLS = [
   ['Ordered', 'warn'],
   ['Shipped', 'ok'],
+  ['Delivered', 'ok'],
   ['Canceled', ''],
   ['Troubleshooting Only', ''],
   ['Requested by Hand', '']
@@ -4171,7 +4370,7 @@ function pOptions(id, label, items) {
   $(id).classList.toggle('on', !!$(id).value);
 }
 function partsDraw() {
-  const all = [...parts.values()].flat().concat(handParts).sort((a, b) => (+b.created || 0) - (+a.created || 0));
+  const all = [...parts.values()].flat().concat(handParts).map(edited).sort((a, b) => (+b.created || 0) - (+a.created || 0));
   document.querySelector('#partsView .pfil').hidden = !partsName;
   if (!partsName) {
     $('psum').innerHTML = '';
@@ -4194,7 +4393,7 @@ function partsDraw() {
     reach = [...escStores].filter(k => ordersFor(k).length).length;
   $('psum').innerHTML =
     `<button class="${pPill ? '' : 'act'}" data-ppill="" aria-pressed="${!pPill}"><b>${found.length.toLocaleString()}</b>All Orders</button>` +
-    P_PILLS.filter(([t]) => t !== 'Requested by Hand' || handParts.length).map(([t, tone]) => `<button class="${tone}${pPill === t ? ' act' : ''}" data-ppill="${t}" aria-pressed="${pPill === t}"><b>${found.filter(o => o.state === t).length.toLocaleString()}</b>${t}</button>`).join('');
+    P_PILLS.filter(([t]) => (t !== 'Requested by Hand' && t !== 'Delivered') || all.some(o => o.state === t)).map(([t, tone]) => `<button class="${tone}${pPill === t ? ' act' : ''}" data-ppill="${t}" aria-pressed="${pPill === t}"><b>${found.filter(o => o.state === t).length.toLocaleString()}</b>${t}</button>`).join('');
   $('pcnt').innerHTML = `<b>${shown.length.toLocaleString()}</b> of ${all.length.toLocaleString()} orders`;
   $('pbody').innerHTML = `${card('Parts Orders', shown.length ? partsTable(shown, true) : '<p class="m">No orders match.</p>', 'Newest first, from the Parts Orders Detail file')}
  <p class="m">${all.length.toLocaleString()} orders at ${new Set(all.map(o => o.store)).size.toLocaleString()} stores, ordered ${days.length ? `${esc(fmtDay(serialDay(Math.min(...days))))} to ${esc(fmtDay(serialDay(Math.max(...days))))}` : 'on no stated date'}, from ${esc(partsName)}.${rows.length ? ` ${reach.toLocaleString()} of the ${escStores.size.toLocaleString()} stores with escalations have an order.` : ''}</p>`;
@@ -4273,8 +4472,11 @@ function complianceTiles(store) {
   const list = store ? presence.get(store) : [...presence.values()].flat();
   if (!list) return `<p class="m">Store ${esc(store)} isn't in the Presence and Functionality file.</p>`;
   const t = pfStats(list),
-    tile = (label, n, tone) => `<div class="${tone}"><b>${n.toLocaleString()}</b><span>${label}</span></div>`;
-  return `<h2>Display Compliance</h2><div class="ctiles">${tile('Present', t.present, 'ok')}${tile('Not Present', t.n - t.present, t.n - t.present ? 'bad' : '')}${tile('Working', t.working, 'ok')}${tile('Not Working', t.asked - t.working, t.asked - t.working ? 'bad' : '')}</div>`;
+    days = list.map(x => +x.at),
+    first = fmtDay(new Date(Math.min(...days))),
+    last = fmtDay(new Date(Math.max(...days))),
+    tile = (label, n, tone, of) => `<div class="${tone}"><span>${label}</span><b>${n.toLocaleString()}</b>${of ? `<small>${n.toLocaleString()} of ${of.toLocaleString()}</small>` : ''}</div>`;
+  return `<h2>${store ? `Display Compliance as of Last Visit <span class="cday">${esc(last)}</span>` : `Display Compliance <span class="cday">Visits ${esc(first === last ? last : `${first} to ${last}`)}</span>`}</h2><div class="ctiles">${tile('Present', t.present, 'ok', t.n)}${tile('Not Present', t.n - t.present, t.n - t.present ? 'bad' : '')}${tile('Working', t.working, 'ok', t.asked)}${tile('Not Working', t.asked - t.working, t.asked - t.working ? 'bad' : '')}</div>`;
 }
 // The five largest of a count, then the rest as Other: [name, n, title] rows.
 function topFive(names, title = x => x) {
@@ -4397,8 +4599,7 @@ function storeTabs(store, r) {
 function storeOverview(store) {
   return (
     (store
-      ? card("Rep's Answers", presenceCard(store, ''), 'Displays present and working, from the Presence and Functionality file') +
-        storeTabs(store, null)
+      ? presenceCards(store) + storeTabs(store, null)
       : card('Presence & Functionality', pfCard(), 'Nationwide, from the Presence and Functionality and Parts Orders Detail files') +
         card('Store Watch', storeWatch(), 'The five stores with the most of each, from every imported file'))
   );
@@ -5079,7 +5280,7 @@ $('replybox').querySelector('form').onsubmit = ev => {
   ev.preventDefault();
   const { subject, lines } = replyNow.facts;
   $('replybox').hidden = true;
-  location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(['Hi,', '', $('r-text').value.trim(), '', ...lines].join('\n') + '\n\n')}`;
+  openMail(`mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(['Hi,', '', $('r-text').value.trim(), '', ...lines].join('\n') + '\n\n')}`);
 };
 // The Reply button and its menu, on Escalations and No Show. dm is the first item's label.
 const replyMenu = dm =>
@@ -5306,12 +5507,6 @@ function paintThemeToggle() {
   t.setAttribute('aria-checked', d);
   t.setAttribute('aria-label', 'Dark mode');
   t.title = d ? 'Dark mode on' : 'Dark mode off';
-  // Store Visits shows the same switch; clicking it clicks this one.
-  const f = $('visView').contentDocument?.getElementById('thm');
-  if (f) {
-    f.innerHTML = t.innerHTML;
-    for (const a of ['role', 'aria-checked', 'aria-label', 'title']) f.setAttribute(a, t.getAttribute(a));
-  }
 }
 {
   const t = loadSetting('bbEscTheme');
@@ -5324,6 +5519,12 @@ $('thm').onclick = () => {
   paintThemeToggle();
 };
 matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', paintThemeToggle);
+// The footer's Status Guide popup closes on a click anywhere else or Esc.
+document.addEventListener('click', e => {
+  const g = document.querySelector('.sg');
+  if (g.open && !g.contains(e.target)) g.open = false;
+});
+addEventListener('keydown', e => e.key === 'Escape' && (document.querySelector('.sg').open = false));
 paintThemeToggle();
 
 // ---- V4: Escalations, Store Visits and Directory tabs. Store Visits and Directory are visits.html in a frame;
@@ -5408,7 +5609,6 @@ $('apptabs').onclick = e => {
 new MutationObserver(syncFrameTheme).observe(document.documentElement, { attributeFilter: ['data-theme'] });
 $('visView').addEventListener('load', () => {
   syncFrameTheme();
-  paintThemeToggle();
   const k = loadSetting('bbV4App');
   showApp(['ns', 'vis', 'dir', 'parts'].includes(k) ? k : 'esc');
 });
