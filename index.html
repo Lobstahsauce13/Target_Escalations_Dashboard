@@ -14,15 +14,11 @@
   --sel: #e6f1f8;
   --acc: #0275b2;
   --acch: #015a8a;
-  --gold: #c0a16b;
-  --s-bad: #d32f2f;
-  --s-warn: #b86400;
-  --s-ok: #23964f;
   --s-mut: #56626e;
   --hdr: #a00000;
   --hdrline: #fff;
   /* New and scheduled: blue in both themes, so they never read as the red of past due. */
-  --new: #0275b2;
+  --new: #0268a0;
   --newbg: #e6f1f8;
   --btn: #015a8a;
   --hbg: #dce2e8;
@@ -62,9 +58,6 @@
     --acc: #f0716a;
     --acch: #f59a95;
     --onacc: #121212;
-    --s-bad: var(--bad);
-    --s-warn: var(--warn);
-    --s-ok: var(--ok);
     --s-mut: var(--mut);
     --hdr: #6b0000;
     --hdrline: #2b2b2b;
@@ -107,9 +100,6 @@
   --acc: #f0716a;
   --acch: #f59a95;
   --onacc: #121212;
-  --s-bad: var(--bad);
-  --s-warn: var(--warn);
-  --s-ok: var(--ok);
   --s-mut: var(--mut);
   --hdr: #6b0000;
   --hdrline: #2b2b2b;
@@ -3490,7 +3480,10 @@ function addTrackerRow(e, orders = tracker, sites = trackerSites, byKey = tracke
 // (Chrome and Edge). Without one the file is still read, and Save says it needs Chrome or Edge.
 async function pickTracker() {
   if (trackerDirty.size && !confirm(`You have ${trackerDirty.size} unsaved tracker changes. Opening another file drops them. Open it anyway?`)) return;
-  if (!window.showOpenFilePicker) return $('tfile').click();
+  if (!window.showOpenFilePicker) {
+    toast("This browser can't save changes back to the file (Chrome or Edge only). You can still open it to view, but edits won't be saveable.");
+    return $('tfile').click();
+  }
   let handle;
   try {
     [handle] = await showOpenFilePicker({ types: [{ description: 'Excel workbook', accept: { 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'] } }] });
@@ -3537,7 +3530,7 @@ function savePill() {
   b.innerHTML = `${ICONS.save}Save ${n} Change${n === 1 ? '' : 's'} to the Tracker`;
 }
 addEventListener('beforeunload', e => {
-  if (trackerDirty.size) e.preventDefault();
+  if (trackerDirty.size || filesLoaded) e.preventDefault();
 });
 
 // The form for a row's hand-kept fields. Y/N fields are a choice; Update to FOM & PML is a date.
@@ -4092,10 +4085,10 @@ function showEscalation(r, keep) {
  <h2 class="vn">Store ${esc(r.site)}</h2>${where ? `<div class="sid">${mapsLink(where)}</div>` : ''}<div class="m ids">Work Order #${esc(r.id)} · <button class="lnk" data-storeview="${esc(store)}">Store Overview</button></div></div>
  <div class="side">${replyMenu('To DM')}${org ? `<div class="team">${org}</div>` : ''}</div></div>
  <div class="panel solo">${glance(r)}</div>
- ${card('Rep & Visits', visitsCard(store), 'Last four weeks, from the data file')}
- ${card("Rep's Answers", presenceCard(store, r.desc), 'Displays present and working, from the Presence and Functionality file')}
- ${card('Tracker Notes', trackerCard(r), 'Kept by hand, from the BDS No Show and Data Review file')}
- ${card('Parts', partsCard(store), "This store's parts orders, from the Parts Orders Detail file")}
+ ${collapsible('tracker', 'Tracker Notes', trackerCard(r), 'Kept by hand, from the BDS No Show and Data Review file')}
+ ${collapsible('visits', 'Rep & Visits', visitsCard(store), 'Last four weeks, from the data file')}
+ ${collapsible('presence', "Rep's Answers", presenceCard(store, r.desc), 'Displays present and working, from the Presence and Functionality file', false)}
+ ${collapsible('parts', 'Parts', partsCard(store), "This store's parts orders, from the Parts Orders Detail file", false)}
  ${collapsible('all', 'Full Record', fullRecord(r), 'Every column of this work order in the export file', false)}`;
   $('d').scrollTop = sc;
   draw();
@@ -4665,9 +4658,23 @@ $('imports').addEventListener('click', e => {
   if (e.target.id === 'imports') closeImports();
 });
 document.addEventListener('keydown', e => {
-  if (e.key !== 'Escape') return;
-  if (!$('addbox').hidden) $('addbox').hidden = true;
-  else if (!$('imports').hidden) closeImports();
+  if (e.key === 'Escape') {
+    if (!$('addbox').hidden) $('addbox').hidden = true;
+    else if (!$('imports').hidden) closeImports();
+    return;
+  }
+  // Arrow-key triage: move the Escalations selection without reaching for the mouse.
+  if ((e.key === 'ArrowDown' || e.key === 'ArrowUp') && !$('escView').hidden && !/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)) {
+    const items = [...$('list').children].filter(el => el.classList.contains('it'));
+    if (!items.length) return;
+    const i = items.findIndex(el => el.classList.contains('sel'));
+    const next = items[(((i < 0 ? -1 : i) + (e.key === 'ArrowDown' ? 1 : -1)) % items.length + items.length) % items.length];
+    e.preventDefault();
+    next.scrollIntoView({ block: 'nearest' });
+    const r = rows[+next.dataset.i];
+    follow(storeKey(r.site));
+    showEscalation(r);
+  }
 });
 $('d').addEventListener('click', e => {
   if (e.target.id === 'openimp') openImports("Let's Get Started");
