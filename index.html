@@ -290,6 +290,7 @@ h1 {
 /* Tight enough that the pills and both buttons fit one row at 1280px. */
 #sum,
 #nsum,
+#psum,
 #vsum {
   display: flex;
   flex-wrap: wrap;
@@ -297,11 +298,13 @@ h1 {
 }
 #sum:empty,
 #nsum:empty,
+#psum:empty,
 #vsum:empty {
   display: none;
 }
 #sum button,
 #nsum button,
+#psum button,
 #vsum .pl {
   display: flex;
   gap: 6px;
@@ -315,30 +318,35 @@ h1 {
 }
 #sum button b,
 #nsum button b,
+#psum button b,
 #vsum .pl b {
   font-size: 15px;
   font-weight: 700;
 }
 #sum .bad,
 #nsum .bad,
+#psum .bad,
 #vsum .bad {
   background: var(--badbg);
   color: var(--bad);
 }
 #sum .warn,
 #nsum .warn,
+#psum .warn,
 #vsum .warn {
   background: var(--warnbg);
   color: var(--warn);
 }
 #sum .ok,
 #nsum .ok,
+#psum .ok,
 #vsum .ok {
   background: var(--okbg);
   color: var(--ok);
 }
 #sum .acc,
 #nsum .acc,
+#psum .acc,
 #vsum .acc {
   background: var(--newbg);
   color: var(--new);
@@ -411,11 +419,13 @@ main {
   color: #8a8a8a;
 }
 #s:not(:placeholder-shown) + .sph,
-#ns:not(:placeholder-shown) + .sph {
+#ns:not(:placeholder-shown) + .sph,
+#ps:not(:placeholder-shown) + .sph {
   display: none;
 }
 #f input[type='search'],
-#nf input[type='search'] {
+#nf input[type='search'],
+#ps {
   flex: 1;
   min-width: 0;
   padding: 6px 9px;
@@ -424,7 +434,8 @@ main {
   border-radius: 10px;
 }
 #f input[type='search']:focus,
-#nf input[type='search']:focus {
+#nf input[type='search']:focus,
+#ps:focus {
   background: var(--inp);
   border-color: var(--acc);
   outline: none;
@@ -458,7 +469,8 @@ main {
   padding: 0 6px;
   margin-left: 2px;
 }
-#fpanel .g2 select {
+#fpanel .g2 select,
+#nshow {
   background: var(--pan2);
   border-color: transparent;
   border-radius: 6px;
@@ -466,10 +478,16 @@ main {
   padding: 5px 6px;
   color: var(--ink);
 }
-#fpanel .g2 select:hover {
+#nshow {
+  width: 100%;
+  margin-top: 8px;
+}
+#fpanel .g2 select:hover,
+#nshow:hover {
   border-color: var(--line);
 }
-#fpanel .g2 select.on {
+#fpanel .g2 select.on,
+#nshow.on {
   background: var(--sel);
   border-color: var(--acc);
   color: var(--acc);
@@ -495,12 +513,14 @@ main {
   border-color: var(--acc);
 }
 #sum button.act,
-#nsum button.act {
+#nsum button.act,
+#psum button.act {
   border-color: currentColor;
   box-shadow: inset 0 0 0 1px currentColor;
 }
 #sum button:hover,
-#nsum button:hover {
+#nsum button:hover,
+#psum button:hover {
   border-color: currentColor;
 }
 .sfil {
@@ -660,6 +680,34 @@ main {
   cursor: pointer;
 }
 #d,
+/* Parts: one page, the filters above a table of every order. */
+#partsView {
+  overflow: auto;
+  padding: 16px 22px 60px;
+}
+.pfil {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.pfil .sbox {
+  flex: 0 0 340px;
+}
+#ps {
+  background: var(--pan);
+}
+.pfil select {
+  padding: 6px 8px;
+  max-width: 260px;
+}
+.pfil .sp {
+  flex: 1;
+}
+#pcnt b {
+  color: var(--ink);
+}
 #nd {
   overflow: auto;
   padding: 16px 22px 60px;
@@ -751,13 +799,13 @@ h2 {
 .reply {
   position: relative;
 }
-#reply {
+.reply > .p {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   font-weight: 600;
 }
-#replymenu {
+.reply [role='menu'] {
   position: absolute;
   right: 0;
   top: calc(100% + 4px);
@@ -771,15 +819,15 @@ h2 {
   border-radius: 8px;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
 }
-#replymenu[hidden] {
+.reply [role='menu'][hidden] {
   display: none;
 }
-#replymenu button {
+.reply [role='menu'] button {
   border: 0;
   text-align: left;
   background: none;
 }
-#replymenu button:hover {
+.reply [role='menu'] button:hover {
   background: var(--sel);
 }
 /* The work order's fields, as rounded tiles side by side. */
@@ -1723,6 +1771,7 @@ mark.trk {
 }
 #escView,
 #nsView,
+#partsView,
 #visView {
   flex: 1;
   min-height: 0;
@@ -1731,6 +1780,7 @@ mark.trk {
 }
 #escView[hidden],
 #nsView[hidden],
+#partsView[hidden],
 #visView[hidden] {
   display: none;
 }
@@ -1739,6 +1789,9 @@ mark.trk {
 .on-dir #sum,
 .on-ns #sum,
 body:not(.on-ns) #nsum,
+body:not(.on-parts) #psum,
+.on-parts #sum,
+.on-parts #addesc,
 .on-vis #addesc,
 .on-dir #addesc,
 .on-ns #addesc,
@@ -2827,32 +2880,6 @@ header .tsave:not([hidden]) + .fpill {
   gap: 4px 16px;
   margin-top: 6px;
 }
-.nsrows {
-  display: grid;
-  gap: 4px;
-}
-.nsrows button {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  text-align: left;
-  background: var(--pan2);
-  border: 1px solid transparent;
-  border-radius: 6px;
-  padding: 6px 10px;
-  color: var(--ink);
-  font: inherit;
-  min-width: 0;
-}
-.nsrows button:hover {
-  border-color: var(--acc);
-}
-.nsrows .m {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
 .lognote {
   background: var(--pan2);
   border-radius: 6px;
@@ -2938,6 +2965,15 @@ header .tsave:not([hidden]) + .fpill {
 .tdet {
   margin: 4px 0;
 }
+.pwhen {
+  margin: 2px 0 6px;
+}
+.tdet > summary .m {
+  font-weight: 400;
+}
+.pgo {
+  margin: 6px 0 10px;
+}
 .tdet > summary {
   cursor: pointer;
   font-weight: 600;
@@ -2946,10 +2982,10 @@ header .tsave:not([hidden]) + .fpill {
 }
 </style></head><body>
 <header><h1><svg class="logo" viewBox="0 0 28 28" role="img" aria-label="Target"><circle cx="14" cy="14" r="11.5" fill="none" stroke="#fff" stroke-width="4"/><circle cx="14" cy="14" r="4.5" fill="#fff"/></svg>Target Escalation Dashboard</h1>
-<nav id="apptabs" role="tablist"><button role="tab" data-app="esc" aria-selected="true">Escalations</button><button role="tab" data-app="ns" aria-selected="false">No Show</button><button role="tab" data-app="vis" aria-selected="false">Store Visits</button><button role="tab" data-app="dir" aria-selected="false">Directory</button></nav>
+<nav id="apptabs" role="tablist"><button role="tab" data-app="esc" aria-selected="true">Escalations</button><button role="tab" data-app="ns" aria-selected="false">No Show</button><button role="tab" data-app="vis" aria-selected="false">Store Visits</button><button role="tab" data-app="dir" aria-selected="false">Directory</button><button role="tab" data-app="parts" aria-selected="false">Parts</button></nav>
 <button id="tsave" class="p tsave" hidden></button><button id="fpill" class="fpill miss" aria-haspopup="dialog" title="Import Files">0 of 5 Files Loaded</button>
 <input id="file" type="file" accept=".xlsx" hidden><input id="vfile" type="file" accept=".xlsx" hidden><input id="pfile" type="file" accept=".xlsx" hidden><input id="tfile" type="file" accept=".xlsx" hidden><input id="xfile" type="file" accept=".xlsx" hidden></header>
-<div id="sumbar"><div id="sum"></div><div id="vsum"></div><div id="nsum"></div><div id="follow"></div><button id="addesc" class="p" type="button"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3v10M3 8h10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Add Escalation</button></div>
+<div id="sumbar"><div id="sum"></div><div id="vsum"></div><div id="nsum"></div><div id="psum"></div><div id="follow"></div><button id="addesc" class="p" type="button"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3v10M3 8h10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Add Escalation</button></div>
 <div id="escView">
 <main>
 <section id="q"><div id="f">
@@ -2973,11 +3009,15 @@ header .tsave:not([hidden]) + .fpill {
 <main>
 <section id="nq"><div id="nf">
 <div class="srow"><label class="sbox"><input id="ns" type="search" placeholder=" " aria-label="Search Store (Target #), Work Order # or Name"><span class="sph" aria-hidden="true">Search Store <small>(Target #)</small>, WO <small>#</small> or Name</span></label></div>
+<select id="nshow" aria-label="Show"></select>
 <div class="fbar"><span id="ncnt" class="m"></span><span class="sp"></span><label class="m">Sort <select id="nso"><option value="new">Newest First</option><option value="old">Oldest First</option><option value="store">Store #</option></select></label>
 <button id="nclr" class="lnk">Clear</button></div></div>
 <div id="nlist"></div></section>
 <section id="nd"></section>
 </main></div>
+<div id="partsView" hidden>
+<div class="pfil"><label class="sbox"><input id="ps" type="search" placeholder=" " aria-label="Search Store, Part, Part # or Tracking #"><span class="sph" aria-hidden="true">Search Store <small>(Target #)</small>, Part or Tracking <small>#</small></span></label><select id="preason" aria-label="Reason"></select><select id="pdisp" aria-label="Display"></select><span class="sp"></span><span id="pcnt" class="m"></span><button id="pclr" class="lnk">Clear</button></div>
+<div id="pbody"></div></div>
 <iframe id="visView" src="visits.html" title="Store visits and directory" hidden></iframe>
 <footer class="contact" id="cta">Got problems? Email <a class="mail" href="mailto:kyle.didonato@channelpartners.com">kyle.didonato@channelpartners.com</a> or <a class="mail" href="https://teams.microsoft.com/l/chat/0/0?users=kyle.didonato@channelpartners.com" target="_blank" rel="noopener" id="ctalink">click here</a>.</footer>
 <div id="imports" class="ovl" hidden><div class="nbox imbox" role="dialog" aria-modal="true" aria-labelledby="imtitle"><h2 id="imtitle">Let's Get Started</h2>
@@ -2994,8 +3034,8 @@ header .tsave:not([hidden]) + .fpill {
 <label for="a-sd">Status Date</label><div><input id="a-sd" type="datetime-local" required></div>
 <label for="a-rd">Report Date</label><div><input id="a-rd" type="datetime-local" required></div>
 <label for="a-los">LOS Finish</label><div><input id="a-los" type="datetime-local" required></div>
-<label for="a-rep">Rep</label><div><input id="a-rep" autocomplete="off"><span class="m" id="a-hint"></span></div>
-<label for="a-fom">FOM (DM)</label><div><input id="a-fom" autocomplete="off"></div>
+<label for="a-rep">Rep</label><div><input id="a-rep" autocomplete="off" list="a-reps"><datalist id="a-reps"></datalist><span class="m" id="a-hint"></span></div>
+<label for="a-fom">FOM (DM)</label><div><input id="a-fom" autocomplete="off" list="a-foms"><datalist id="a-foms"></datalist></div>
 <label for="a-comments">Comments</label><div><textarea id="a-comments" rows="2"></textarea></div>
 </div>
 <p id="a-err" class="aerr" role="alert"></p>
@@ -3634,7 +3674,8 @@ function readParts(wb) {
     if (!store) return;
     n++;
     const o = Object.fromEntries(Object.keys(PARTS_COLS).map(k => [k, k === 'created' || k === 'shipped' ? a[col[k]] : clean(a[col[k]])]));
-    o.state = /cancel/i.test(o.sent) || /cancel/i.test(o.placed) ? 'Canceled' : o.track ? 'Shipped' : /troubleshoot/i.test(o.type) ? 'Troubleshooting only' : 'Ordered';
+    o.store = store;
+    o.state = /cancel/i.test(o.sent) || /cancel/i.test(o.placed) ? 'Canceled' : o.track ? 'Shipped' : /troubleshoot/i.test(o.type) ? 'Troubleshooting Only' : 'Ordered';
     (out.get(store) ?? out.set(store, []).get(store)).push(o);
   });
   if (!n) throw new DataError('This file has no parts orders. Nothing was loaded.');
@@ -3904,39 +3945,121 @@ function trackerFacts(e, editable) {
 }
 function trackerCard(r) {
   if (!trackerName) return '<p class="m">Import the BDS No Show and Data Review file to see the notes kept on this work order.</p>';
-  const es = tracker.get(r.id);
-  if (!es) return `<p class="m">Work order ${esc(r.id)} isn't in the tracker file yet.</p>`;
-  return es.map(e => `${es.length > 1 ? `<h4 class="pgh">${esc(e.sheet)}</h4>` : ''}${trackerFacts(e, true)}`).join('');
+  const es = tracker.get(r.id),
+    prev = (trackerSites.get(storeKey(r.site)) ?? []).filter(e => e.id !== r.id);
+  return `${es ? es.map(e => `${es.length > 1 ? `<h4 class="pgh">${esc(e.sheet)}</h4>` : ''}${trackerFacts(e, true)}`).join('') : `<p class="m">Work order ${esc(r.id)} isn't in the tracker file yet.</p>`}${prev.length ? `<h4 class="pgh">Previous Work Orders <span class="m">${prev.length}</span></h4>${prevOrders(prev)}` : ''}`;
 }
 // Every tracker row for a store, newest work order first. Each opens from its work order number and sheet; the newest is open.
 function storeTrackerCard(store) {
   if (!trackerName) return '<p class="m">Import the BDS No Show and Data Review file to see the notes kept on this store.</p>';
   const es = trackerSites.get(store);
   if (!es) return `<p class="m">Store ${esc(store)} has no rows in the tracker file.</p>`;
+  return prevOrders(es);
+}
+// Tracker rows as dropdowns, newest Status Date first, with only the newest open: the work order, its sheet, date and
+// description, then Maximo's dates and the notes kept by hand. Open on No Show goes to that row there.
+function prevOrders(es) {
   return [...es]
-    .sort((a, b) => b.id.localeCompare(a.id, undefined, { numeric: true }))
-    .map((e, i) => `<details class="tdet"${i ? '' : ' open'}><summary>WO ${esc(e.id)} <span class="m">${esc(e.sheet)}</span></summary>${trackerFacts(e, false)}</details>`)
+    .sort((a, b) => nsTime(b) - nsTime(a))
+    .map((e, i) => {
+      const d = nsDate(e),
+        when = [['Status Date', 'sd'], ['Report Date', 'rd'], ['LOS Finish', 'los']].filter(([, k]) => trackerText(k, e.v[k]));
+      return `<details class="tdet"${i ? '' : ' open'}><summary>WO ${esc(e.id)} <span class="tag">${esc(e.sheet)}</span> <span class="m">${d ? esc(fmtDay(d)) + ' · ' : ''}${esc(clean(e.v.desc))}</span></summary>${when.length ? `<div class="m pwhen">${when.map(([t, k]) => `${t} <b>${esc(trackerText(k, e.v[k]))}</b>`).join(' · ')}</div>` : ''}${trackerFacts(e, false)}<p class="pgo"><button class="lnk" data-nsopen="${esc(e.key)}">Open on No Show</button></p></details>`;
+    })
     .join('');
 }
 
 // This store's parts orders, newest first: the part, why it was ordered, where it stands, and its tracking number.
-const PART_STATE = { Shipped: 'st-done', Ordered: 'st-open', Canceled: '', 'Troubleshooting only': '' };
+const PART_STATE = { Shipped: 'st-done', Ordered: 'st-open', Canceled: '', 'Troubleshooting Only': '' };
 function partsCard(store) {
   if (!partsName) return '<p class="m">Import the Parts Orders Detail file to see this store\'s parts orders.</p>';
   const os = parts.get(store);
   if (!os) return `<p class="m">Store ${esc(store)} has no parts orders in the parts file.</p>`;
-  const track = o => {
+  return partsTable(os, false);
+}
+// Parts orders as a table: part, reason, order date, status and tracking; withStore adds a Store column that opens the
+// store on Store Visits (the Parts tab).
+function partsTable(os, withStore) {
+  const escStores = withStore ? new Set(rows.map(r => storeKey(r.site))) : null,
+    track = o => {
     const u = TRACKING_URL[norm(o.carrier)];
     return o.track
       ? `${u ? `<a href="${u}${encodeURIComponent(o.track)}" target="_blank" rel="noopener">${esc(o.track)} ${ICONS.ext}</a>` : esc(o.track)}<div class="m">${esc(o.carrier)}${typeof o.shipped === 'number' ? ` · shipped ${esc(fmtDay(serialDay(o.shipped)))}` : ''}</div>`
       : '<span class="m">None Yet</span>';
   };
-  return `<table class="ptab"><thead><tr><th>Part</th><th>Reason</th><th>Ordered</th><th>Status</th><th>Tracking</th></tr></thead><tbody>${os
+  return `<table class="ptab"><thead><tr>${withStore ? '<th>Store</th>' : ''}<th>Part</th><th>Reason</th><th>Ordered</th><th>Status</th><th>Tracking</th></tr></thead><tbody>${os
     .map(
-      o => `<tr><td><b>${esc(o.part || o.type)}</b>${o.number ? ` <span class="m">${esc(o.number)}</span>` : ''}${o.display ? `<div class="m">${esc(o.display)}</div>` : ''}${o.notes ? `<div class="pnote">${esc(o.notes)}</div>` : ''}</td><td>${esc(o.reason) || '<span class="m">None</span>'}${o.stock ? `<div class="m">${esc(o.stock)}</div>` : ''}</td><td>${typeof o.created === 'number' ? esc(fmtDay(serialDay(o.created))) : ''}</td><td><span class="tag ${PART_STATE[o.state]}">${esc(o.state)}</span></td><td>${track(o)}</td></tr>`
+      o => `<tr>${withStore ? `<td><button class="lnk" data-partstore="${esc(o.store)}" title="Open on Store Visits">Store ${esc(o.store)}</button>${escStores.has(o.store) ? '<div><span class="tag st-open">Has Escalations</span></div>' : ''}</td>` : ''}<td><b>${esc(o.part || o.type)}</b>${o.number ? ` <span class="m">${esc(o.number)}</span>` : ''}${o.display ? `<div class="m">${esc(o.display)}</div>` : ''}${o.notes ? `<div class="pnote">${esc(o.notes)}</div>` : ''}</td><td>${esc(o.reason) || '<span class="m">None</span>'}${o.stock ? `<div class="m">${esc(o.stock)}</div>` : ''}</td><td>${typeof o.created === 'number' ? esc(fmtDay(serialDay(o.created))) : ''}</td><td><span class="tag ${PART_STATE[o.state]}">${esc(o.state)}</span></td><td>${track(o)}</td></tr>`
     )
     .join('')}</tbody></table>`;
 }
+
+// ---- Parts: every order in the Parts Orders Detail file on a tab of its own, newest first. Status pills in the bar,
+// then search, Reason and Display; a store opens on Store Visits. The header line says which dates the file covers and how
+// many escalation stores it reaches, since orders only show on an escalation when its store has one.
+let pPill = '';
+const P_PILLS = [
+  ['Ordered', 'warn'],
+  ['Shipped', 'ok'],
+  ['Canceled', ''],
+  ['Troubleshooting Only', '']
+];
+function pOptions(id, label, items) {
+  const old = $(id).value,
+    list = [...new Set(items.filter(Boolean))].sort((a, b) => a.localeCompare(b));
+  $(id).innerHTML = `<option value="">${label}</option>${list.map(x => `<option>${esc(x)}</option>`).join('')}`;
+  $(id).value = list.includes(old) ? old : '';
+  $(id).classList.toggle('on', !!$(id).value);
+}
+function partsDraw() {
+  const all = [...parts.values()].flat().sort((a, b) => (+b.created || 0) - (+a.created || 0));
+  document.querySelector('#partsView .pfil').hidden = !partsName;
+  if (!partsName) {
+    $('psum').innerHTML = '';
+    $('pbody').innerHTML = '<div class="nsempty"><h2>Import the Parts File</h2><p class="m">Parts is read from the Parts Orders Detail file.</p><button class="p" data-imp>Import Files</button></div>';
+    return;
+  }
+  pOptions('preason', 'All Reasons', all.map(o => o.reason));
+  pOptions('pdisp', 'All Displays', all.map(o => o.display));
+  const q = $('ps').value.trim().toLowerCase(),
+    st = /^t?\d{1,5}$/.test(q) ? storeKey(q) : '',
+    found = all.filter(
+      o =>
+        (!q || (st ? o.store === st : [o.part, o.number, o.track, o.display, o.notes].some(x => String(x ?? '').toLowerCase().includes(q)))) &&
+        (!$('preason').value || o.reason === $('preason').value) &&
+        (!$('pdisp').value || o.display === $('pdisp').value)
+    ),
+    shown = pPill ? found.filter(o => o.state === pPill) : found,
+    days = all.map(o => o.created).filter(x => typeof x === 'number'),
+    escStores = new Set(rows.map(r => storeKey(r.site))),
+    reach = [...escStores].filter(k => parts.has(k)).length;
+  $('psum').innerHTML =
+    `<button class="${pPill ? '' : 'act'}" data-ppill="" aria-pressed="${!pPill}"><b>${found.length.toLocaleString()}</b>All Orders</button>` +
+    P_PILLS.map(([t, tone]) => `<button class="${tone}${pPill === t ? ' act' : ''}" data-ppill="${t}" aria-pressed="${pPill === t}"><b>${found.filter(o => o.state === t).length.toLocaleString()}</b>${t}</button>`).join('');
+  $('pcnt').innerHTML = `<b>${shown.length.toLocaleString()}</b> of ${all.length.toLocaleString()} orders`;
+  $('pbody').innerHTML = `<p class="m">${all.length.toLocaleString()} orders at ${parts.size.toLocaleString()} stores, ordered ${days.length ? `${esc(fmtDay(serialDay(Math.min(...days))))} to ${esc(fmtDay(serialDay(Math.max(...days))))}` : 'on no stated date'}, from ${esc(partsName)}.${rows.length ? ` ${reach.toLocaleString()} of the ${escStores.size.toLocaleString()} stores with escalations have an order.` : ''}</p>
+ ${card('Parts Orders', shown.length ? partsTable(shown, true) : '<p class="m">No orders match.</p>', 'Newest first, from the Parts Orders Detail file')}`;
+}
+$('psum').onclick = e => {
+  const b = e.target.closest('[data-ppill]');
+  if (!b) return;
+  pPill = b.dataset.ppill === pPill ? '' : b.dataset.ppill;
+  partsDraw();
+};
+$('ps').addEventListener('input', partsDraw);
+$('preason').onchange = $('pdisp').onchange = partsDraw;
+$('pclr').onclick = () => {
+  $('ps').value = $('preason').value = $('pdisp').value = '';
+  pPill = '';
+  partsDraw();
+};
+$('partsView').addEventListener('click', e => {
+  const b = e.target.closest('[data-partstore],[data-imp]');
+  if (!b) return;
+  if (b.dataset.imp !== undefined) return openImports("Let's Get Started");
+  follow(b.dataset.partstore);
+  showApp('vis');
+});
 
 // A panel that is always open: a title, a hint, and its body.
 const card = (t, body, hint) => `<section class="card open"><h3 class="ch">${t}<span class="hint">${hint}</span></h3>${body}</section>`;
@@ -3967,7 +4090,7 @@ function showEscalation(r, keep) {
   $('d').innerHTML = `<div class="top"><div class="hd">
  <div class="chips">${statusTag(r)}${r.manual ? '<span class="tag hand" title="Typed in on this page; not in the export file yet">Added by Hand</span>' : ''}${r.problem ? `<span class="tag pcode" title="Problem Code">${esc(r.problem)}</span>` : ''}<span class="due ${s}">${esc(dueText(r))}</span></div>${r.los ? `<div class="m dln">LOS Finish ${esc(r.los.shown)}</div>` : ''}
  <h2 class="vn">Store ${esc(r.site)}</h2>${where ? `<div class="sid">${mapsLink(where)}</div>` : ''}<div class="m ids">Work Order #${esc(r.id)} · <button class="lnk" data-storeview="${esc(store)}">Store Overview</button></div></div>
- <div class="side"><div class="reply"><button id="reply" class="p" aria-haspopup="menu" aria-expanded="false">${ICONS.mail}Reply</button><div id="replymenu" role="menu" hidden><button role="menuitem" data-to="dm">To DM</button><button role="menuitem" data-to="pml">To PML</button></div></div>${org ? `<div class="team">${org}</div>` : ''}</div></div>
+ <div class="side">${replyMenu('To DM')}${org ? `<div class="team">${org}</div>` : ''}</div></div>
  <div class="panel solo">${glance(r)}</div>
  ${card('Rep & Visits', visitsCard(store), 'Last four weeks, from the data file')}
  ${card("Rep's Answers", presenceCard(store, r.desc), 'Displays present and working, from the Presence and Functionality file')}
@@ -3996,20 +4119,79 @@ function complianceTiles(store) {
     tile = (label, n, tone) => `<div class="${tone}"><b>${n.toLocaleString()}</b><span>${label}</span></div>`;
   return `<h2>Display Compliance</h2><div class="ctiles">${tile('Present', t.present, 'ok')}${tile('Not Present', t.n - t.present, t.n - t.present ? 'bad' : '')}${tile('Working', t.working, 'ok')}${tile('Not Working', t.asked - t.working, t.asked - t.working ? 'bad' : '')}</div>`;
 }
-// Presence and functionality % for the nation and each region, as two bars per row. Shown only when no store is picked;
-// a picked store shows just its own display compliance counts in the header.
+// The five largest of a count, then the rest as Other: [name, n, title] rows.
+function topFive(names, title = x => x) {
+  const m = new Map();
+  names.forEach(x => m.set(x, (m.get(x) ?? 0) + 1));
+  const all = [...m].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])),
+    rest = all.slice(5).reduce((a, [, n]) => a + n, 0);
+  return [...all.slice(0, 5).map(([x, n]) => [x, n, title(x)]), ...(rest ? [['Other', rest, `${all.length - 5} others`]] : [])];
+}
+// A pie of up to five slices plus Other (gray), with a legend of names, counts and shares. Hover a slice for its count.
+function pie(title, hint, parts) {
+  const total = parts.reduce((a, [, n]) => a + n, 0);
+  if (!total) return `<div class="pie"><h4>${title}</h4><p class="m">${hint}: none.</p></div>`;
+  let at = 0;
+  const pt = f => `${(50 + 46 * Math.sin(2 * Math.PI * f)).toFixed(2)} ${(50 - 46 * Math.cos(2 * Math.PI * f)).toFixed(2)}`,
+    slices = parts.map(([name, n, t], i) => {
+      const a = at / total,
+        b = (at += n) / total,
+        tip = `<title>${esc(t)}: ${n.toLocaleString()} (${pct(n, total)}%)</title>`,
+        cls = name === 'Other' ? 'sl0' : `sl${i + 1}`;
+      return parts.length === 1 ? `<circle class="${cls}" cx="50" cy="50" r="46">${tip}</circle>` : `<path class="${cls}" d="M50 50L${pt(a)}A46 46 0 ${b - a > 0.5 ? 1 : 0} 1 ${pt(b)}Z">${tip}</path>`;
+    });
+  return `<div class="pie"><h4>${title}</h4><div class="pierow"><svg viewBox="0 0 100 100" role="img" aria-label="${esc(title)}">${slices.join('')}</svg><ul>${parts
+    .map(([name, n, t], i) => `<li title="${esc(t)}"><i class="${name === 'Other' ? 'sl0' : `sl${i + 1}`}"></i><span>${esc(name)}</span><b>${n.toLocaleString()}</b><small>${pct(n, total)}%</small></li>`)
+    .join('')}</ul></div><p class="m">${total.toLocaleString()} ${hint}</p></div>`;
+}
+// Shown when no store is picked: what goes missing, breaks and gets ordered most, nationwide. A picked store shows just
+// its own display compliance counts in the header.
 function pfCard() {
-  if (!presenceName) return '<p class="m">Import the Presence and Functionality file to see presence and functionality.</p>';
-  const all = [...presence.values()].flat(),
-    areas = [['Nationwide', all], ...[...new Set(all.map(x => x.region))].sort((a, b) => a.localeCompare(b, undefined, { numeric: true })).map(r => [`Region ${r}`, all.filter(x => x.region === r)])],
-    bar = (k, label, a, b) =>
-      `<div class="pfbar ${k}" title="${label}: ${a.toLocaleString()} of ${b.toLocaleString()} displays"><span class="trk"><i style="width:${pct(a, b)}%"></i></span><span>${pct(a, b)}%</span></div>`;
-  return `<div class="pflegend"><span><i class="pfsw p"></i>Presence</span><span><i class="pfsw f"></i>Functionality</span></div><div class="pfgrid">${areas
-    .map(([t, list]) => {
-      const x = pfStats(list);
-      return `<div class="pfl">${esc(t)}<small>${x.n.toLocaleString()} displays</small></div><div class="pfbars">${bar('p', 'Present', x.present, x.n)}${bar('f', 'Working', x.working, x.asked)}</div>`;
-    })
-    .join('')}</div>`;
+  const all = presenceName ? [...presence.values()].flat() : [],
+    // "Hero Endcap - DPCI 057-03-0470" is named "Hero Endcap"; its DPCI shows on hover.
+    short = d => d.replace(/\s*[-–]?\s*DPCI\s*[\d-]+\s*$/i, '') || d,
+    byName = list => {
+      const full = new Map(list.map(x => [short(x.display), x.display]));
+      return topFive(list.map(x => short(x.display)), x => full.get(x) ?? x);
+    },
+    ordered = [...parts.values()].flat().filter(o => o.state === 'Ordered' || o.state === 'Shipped');
+  return `<div class="pies">${
+    presenceName
+      ? pie('Most Missing Displays', 'displays not present', byName(all.filter(x => !x.present))) + pie('Most Broken Displays', 'displays present but not working', byName(all.filter(x => x.present && x.working === false)))
+      : '<div class="pie"><h4>Missing & Broken Displays</h4><p class="m">Import the Presence and Functionality file to see them.</p></div>'
+  }${partsName ? pie('Most Ordered Parts', 'parts ordered or shipped', topFive(ordered.map(o => o.part || o.type))) : '<div class="pie"><h4>Most Ordered Parts</h4><p class="m">Import the Parts Orders Detail file to see them.</p></div>'}</div>`;
+}
+// Stores to look at first, when no store is picked: the five with the most of each problem. A store opens on Store Visits.
+function storeWatch() {
+  // list: [store, value to rank by, value shown]; low ranks the smallest first.
+  const rank = (title, hint, list, ready, low) => {
+    const top = list
+      .filter(([k]) => k)
+      .sort((a, b) => (low ? a[1] - b[1] : b[1] - a[1]) || +a[0] - +b[0])
+      .slice(0, 5);
+    return `<div class="watch"><h4>${title}</h4><p class="m">${hint}</p>${
+      !ready ? '<p class="m">Import that file to see it.</p>' : top.length ? `<ol>${top.map(([k, , v]) => `<li><button class="lnk" data-pickstore="${esc(k)}">Store ${esc(k)}</button><b>${esc(v)}</b></li>`).join('')}</ol>` : '<p class="m">None.</p>'
+    }</div>`;
+  };
+  const counts = keys => {
+      const m = new Map();
+      keys.forEach(k => m.set(k, (m.get(k) ?? 0) + 1));
+      return [...m].map(([k, n]) => [k, n, n.toLocaleString()]);
+    },
+    // Present and working answers out of every answer, so a store's missing and broken displays both count.
+    compliance = [...presence].map(([k, list]) => {
+      const x = pfStats(list),
+        p = pct(x.present + x.working, x.n + x.asked);
+      return [k, p, `${p}%`];
+    }),
+    yearAgo = Date.now() - 365 * 864e5;
+  return `<div class="watches">${[
+    rank('Lowest Display Compliance', 'Present and working, from the Presence file', compliance, !!presenceName, true),
+    rank('Most Escalations', 'CM work orders in the export file', counts(rows.map(r => storeKey(r.site))), rows.length > 0),
+    rank('Most No Shows', 'Tracker rows, last 12 months', counts([...trackerRowsByKey.values()].filter(e => nsTime(e) >= yearAgo).map(e => e.store)), !!trackerName),
+    rank('Most Missed Visits', 'Past their date, not completed', visitsName ? [...visFrame().missedByStore()].map(([k, n]) => [k, n, n.toLocaleString()]) : [], !!visitsName),
+    rank('Most Parts Orders', 'Not canceled, from the Parts file', counts([...parts.values()].flat().filter(o => o.state !== 'Canceled').map(o => o.store)), !!partsName)
+  ].join('')}</div>`;
 }
 // The store's work orders in the export file, newest first. Each opens on the Escalations tab.
 function storeOrdersCard(store) {
@@ -4031,7 +4213,8 @@ function storeOverview(store) {
         card('Escalations', storeOrdersCard(store), "This store's CM work orders, from the export file") +
         card('Tracker Notes', storeTrackerCard(store), 'Kept by hand, from the BDS No Show and Data Review file') +
         card('Parts', partsCard(store), "This store's parts orders and tracking, from the Parts Orders Detail file")
-      : card('Presence & Functionality', pfCard(), 'Nationwide and by region, from the Presence and Functionality file'))
+      : card('Presence & Functionality', pfCard(), 'Nationwide, from the Presence and Functionality and Parts Orders Detail files') +
+        card('Store Watch', storeWatch(), 'The five stores with the most of each, from every imported file'))
   );
 }
 // The store overview on Escalations: the store's display compliance in the header, then the same cards as Store Visits.
@@ -4059,6 +4242,7 @@ function refreshViews() {
   if (current) showEscalation(current, true);
   else if (shownStore) storeView(shownStore);
   if (!$('nsView').hidden) nsDraw(true);
+  if (!$('partsView').hidden) partsDraw();
   visFrame().renderWork();
 }
 
@@ -4077,6 +4261,13 @@ const NS_PILLS = [
   ['unsent', 'Not Emailed', 'bad', e => !ynYes(e.v.emailed)],
   ['waiting', 'Waiting on Response', 'acc', e => ynYes(e.v.emailed) && !clean(e.v.resp)],
   ['answered', 'Responded', 'ok', e => !!clean(e.v.resp)]
+];
+// The Show dropdown: every pill, plus what the list's other tags say. It and the pills set the same filter.
+const NS_FILTERS = [
+  ...NS_PILLS.slice(0, 1),
+  ['closed', 'Closed in Maximo', '', e => ynYes(e.v.closed)],
+  ...NS_PILLS.slice(1),
+  ['unsaved', 'Unsaved', '', e => trackerDirty.has(e.key)]
 ];
 // A row's Status Date as a UTC date, for sorting, the list and the month chart. Maximo's text is read as written.
 function nsDate(e) {
@@ -4100,9 +4291,10 @@ function nsSearch(e) {
 // The rows the search, sheet and pill leave; skip leaves out the sheet or the pill, so each pill counts what clicking it shows.
 const nsRows = (skip = '') =>
   [...trackerRowsByKey.values()].filter(
-    e => nsSearch(e) && (skip === 'sheet' || !nsSheet || e.sheet === nsSheet) && (skip === 'pill' || !nsPill || NS_PILLS.find(p => p[0] === nsPill)[3](e))
+    e => nsSearch(e) && (skip === 'sheet' || !nsSheet || e.sheet === nsSheet) && (skip === 'pill' || !nsPill || NS_FILTERS.find(p => p[0] === nsPill)[3](e))
   );
 function nsPills() {
+  $('nshow').hidden = !trackerName;
   if (!trackerName) return ($('nsum').innerHTML = '');
   const bySheet = nsRows('sheet'),
     byPill = nsRows('pill'),
@@ -4119,6 +4311,9 @@ function nsPills() {
       ([k, t, tone, f]) =>
         `<button class="${tone}${nsPill === k ? ' act' : ''}" data-npill="${k}" aria-pressed="${nsPill === k}"><b>${byPill.filter(f).length.toLocaleString()}</b>${t}</button>`
     ).join('');
+  $('nshow').innerHTML = `<option value="">Show: All Rows</option>${NS_FILTERS.map(([k, t, , f]) => `<option value="${k}">${t} (${byPill.filter(f).length.toLocaleString()})</option>`).join('')}`;
+  $('nshow').value = nsPill;
+  $('nshow').classList.toggle('on', !!nsPill);
 }
 function nsDraw(keep) {
   nsPills();
@@ -4217,15 +4412,16 @@ function nsShow(e, keep) {
   const sc = keep ? $('nd').scrollTop : 0,
     [tone, label] = nsState(e),
     tile = (t, v) => `<div><span>${t}</span><b>${v ? esc(v) : '<em class="m">None</em>'}</b></div>`,
-    others = (trackerSites.get(e.store) ?? []).filter(x => x !== e).sort((a, b) => nsTime(b) - nsTime(a)),
-    desc = clean(e.v.desc);
+    others = (trackerSites.get(e.store) ?? []).filter(x => x !== e),
+    desc = clean(e.v.desc),
+    dates = [['Status Date', 'sd'], ['Report Date', 'rd']].filter(([, k]) => trackerText(k, e.v[k])).map(([t, k]) => ` · ${t} <b>${esc(trackerText(k, e.v[k]))}</b>`).join('');
   $('nd').innerHTML = `<div class="top"><div class="hd">
  <div class="chips"><span class="tag">${esc(e.sheet)}</span>${nsMaximoTag(e)}<span class="tag ${tone}">${label}</span></div>
- <h2 class="vn">Store ${esc(clean(e.v.site))}</h2><div class="m ids">Work Order #${esc(e.id)}</div>
- <div class="nsgo">${rows.some(r => r.id === e.id) ? '<button class="lnk" data-nsgo="esc">Open on Escalations</button>' : ''}${e.store ? '<button class="lnk" data-nsgo="vis">Open Store on Store Visits</button>' : ''}<button class="lnk" data-nsgo="back">Back to Summary</button></div></div></div>
- <div class="panel solo">${desc ? `<div class="issw"><p class="issue">${esc(desc)}</p></div>` : ''}<div class="tiles">${tile('Problem Code', clean(e.v.problem))}${tile('Status', clean(e.v.status))}${tile('Status Date', trackerText('sd', e.v.sd))}${tile('Report Date', trackerText('rd', e.v.rd))}${tile('LOS Finish', trackerText('los', e.v.los))}${tile('Vendor Work Validation', clean(e.v.val))}</div></div>
+ <h2 class="vn">Store ${esc(clean(e.v.site))}</h2><div class="m ids">Work Order #${esc(e.id)}${dates}</div>
+ <div class="nsgo">${rows.some(r => r.id === e.id) ? '<button class="lnk" data-nsgo="esc">Open on Escalations</button>' : ''}${e.store ? '<button class="lnk" data-nsgo="vis">Open Store on Store Visits</button>' : ''}<button class="lnk" data-nsgo="back">Back to Summary</button></div></div><div class="side">${replyMenu('To DM/FOM')}</div></div>
+ <div class="panel solo">${desc ? `<div class="issw"><p class="issue">${esc(desc)}</p></div>` : ''}<div class="tiles">${tile('Problem Code', clean(e.v.problem))}${tile('Status', clean(e.v.status))}${tile('LOS Finish', trackerText('los', e.v.los))}${tile('Vendor Work Validation', clean(e.v.val))}</div></div>
  ${card('Tracker Notes', trackerFacts(e, true), 'Kept by hand; Save at the top writes changes into the file')}
- ${others.length ? card('Other Rows for This Store', `<div class="nsrows">${others.map(x => `<button type="button" data-nsk="${esc(x.key)}"><span class="tag">${esc(x.sheet)}</span><b>WO ${esc(x.id)}</b><span class="m">${nsDate(x) ? esc(fmtDay(nsDate(x))) + ' · ' : ''}${esc(clean(x.v.desc))}</span></button>`).join('')}</div>`, 'From the same file') : ''}
+ ${others.length ? card('Previous Work Orders', prevOrders(others), "This store's other rows in the tracker file") : ''}
  ${collapsible('nsnotes', 'Log Notes', nsNotes(), 'From the Responses sheet', false)}`;
   $('nd').scrollTop = sc;
 }
@@ -4258,21 +4454,21 @@ $('ns').addEventListener('input', () => {
   nsReset();
 });
 $('nso').onchange = nsReset;
+$('nshow').onchange = () => {
+  nsPill = $('nshow').value;
+  nsReset();
+};
 $('nclr').onclick = () => {
   $('ns').value = '';
   nsSheet = nsPill = nsSel = '';
   nsReset();
 };
 $('nd').addEventListener('click', ev => {
-  const t = ev.target.closest('[data-nsgo],[data-nsk],[data-nsq],[data-copy],[data-imp]');
+  const t = ev.target.closest('[data-nsgo],[data-nsq],[data-copy],[data-imp]');
   if (!t) return;
   const e = trackerRowsByKey.get(nsSel);
   if (t.dataset.imp !== undefined) openImports("Let's Get Started");
-  else if (t.dataset.nsk) {
-    nsSel = t.dataset.nsk;
-    trackerEditing = '';
-    nsDraw();
-  } else if (t.dataset.nsq) {
+  else if (t.dataset.nsq) {
     $('ns').value = t.dataset.nsq;
     nsReset();
   } else if (t.dataset.copy)
@@ -4288,6 +4484,17 @@ $('nd').addEventListener('click', ev => {
     nsSel = '';
     nsDraw();
   }
+});
+
+// Open on No Show, from any tab (Store Visits calls it from its frame).
+function openOnNoShow(key) {
+  nsSel = key;
+  trackerEditing = '';
+  showApp('ns');
+}
+document.addEventListener('click', ev => {
+  const b = ev.target.closest('[data-nsopen]');
+  if (b) openOnNoShow(b.dataset.nsopen);
 });
 
 // ---- Add escalation: a work order typed in by hand. It joins the list as New, marked Added by hand, and becomes a new
@@ -4309,8 +4516,17 @@ function openAdd() {
   const st = storeKey($('s').value);
   if (/^\d{1,5}$/.test(st)) $('a-store').value = st;
   fillAddReps();
+  fillAddNames();
   $('addbox').hidden = false;
   $('a-wo').focus();
+}
+// The names the Rep and FOM (DM) fields suggest as you type: every rep and FOM in the data file, A to Z. The tracker's
+// typed names are left out: they hold misspellings and old names (123 FOM spellings not in the data file, checked round 6).
+function fillAddNames() {
+  const v = visitsName ? visFrame().addNames() : { reps: [], foms: [] },
+    list = names => [...new Set(names.map(clean).filter(Boolean))].sort((a, b) => a.localeCompare(b)).map(x => `<option value="${esc(x)}">`).join('');
+  $('a-reps').innerHTML = list(v.reps);
+  $('a-foms').innerHTML = list(v.foms);
 }
 // The store's rep this week and its DM, from the data file, until they're typed over.
 function fillAddReps() {
@@ -4512,14 +4728,42 @@ function replyLink(r, to) {
   }
   return `mailto:?subject=${encodeURIComponent(`Target WO ${r.id} - Store ${r.site} - ${r.problem}`)}&body=${encodeURIComponent(lines.join('\n') + '\n\n')}`;
 }
-function toggleReplyMenu(open) {
-  const m = $('replymenu');
-  if (!m) return;
-  m.hidden = !open;
-  $('reply').setAttribute('aria-expanded', open);
+// The same for a No Show row, from the tracker file: Maximo's fields as the tracker kept them, then the notes kept by hand.
+// The DM's draft adds the rep named in the tracker and each week's rep.
+function nsReplyLink(e, to) {
+  const v = visitsName && e.store ? visFrame().weeksFor(e.store) : null,
+    f = k => trackerText(k, e.v[k]) || 'none',
+    lines = [
+      'Hi,',
+      '',
+      `Target work order ${e.id} for store ${clean(e.v.site)}:`,
+      '',
+      `Problem Code: ${f('problem')}`,
+      `Status Date: ${f('sd')}`,
+      `Report Date: ${f('rd')}`,
+      `LOS Finish: ${f('los')}`,
+      `Description: ${f('desc')}`,
+      '',
+      `Comments: ${f('comments')}`,
+      `Action on Maximo: ${f('action')}`
+    ];
+  if (to === 'dm') lines.push(`Rep: ${f('rep')}`, `FOM (DM): ${f('fom')}`);
+  if (v) lines.push('', 'Visits, last four weeks:', ...v.weeks.map(w => `${w.wave}: ${to === 'dm' ? `${w.rep}, ` : ''}${w.status}`));
+  return `mailto:?subject=${encodeURIComponent(`Target WO ${e.id} - Store ${clean(e.v.site)} - ${clean(e.v.problem)}`)}&body=${encodeURIComponent(lines.join('\n') + '\n\n')}`;
 }
+// The Reply button and its menu, on Escalations and No Show. dm is the first item's label.
+const replyMenu = dm =>
+  `<div class="reply"><button class="p" aria-haspopup="menu" aria-expanded="false">${ICONS.mail}Reply</button><div role="menu" hidden><button role="menuitem" data-to="dm">${dm}</button><button role="menuitem" data-to="pml">To PML</button></div></div>`;
+// A click closes any open reply menu; the Reply button opens its own, and a menu item opens that tab's email draft.
 document.addEventListener('click', e => {
-  if (!e.target.closest('.reply')) toggleReplyMenu(false);
+  const box = e.target.closest('.reply'),
+    b = e.target.closest('.reply button'),
+    open = b && !b.dataset.to && box.querySelector('[role=menu]').hidden;
+  document.querySelectorAll('.reply').forEach(x => {
+    x.querySelector('[role=menu]').hidden = !(open && x === box);
+    x.firstElementChild.setAttribute('aria-expanded', open && x === box);
+  });
+  if (b?.dataset.to) location.href = $('nsView').hidden ? replyLink(current, b.dataset.to) : nsReplyLink(trackerRowsByKey.get(nsSel), b.dataset.to);
 });
 $('d').addEventListener('click', e => {
   const tr = e.target.closest('tr[data-f]');
@@ -4531,11 +4775,6 @@ $('d').addEventListener('click', e => {
       .querySelectorAll('details.pv')
       .forEach(d => (d.open = t.id === 'pvopen'));
     return;
-  }
-  if (t.id === 'reply') toggleReplyMenu($('replymenu').hidden);
-  if (t.dataset.to) {
-    toggleReplyMenu(false);
-    location.href = replyLink(current, t.dataset.to);
   }
 });
 $('d').addEventListener('keydown', e => {
@@ -4812,13 +5051,16 @@ $('vsum').onclick = e => {
 function showApp(k) {
   $('escView').hidden = k !== 'esc';
   $('nsView').hidden = k !== 'ns';
+  $('partsView').hidden = k !== 'parts';
   $('visView').hidden = k !== 'vis' && k !== 'dir';
   document.body.classList.toggle('on-vis', k === 'vis');
   document.body.classList.toggle('on-dir', k === 'dir');
   document.body.classList.toggle('on-ns', k === 'ns');
+  document.body.classList.toggle('on-parts', k === 'parts');
   document.querySelectorAll('#apptabs [role=tab]').forEach(b => b.setAttribute('aria-selected', b.dataset.app === k));
   if (k === 'vis' || k === 'dir') visFrame().showView(k);
   if (k === 'ns') nsDraw();
+  if (k === 'parts') partsDraw();
   if (k === 'vis') visFrame().showStore(followed);
   if (k === 'esc') openFollowedOnEscalations();
   saveSetting('bbV4App', k);
@@ -4838,7 +5080,7 @@ $('visView').addEventListener('load', () => {
   syncFrameTheme();
   paintThemeToggle();
   const k = loadSetting('bbV4App');
-  showApp(['ns', 'vis', 'dir'].includes(k) ? k : 'esc');
+  showApp(['ns', 'vis', 'dir', 'parts'].includes(k) ? k : 'esc');
 });
 btnState();
 openImports("Let's Get Started");
