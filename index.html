@@ -773,10 +773,65 @@ h2 {
   padding-bottom: 14px;
 }
 .card .ch {
+  display: flex;
+  align-items: center;
   margin: 0;
   padding: 10px 0;
   font-size: 1em;
   font-weight: 650;
+}
+/* A card's Edit button, at its top right. */
+.cedit {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: auto;
+  padding: 3px 10px;
+  font-size: 13px;
+  font-weight: 600;
+}
+/* One card with tabs, drawn like the header tabs: a red strip whose open tab is a panel running into the card. */
+.tabcard {
+  padding: 0;
+  overflow: hidden;
+}
+.ctabs {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  padding: 8px 10px 0;
+  background: var(--hdr);
+}
+.ctabs [role='tab'] {
+  border: 0;
+  border-radius: 8px 8px 0 0;
+  padding: 7px 16px 8px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.85);
+}
+.ctabs [role='tab']:hover:not([aria-selected='true']) {
+  background: rgba(255, 255, 255, 0.12);
+}
+.ctabs [role='tab'][aria-selected='true'] {
+  background: var(--pan);
+  color: var(--ink);
+  font-weight: 600;
+}
+.ctact {
+  margin: 0 0 6px auto;
+  align-self: center;
+}
+.ctpane {
+  padding: 4px 14px 14px;
+}
+.ctpane > .hint {
+  margin: 4px 0 10px;
+  font-size: 12.5px;
+  color: var(--mut);
+}
+.rowh {
+  display: flex;
+  align-items: center;
 }
 /* Problem Code in the store header. */
 .tag.pcode {
@@ -932,6 +987,14 @@ h2 {
   padding: 7px 8px;
   vertical-align: top;
   border-bottom: 1px solid var(--line);
+}
+.ptab .tag {
+  white-space: nowrap;
+}
+/* The Parts tab's Store column: the store number alone, a size up. */
+.ptab .pstore {
+  font-size: 15px;
+  font-weight: 600;
 }
 .ptab tr:last-child td {
   border-bottom: 0;
@@ -1782,6 +1845,7 @@ body:not(.on-ns) #nsum,
 body:not(.on-parts) #psum,
 .on-parts #sum,
 .on-parts #addesc,
+body:not(.on-parts) #addpart,
 .on-vis #addesc,
 .on-dir #addesc,
 .on-ns #addesc,
@@ -2731,7 +2795,8 @@ header .tsave[hidden] {
 header .tsave:not([hidden]) + .fpill {
   margin-left: 0;
 }
-#addesc {
+#addesc,
+#addpart {
   margin-left: auto;
   display: inline-flex;
   align-items: center;
@@ -2744,12 +2809,26 @@ header .tsave:not([hidden]) + .fpill {
   background: var(--line);
   margin: 2px 4px;
 }
+#replybox[hidden],
+#partbox[hidden],
 #addbox[hidden] {
   display: none;
 }
 .addform {
   width: min(640px, 100%);
   overflow: auto;
+}
+.replyform {
+  width: min(760px, 100%);
+}
+.replyform #r-scn {
+  width: 100%;
+}
+.replyform .mbtn > .m {
+  font-size: 12.5px;
+}
+.r-pml[hidden] {
+  display: none;
 }
 .tform {
   display: grid;
@@ -2975,7 +3054,7 @@ header .tsave:not([hidden]) + .fpill {
 <nav id="apptabs" role="tablist"><button role="tab" data-app="esc" aria-selected="true">Escalations</button><button role="tab" data-app="ns" aria-selected="false">No Show</button><button role="tab" data-app="vis" aria-selected="false">Store Visits</button><button role="tab" data-app="dir" aria-selected="false">Directory</button><button role="tab" data-app="parts" aria-selected="false">Parts</button></nav>
 <button id="tsave" class="p tsave" hidden></button><button id="fpill" class="fpill miss" aria-haspopup="dialog" title="Import Files">0 of 5 Files Loaded</button>
 <input id="file" type="file" accept=".xlsx" hidden><input id="vfile" type="file" accept=".xlsx" hidden><input id="pfile" type="file" accept=".xlsx" hidden><input id="tfile" type="file" accept=".xlsx" hidden><input id="xfile" type="file" accept=".xlsx" hidden></header>
-<div id="sumbar"><div id="sum"></div><div id="vsum"></div><div id="nsum"></div><div id="psum"></div><div id="follow"></div><button id="addesc" class="p" type="button"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3v10M3 8h10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Add Escalation</button></div>
+<div id="sumbar"><div id="sum"></div><div id="vsum"></div><div id="nsum"></div><div id="psum"></div><div id="follow"></div><button id="addesc" class="p" type="button"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3v10M3 8h10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Add Escalation</button><button id="addpart" class="p" type="button"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3v10M3 8h10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>New Part Order</button></div>
 <div id="escView">
 <main>
 <section id="q"><div id="f">
@@ -3030,6 +3109,26 @@ header .tsave:not([hidden]) + .fpill {
 </div>
 <p id="a-err" class="aerr" role="alert"></p>
 <div class="mbtn"><span class="sp" style="flex:1"></span><button type="button" id="a-cancel">Cancel</button><button class="p" type="submit">Add Escalation</button></div></form></div>
+<div id="partbox" class="ovl" hidden><form class="nbox addform" role="dialog" aria-modal="true" aria-labelledby="parttitle" novalidate><h2 id="parttitle">New Part Order</h2>
+<p class="m">Opens an email with the order filled in, and lists it on Parts as Requested by Hand until the Parts Orders Detail file has it.</p>
+<div class="tform">
+<label for="o-store">Store #</label><div><input id="o-store" inputmode="numeric" autocomplete="off" required placeholder="e.g. 3319"></div>
+<label for="o-display">Display</label><div><input id="o-display" autocomplete="off" list="o-displays" required><datalist id="o-displays"></datalist><span class="m" id="o-hint"></span></div>
+<label for="o-part">Part Name</label><div><input id="o-part" autocomplete="off" required></div>
+<label for="o-number">Part #</label><div><input id="o-number" autocomplete="off"></div>
+<label for="o-reason">Reason</label><div><select id="o-reason"><option>Missing</option><option>Broken</option></select></div>
+<label for="o-notes">Notes</label><div><textarea id="o-notes" rows="2"></textarea></div>
+</div>
+<p id="o-err" class="aerr" role="alert"></p>
+<div class="mbtn"><span class="sp" style="flex:1"></span><button type="button" id="o-cancel">Cancel</button><button class="p" type="submit">Open Email</button></div></form></div>
+<div id="replybox" class="ovl" hidden><form class="nbox addform replyform" role="dialog" aria-modal="true" aria-labelledby="rtitle" novalidate><h2 id="rtitle">Reply</h2>
+<p class="m" id="r-sub"></p>
+<div class="tform">
+<label for="r-scn">Situation</label><div><select id="r-scn"></select><span class="m" id="r-why"></span></div>
+<label class="r-pml">Move WO To</label><div class="r-pml"><b id="r-status"></b></div>
+<label for="r-text">Message</label><div><textarea id="r-text" rows="8"></textarea><span class="m" id="r-fill"></span></div>
+</div>
+<div class="mbtn"><span class="m">The email adds this work order's facts below the message.</span><span class="sp" style="flex:1"></span><button type="button" id="r-cancel">Cancel</button><button type="button" id="r-copy">Copy</button><button class="p" type="submit">Open Email</button></div></form></div>
 <div id="toast"></div>
 <script>
 
@@ -3527,7 +3626,7 @@ function savePill() {
   const b = $('tsave'),
     n = dirtyCount();
   b.hidden = !n;
-  b.innerHTML = `${ICONS.save}Save ${n} Change${n === 1 ? '' : 's'} to the Tracker`;
+  b.innerHTML = `${ICONS.save}Save ${n} Change${n === 1 ? '' : 's'}`;
 }
 addEventListener('beforeunload', e => {
   if (trackerDirty.size || filesLoaded) e.preventDefault();
@@ -3683,6 +3782,7 @@ async function importParts(f) {
     parts = d.stores;
     partsOrders = d.n;
     partsName = f.name;
+    dropFiledHandParts();
     toast(`✓ Loaded ${d.n.toLocaleString()} parts orders for ${d.stores.size.toLocaleString()} stores from ${f.name}.`);
   } catch (e) {
     toast(e instanceof DataError ? e.message : "This file couldn't be opened as a workbook. Import the Parts Orders Detail file (.xlsx).");
@@ -3690,6 +3790,69 @@ async function importParts(f) {
   busyBtn('ximp', false);
   refreshViews();
 }
+
+// ---- New Part Order: the page can't place an order, so it opens an email with the order filled in and keeps the
+// request in this browser, listed as Requested by Hand, until a Parts Orders Detail file has an order for the same
+// store and part (by Part # when one was typed, else by Part Name).
+let handParts = [];
+try {
+  handParts = JSON.parse(loadSetting('bbHandParts') ?? '[]');
+} catch (e) {}
+const saveHandParts = () => saveSetting('bbHandParts', JSON.stringify(handParts));
+function dropFiledHandParts() {
+  const same = (a, b) => !!a && norm(a) === norm(b);
+  handParts = handParts.filter(h => !(parts.get(h.store) ?? []).some(o => (h.number ? same(h.number, o.number) : same(h.part, o.part)) && +o.created >= h.created));
+  saveHandParts();
+}
+// A store's orders, from the file and by hand, newest first.
+const ordersFor = store => [...(parts.get(store) ?? []), ...handParts.filter(o => o.store === store)].sort((a, b) => (+b.created || 0) - (+a.created || 0));
+function openPartOrder() {
+  if (!partsName) return toast('Import the Parts Orders Detail file first: a new order is listed with the orders in it.');
+  $('partbox').querySelector('form').reset();
+  $('o-err').textContent = '';
+  const st = storeKey($('ps').value) || storeKey(followed);
+  $('o-store').value = /^\d{1,5}$/.test(st) ? st : '';
+  fillPartDisplays();
+  $('partbox').hidden = false;
+  $(($('o-store').value ? 'o-display' : 'o-store')).focus();
+}
+// The Display field suggests the store's displays from the Presence file, the ones not present or not working first,
+// and picking one of those sets Reason to Missing or Broken.
+function fillPartDisplays() {
+  const rs = presenceName ? presence.get(storeKey($('o-store').value)) ?? [] : [],
+    bad = rs.filter(x => !x.present || x.working === false),
+    list = [...bad, ...rs.filter(x => !bad.includes(x))];
+  $('o-displays').innerHTML = list.map(x => `<option value="${esc(x.display)}">${!x.present ? 'Not Present' : x.working === false ? 'Not Working' : ''}</option>`).join('');
+  $('o-hint').textContent = presenceName ? (rs.length ? `${bad.length} of ${rs.length} displays not present or not working, from the Presence file` : '') : 'Import the Presence and Functionality file to pick from the store\'s displays';
+}
+$('o-store').addEventListener('input', fillPartDisplays);
+$('partbox').addEventListener('input', () => ($('o-err').textContent = ''));
+$('o-display').addEventListener('input', () => {
+  const x = (presence.get(storeKey($('o-store').value)) ?? []).find(d => d.display === $('o-display').value);
+  if (x && (!x.present || x.working === false)) $('o-reason').value = x.present ? 'Broken' : 'Missing';
+});
+function addPartOrder(ev) {
+  ev.preventDefault();
+  const st = storeKey($('o-store').value),
+    v = id => $(id).value.trim(),
+    bad = !/^\d{1,5}$/.test(st) ? 'Type the store number.' : !v('o-display') ? 'Type or pick the display.' : !v('o-part') ? 'Type the part name.' : '';
+  if (bad) return ($('o-err').textContent = bad);
+  const t = new Date(),
+    o = { store: st, display: v('o-display'), part: v('o-part'), number: v('o-number'), reason: $('o-reason').value, notes: v('o-notes'), created: Math.floor((Date.UTC(t.getFullYear(), t.getMonth(), t.getDate()) - Date.UTC(1899, 11, 30)) / 864e5), state: 'Requested by Hand', hand: true },
+    lines = ['Hi,', '', `Please order this part for Target store ${st}:`, '', `Store: ${st}`, `Display: ${o.display}`, `Part: ${o.part}${o.number ? ` (${o.number})` : ''}`, `Reason: ${o.reason}`, ...(o.notes ? [`Notes: ${o.notes}`] : [])];
+  handParts.push(o);
+  saveHandParts();
+  $('partbox').hidden = true;
+  partsDraw();
+  toast(`✓ Listed ${o.part} for store ${st} as Requested by Hand.`);
+  location.href = `mailto:?subject=${encodeURIComponent(`Part Order - Target Store ${st} - ${o.part}`)}&body=${encodeURIComponent(lines.join('\n') + '\n\n')}`;
+}
+$('addpart').onclick = openPartOrder;
+$('o-cancel').onclick = () => ($('partbox').hidden = true);
+$('partbox').querySelector('form').onsubmit = addPartOrder;
+$('partbox').addEventListener('click', e => {
+  if (e.target.id === 'partbox') $('partbox').hidden = true;
+});
 
 const FILTERS = [
   ['fd', 'When', r => DUE_LABELS[dueState(r)]],
@@ -3853,7 +4016,7 @@ function glance(r) {
   const fact = (t, v) => `<div><span>${t}</span><b>${v || '<em class="m">None</em>'}</b></div>`,
     val = /^pass\.?$/i.test(r.val) || !r.val ? '' : fact('Vendor Work Validation', `<span class="${/^fail/i.test(r.val) ? 'vfail' : ''}">${esc(r.val)}</span>`);
   return `${r.desc ? `<div class="issw"><p class="issue">${esc(r.desc)}</p></div>` : ''}
- <div class="tiles">${fact('Status', `${esc(statusLabel(r))} <span class="m">· ${esc(r.status)}</span>`)}${fact('Status Date', r.sd && esc(r.sd.shown))}${fact('Report Date', r.rd && esc(r.rd.shown))}${fact('LOS Finish', r.los && esc(r.los.shown))}${val}${fact('Work Order', esc(r.id))}${fact('Site', esc(r.site))}</div>
+ <div class="tiles">${fact('Status', `${esc(statusLabel(r))} <span class="m">· ${esc(r.status)}</span>`)}${fact('Status Date', r.sd && esc(r.sd.shown))}${fact('Report Date', r.rd && esc(r.rd.shown))}${fact('LOS Finish', r.los && esc(r.los.shown))}${val}${fact('Work Order', esc(r.id))}</div>
  <h3 class="tlh">Timeline</h3>${timeline(r)}`;
 }
 
@@ -3928,19 +4091,21 @@ function presenceCard(store, desc) {
 }
 
 // What the tracker kept by hand says about this work order: one block per tracker row (No show or Data Review).
-// A tracker row's hand-kept fields, as the card shows them. editable adds an Edit button (Escalations and No Show; the
-// Store Visits overview only shows them). A changed field not yet saved is marked.
+// A tracker row's hand-kept fields, as the card shows them. editable shows the form while the row is being edited
+// (Escalations and No Show; the Store Visits overview only shows them). A changed field not yet saved is marked.
 function trackerFacts(e, editable) {
   if (editable && trackerEditing === e.key) return trackerForm(e);
   const dirty = trackerDirty.get(e.key) ?? new Set(),
     filled = HAND_KEYS.map(k => [k, trackerText(k, e.v[k])]).filter(([k, v]) => v || dirty.has(k));
-  return `${filled.length ? `<dl class="facts tfacts">${filled.map(([k, v]) => `<dt>${esc(COL[k][1])}${dirty.has(k) ? ' <span class="tag unsaved" title="Not saved to the file yet">Unsaved</span>' : ''}</dt><dd>${k === 'rep' ? trackerReps(v) : esc(v)}</dd>`).join('')}</dl>` : '<p class="m">Nothing entered yet.</p>'}${editable ? `<div class="mbtn"><button data-tedit="${esc(e.key)}">${ICONS.edit}Edit</button></div>` : ''}`;
+  return `${filled.length ? `<dl class="facts tfacts">${filled.map(([k, v]) => `<dt>${esc(COL[k][1])}${dirty.has(k) ? ' <span class="tag unsaved" title="Not saved to the file yet">Unsaved</span>' : ''}</dt><dd>${k === 'rep' ? trackerReps(v) : esc(v)}</dd>`).join('')}</dl>` : '<p class="m">Nothing entered yet.</p>'}`;
 }
+// The Edit button for a tracker row, at the top right of its card; hidden while the row's form is open.
+const editBtn = e => (trackerEditing === e.key ? '' : `<button class="cedit" data-tedit="${esc(e.key)}">${ICONS.edit}Edit</button>`);
 function trackerCard(r) {
   if (!trackerName) return '<p class="m">Import the BDS No Show and Data Review file to see the notes kept on this work order.</p>';
   const es = tracker.get(r.id),
     prev = (trackerSites.get(storeKey(r.site)) ?? []).filter(e => e.id !== r.id);
-  return `${es ? es.map(e => `${es.length > 1 ? `<h4 class="pgh">${esc(e.sheet)}</h4>` : ''}${trackerFacts(e, true)}`).join('') : `<p class="m">Work order ${esc(r.id)} isn't in the tracker file yet.</p>`}${prev.length ? `<h4 class="pgh">Previous Work Orders <span class="m">${prev.length}</span></h4>${prevOrders(prev)}` : ''}`;
+  return `${es ? es.map(e => `${es.length > 1 ? `<h4 class="pgh rowh">${esc(e.sheet)}${editBtn(e)}</h4>` : ''}${trackerFacts(e, true)}`).join('') : `<p class="m">Work order ${esc(r.id)} isn't in the tracker file yet.</p>`}${prev.length ? `<h4 class="pgh">Previous Work Orders <span class="m">${prev.length}</span></h4>${prevOrders(prev)}` : ''}`;
 }
 // Every tracker row for a store, newest work order first. Each opens from its work order number and sheet; the newest is open.
 function storeTrackerCard(store) {
@@ -3963,11 +4128,11 @@ function prevOrders(es) {
 }
 
 // This store's parts orders, newest first: the part, why it was ordered, where it stands, and its tracking number.
-const PART_STATE = { Shipped: 'st-done', Ordered: 'st-open', Canceled: '', 'Troubleshooting Only': '' };
+const PART_STATE = { Shipped: 'st-done', Ordered: 'st-open', Canceled: '', 'Troubleshooting Only': '', 'Requested by Hand': 'hand' };
 function partsCard(store) {
   if (!partsName) return '<p class="m">Import the Parts Orders Detail file to see this store\'s parts orders.</p>';
-  const os = parts.get(store);
-  if (!os) return `<p class="m">Store ${esc(store)} has no parts orders in the parts file.</p>`;
+  const os = ordersFor(store);
+  if (!os.length) return `<p class="m">Store ${esc(store)} has no parts orders in the parts file.</p>`;
   return partsTable(os, false);
 }
 // Parts orders as a table: part, reason, order date, status and tracking; withStore adds a Store column that opens the
@@ -3982,7 +4147,7 @@ function partsTable(os, withStore) {
   };
   return `<table class="ptab"><thead><tr>${withStore ? '<th>Store</th>' : ''}<th>Part</th><th>Reason</th><th>Ordered</th><th>Status</th><th>Tracking</th></tr></thead><tbody>${os
     .map(
-      o => `<tr>${withStore ? `<td><button class="lnk" data-partstore="${esc(o.store)}" title="Open on Store Visits">Store ${esc(o.store)}</button>${escStores.has(o.store) ? '<div><span class="tag st-open">Has Escalations</span></div>' : ''}</td>` : ''}<td><b>${esc(o.part || o.type)}</b>${o.number ? ` <span class="m">${esc(o.number)}</span>` : ''}${o.display ? `<div class="m">${esc(o.display)}</div>` : ''}${o.notes ? `<div class="pnote">${esc(o.notes)}</div>` : ''}</td><td>${esc(o.reason) || '<span class="m">None</span>'}${o.stock ? `<div class="m">${esc(o.stock)}</div>` : ''}</td><td>${typeof o.created === 'number' ? esc(fmtDay(serialDay(o.created))) : ''}</td><td><span class="tag ${PART_STATE[o.state]}">${esc(o.state)}</span></td><td>${track(o)}</td></tr>`
+      o => `<tr>${withStore ? `<td><button class="lnk pstore" data-partstore="${esc(o.store)}" title="Open Store ${esc(o.store)} on Store Visits">${esc(o.store)}</button>${escStores.has(o.store) ? '<div><span class="tag st-open">Has Escalations</span></div>' : ''}</td>` : ''}<td><b>${esc(o.part || o.type)}</b>${o.number ? ` <span class="m">${esc(o.number)}</span>` : ''}${o.display ? `<div class="m">${esc(o.display)}</div>` : ''}${o.notes ? `<div class="pnote">${esc(o.notes)}</div>` : ''}</td><td>${o.reason ? `<b>${esc(o.reason)}</b>` : '<span class="m">None</span>'}${o.stock ? `<div class="m">${esc(o.stock)}</div>` : ''}</td><td>${typeof o.created === 'number' ? esc(fmtDay(serialDay(o.created))) : ''}</td><td><span class="tag ${PART_STATE[o.state]}">${esc(o.state)}</span></td><td>${track(o)}</td></tr>`
     )
     .join('')}</tbody></table>`;
 }
@@ -3995,7 +4160,8 @@ const P_PILLS = [
   ['Ordered', 'warn'],
   ['Shipped', 'ok'],
   ['Canceled', ''],
-  ['Troubleshooting Only', '']
+  ['Troubleshooting Only', ''],
+  ['Requested by Hand', '']
 ];
 function pOptions(id, label, items) {
   const old = $(id).value,
@@ -4005,7 +4171,7 @@ function pOptions(id, label, items) {
   $(id).classList.toggle('on', !!$(id).value);
 }
 function partsDraw() {
-  const all = [...parts.values()].flat().sort((a, b) => (+b.created || 0) - (+a.created || 0));
+  const all = [...parts.values()].flat().concat(handParts).sort((a, b) => (+b.created || 0) - (+a.created || 0));
   document.querySelector('#partsView .pfil').hidden = !partsName;
   if (!partsName) {
     $('psum').innerHTML = '';
@@ -4025,13 +4191,13 @@ function partsDraw() {
     shown = pPill ? found.filter(o => o.state === pPill) : found,
     days = all.map(o => o.created).filter(x => typeof x === 'number'),
     escStores = new Set(rows.map(r => storeKey(r.site))),
-    reach = [...escStores].filter(k => parts.has(k)).length;
+    reach = [...escStores].filter(k => ordersFor(k).length).length;
   $('psum').innerHTML =
     `<button class="${pPill ? '' : 'act'}" data-ppill="" aria-pressed="${!pPill}"><b>${found.length.toLocaleString()}</b>All Orders</button>` +
-    P_PILLS.map(([t, tone]) => `<button class="${tone}${pPill === t ? ' act' : ''}" data-ppill="${t}" aria-pressed="${pPill === t}"><b>${found.filter(o => o.state === t).length.toLocaleString()}</b>${t}</button>`).join('');
+    P_PILLS.filter(([t]) => t !== 'Requested by Hand' || handParts.length).map(([t, tone]) => `<button class="${tone}${pPill === t ? ' act' : ''}" data-ppill="${t}" aria-pressed="${pPill === t}"><b>${found.filter(o => o.state === t).length.toLocaleString()}</b>${t}</button>`).join('');
   $('pcnt').innerHTML = `<b>${shown.length.toLocaleString()}</b> of ${all.length.toLocaleString()} orders`;
-  $('pbody').innerHTML = `<p class="m">${all.length.toLocaleString()} orders at ${parts.size.toLocaleString()} stores, ordered ${days.length ? `${esc(fmtDay(serialDay(Math.min(...days))))} to ${esc(fmtDay(serialDay(Math.max(...days))))}` : 'on no stated date'}, from ${esc(partsName)}.${rows.length ? ` ${reach.toLocaleString()} of the ${escStores.size.toLocaleString()} stores with escalations have an order.` : ''}</p>
- ${card('Parts Orders', shown.length ? partsTable(shown, true) : '<p class="m">No orders match.</p>', 'Newest first, from the Parts Orders Detail file')}`;
+  $('pbody').innerHTML = `${card('Parts Orders', shown.length ? partsTable(shown, true) : '<p class="m">No orders match.</p>', 'Newest first, from the Parts Orders Detail file')}
+ <p class="m">${all.length.toLocaleString()} orders at ${new Set(all.map(o => o.store)).size.toLocaleString()} stores, ordered ${days.length ? `${esc(fmtDay(serialDay(Math.min(...days))))} to ${esc(fmtDay(serialDay(Math.max(...days))))}` : 'on no stated date'}, from ${esc(partsName)}.${rows.length ? ` ${reach.toLocaleString()} of the ${escStores.size.toLocaleString()} stores with escalations have an order.` : ''}</p>`;
 }
 $('psum').onclick = e => {
   const b = e.target.closest('[data-ppill]');
@@ -4054,8 +4220,8 @@ $('partsView').addEventListener('click', e => {
   showApp('vis');
 });
 
-// A panel that is always open: a title, a hint, and its body.
-const card = (t, body, hint) => `<section class="card open"><h3 class="ch">${t}<span class="hint">${hint}</span></h3>${body}</section>`;
+// A panel that is always open: a title, a hint, an optional button at the top right, and its body.
+const card = (t, body, hint, action = '') => `<section class="card open"><h3 class="ch">${t}<span class="hint">${hint}</span>${action}</h3>${body}</section>`;
 
 // The store's street address from the data file, or Maximo's city and state until that file is in.
 function storeAddress(r) {
@@ -4085,10 +4251,8 @@ function showEscalation(r, keep) {
  <h2 class="vn">Store ${esc(r.site)}</h2>${where ? `<div class="sid">${mapsLink(where)}</div>` : ''}<div class="m ids">Work Order #${esc(r.id)} · <button class="lnk" data-storeview="${esc(store)}">Store Overview</button></div></div>
  <div class="side">${replyMenu('To DM')}${org ? `<div class="team">${org}</div>` : ''}</div></div>
  <div class="panel solo">${glance(r)}</div>
- ${collapsible('tracker', 'Tracker Notes', trackerCard(r), 'Kept by hand, from the BDS No Show and Data Review file')}
- ${collapsible('visits', 'Rep & Visits', visitsCard(store), 'Last four weeks, from the data file')}
+ ${storeTabs(store, r)}
  ${collapsible('presence', "Rep's Answers", presenceCard(store, r.desc), 'Displays present and working, from the Presence and Functionality file', false)}
- ${collapsible('parts', 'Parts', partsCard(store), "This store's parts orders, from the Parts Orders Detail file", false)}
  ${collapsible('all', 'Full Record', fullRecord(r), 'Every column of this work order in the export file', false)}`;
   $('d').scrollTop = sc;
   draw();
@@ -4186,11 +4350,12 @@ function storeWatch() {
     rank('Most Parts Orders', 'Not canceled, from the Parts file', counts([...parts.values()].flat().filter(o => o.state !== 'Canceled').map(o => o.store)), !!partsName)
   ].join('')}</div>`;
 }
-// The store's work orders in the export file, newest first. Each opens on the Escalations tab.
-function storeOrdersCard(store) {
+// The store's work orders in the export file, newest first, leaving out skip (the one already open). Each opens on the
+// Escalations tab.
+function storeOrdersCard(store, skip) {
   if (!rows.length) return '<p class="m">Import the export file to see this store\'s escalations.</p>';
-  const list = rows.filter(r => storeKey(r.site) === store).sort((a, b) => (b.sd ? +b.sd.at : 0) - (a.sd ? +a.sd.at : 0));
-  if (!list.length) return `<p class="m">Store ${esc(store)} has no CM work orders in the export file.</p>`;
+  const list = rows.filter(r => storeKey(r.site) === store && r !== skip).sort((a, b) => (b.sd ? +b.sd.at : 0) - (a.sd ? +a.sd.at : 0));
+  if (!list.length) return `<p class="m">Store ${esc(store)} has no ${skip ? 'other ' : ''}CM work orders in the export file.</p>`;
   return `<div class="olist">${list
     .map(
       r =>
@@ -4198,14 +4363,42 @@ function storeOrdersCard(store) {
     )
     .join('')}</div>`;
 }
+// One card with tabs, drawn like the header tabs: each tab is [key, title, body, hint, action]; the action (an Edit
+// button) sits at the top right while its tab is open. The open tab is kept from one work order or store to the next.
+let cardTab = '';
+function tabCard(tabs) {
+  const on = tabs.some(t => t[0] === cardTab) ? cardTab : tabs[0][0];
+  return `<section class="card tabcard"><div class="ctabs" role="tablist">${tabs.map(([k, t]) => `<button role="tab" data-ctab="${k}" aria-selected="${k === on}">${t}</button>`).join('')}${tabs
+    .map(([k, , , , a]) => (a ? `<span class="ctact" data-act="${k}"${k === on ? '' : ' hidden'}>${a}</span>` : ''))
+    .join('')}</div>${tabs.map(([k, , body, hint]) => `<div class="ctpane" role="tabpanel" data-pane="${k}"${k === on ? '' : ' hidden'}><p class="hint">${hint}</p>${body}</div>`).join('')}</section>`;
+}
+// Opens a tab of a tabbed card; Store Visits calls it for the overview in its own page.
+function pickCardTab(b) {
+  cardTab = b.dataset.ctab;
+  const box = b.closest('.tabcard');
+  box.querySelectorAll('[data-ctab]').forEach(x => x.setAttribute('aria-selected', x === b));
+  box.querySelectorAll('[data-pane],[data-act]').forEach(x => (x.hidden = (x.dataset.pane ?? x.dataset.act) !== cardTab));
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-ctab]');
+  if (b) pickCardTab(b);
+});
+// A store's Rep & Visits, Escalations, Tracker Notes and Parts as one tabbed card. r is the open work order (its tracker
+// rows lead Tracker Notes and it is left out of Escalations), or null on the store overview.
+function storeTabs(store, r) {
+  const es = r && trackerName ? tracker.get(r.id) : null;
+  return tabCard([
+    ['visits', 'Rep & Visits', visitsCard(store), 'Last four weeks, from the data file'],
+    ['escs', 'Escalations', storeOrdersCard(store, r), r ? "This store's other CM work orders, from the export file" : "This store's CM work orders, from the export file"],
+    ['tracker', 'Tracker Notes', r ? trackerCard(r) : storeTrackerCard(store), 'Kept by hand, from the BDS No Show and Data Review file', es?.length === 1 ? editBtn(es[0]) : ''],
+    ['parts', 'Parts', partsCard(store), "This store's parts orders and tracking, from the Parts Orders Detail file"]
+  ]);
+}
 function storeOverview(store) {
   return (
     (store
       ? card("Rep's Answers", presenceCard(store, ''), 'Displays present and working, from the Presence and Functionality file') +
-        card('Rep & Visits', visitsCard(store), 'Last four weeks, from the data file') +
-        card('Escalations', storeOrdersCard(store), "This store's CM work orders, from the export file") +
-        card('Tracker Notes', storeTrackerCard(store), 'Kept by hand, from the BDS No Show and Data Review file') +
-        card('Parts', partsCard(store), "This store's parts orders and tracking, from the Parts Orders Detail file")
+        storeTabs(store, null)
       : card('Presence & Functionality', pfCard(), 'Nationwide, from the Presence and Functionality and Parts Orders Detail files') +
         card('Store Watch', storeWatch(), 'The five stores with the most of each, from every imported file'))
   );
@@ -4413,7 +4606,7 @@ function nsShow(e, keep) {
  <h2 class="vn">Store ${esc(clean(e.v.site))}</h2><div class="m ids">Work Order #${esc(e.id)}${dates}</div>
  <div class="nsgo">${rows.some(r => r.id === e.id) ? '<button class="lnk" data-nsgo="esc">Open on Escalations</button>' : ''}${e.store ? '<button class="lnk" data-nsgo="vis">Open Store on Store Visits</button>' : ''}<button class="lnk" data-nsgo="back">Back to Summary</button></div></div><div class="side">${replyMenu('To DM/FOM')}</div></div>
  <div class="panel solo">${desc ? `<div class="issw"><p class="issue">${esc(desc)}</p></div>` : ''}<div class="tiles">${tile('Problem Code', clean(e.v.problem))}${tile('Status', clean(e.v.status))}${tile('LOS Finish', trackerText('los', e.v.los))}${tile('Vendor Work Validation', clean(e.v.val))}</div></div>
- ${card('Tracker Notes', trackerFacts(e, true), 'Kept by hand; Save at the top writes changes into the file')}
+ ${card('Tracker Notes', trackerFacts(e, true), 'Kept by hand; Save at the top writes changes into the file', editBtn(e))}
  ${others.length ? card('Previous Work Orders', prevOrders(others), "This store's other rows in the tracker file") : ''}
  ${collapsible('nsnotes', 'Log Notes', nsNotes(), 'From the Responses sheet', false)}`;
   $('nd').scrollTop = sc;
@@ -4713,13 +4906,12 @@ function filterFromRow(tr) {
   toast(`Showing ${n.toLocaleString()} work order${n === 1 ? '' : 's'} in the list.`);
 }
 
-// Reply opens an email draft in the mail app, To line blank, with this work order's facts. The DM's draft adds the rep
-// assigned each week; the PML is Target's contact, so theirs gives the visits without rep names.
-function replyLink(r, to) {
+// Reply: the work order's facts that every reply email ends with, To line blank. The DM's adds the rep assigned each
+// week and the steps kept in the tracker; the PML is Target's contact, so theirs gives the visits without rep names.
+function replyFacts(r, to) {
   const v = visitsName ? visFrame().weeksFor(storeKey(r.site)) : null,
+    es = trackerName ? tracker.get(r.id) ?? [] : [],
     lines = [
-      'Hi,',
-      '',
       `Target work order ${r.id} for store ${r.site}:`,
       '',
       `Store: ${r.site}, ${storeAddress(r)}`,
@@ -4729,20 +4921,19 @@ function replyLink(r, to) {
       `LOS Finish: ${r.los ? `${r.los.shown} (${dueText(r)})` : 'none'}`,
       `Description: ${r.desc}`
     ];
+  if (to === 'dm') es.forEach(e => lines.push(`Comments: ${trackerText('comments', e.v.comments) || 'none'}`, `Action on Maximo: ${trackerText('action', e.v.action) || 'none'}`));
   if (v) {
     if (to === 'dm') lines.push(`DM: ${v.dm || 'none'}`);
     lines.push('', 'Visits, last four weeks:', ...v.weeks.map(w => `${w.wave}: ${to === 'dm' ? `${w.rep}, ` : ''}${w.status}`));
   }
-  return `mailto:?subject=${encodeURIComponent(`Target WO ${r.id} - Store ${r.site} - ${r.problem}`)}&body=${encodeURIComponent(lines.join('\n') + '\n\n')}`;
+  return { subject: `Target WO ${r.id} - Store ${r.site} - ${r.problem}`, lines };
 }
 // The same for a No Show row, from the tracker file: Maximo's fields as the tracker kept them, then the notes kept by hand.
-// The DM's draft adds the rep named in the tracker and each week's rep.
-function nsReplyLink(e, to) {
+// The DM's adds the rep named in the tracker and each week's rep.
+function nsReplyFacts(e, to) {
   const v = visitsName && e.store ? visFrame().weeksFor(e.store) : null,
     f = k => trackerText(k, e.v[k]) || 'none',
     lines = [
-      'Hi,',
-      '',
       `Target work order ${e.id} for store ${clean(e.v.site)}:`,
       '',
       `Problem Code: ${f('problem')}`,
@@ -4756,8 +4947,140 @@ function nsReplyLink(e, to) {
     ];
   if (to === 'dm') lines.push(`Rep: ${f('rep')}`, `FOM (DM): ${f('fom')}`);
   if (v) lines.push('', 'Visits, last four weeks:', ...v.weeks.map(w => `${w.wave}: ${to === 'dm' ? `${w.rep}, ` : ''}${w.status}`));
-  return `mailto:?subject=${encodeURIComponent(`Target WO ${e.id} - Store ${clean(e.v.site)} - ${clean(e.v.problem)}`)}&body=${encodeURIComponent(lines.join('\n') + '\n\n')}`;
+  return { subject: `Target WO ${e.id} - Store ${clean(e.v.site)} - ${clean(e.v.problem)}`, lines };
 }
+
+// The DM's situations. To PML uses the Responses sheet's canned log notes instead. {braces} are filled from the files;
+// what no file has is left as (fill in).
+const DM_NOTES = [
+  {
+    code: 'NO_SHOW',
+    key: 'missed',
+    cat: 'BDS NO SHOW',
+    scenario: 'Missed visit: the rep did not visit that week',
+    note: "Store {store}'s PML submitted a No Show work order ({wo}) for the week of {week}. The data file shows no completed visit that week ({rep}, {weekstatus}).\n\nPlease follow up with the rep and let me know when the store will be visited, so I can update the PML and the work order."
+  },
+  {
+    code: 'NO_SHOW',
+    key: 'visited',
+    cat: 'BDS NO SHOW',
+    scenario: 'PML hours: the rep visited, but not while the PML was there',
+    note: "Store {store}'s PML submitted a No Show work order ({wo}), but {rep} visited on {visit}. The PML expects the rep during PML hours.\n\nPlease partner with the rep to be in store during PML hours in the coming weeks. I'm declining the work order with Target and noting that it was escalated to you."
+  },
+  {
+    code: 'DATA_REVIEW',
+    key: 'variance',
+    cat: 'BDS DATA REVIEW',
+    scenario: "Data review: the PML's report differs from the rep's",
+    note: "Store {store}'s PML submitted a Data Review work order ({wo}): {desc}\n\nThe rep's last report: {answer}.\n\nPlease have the rep review this display with the PML on the next visit and fix or order what's needed."
+  }
+];
+// Dates the way the canned notes write them.
+const mdy = d => `${d.getUTCMonth() + 1}/${d.getUTCDate()}/${String(d.getUTCFullYear()).slice(2)}`,
+  md = d => `${d.getUTCMonth() + 1}/${d.getUTCDate()}`,
+  hm = d => (d.getUTCHours() || d.getUTCMinutes() ? `${d.getUTCHours() % 12 || 12}:${String(d.getUTCMinutes()).padStart(2, '0')} ${d.getUTCHours() < 12 ? 'AM' : 'PM'}` : '');
+// What the files say about a work order, for picking and filling a situation: the week it was raised in (the wave
+// whose seven days hold its Status Date), whether the rep visited then, the next scheduled visit, and the rep's answer for the display the description names.
+function replyCtx(src) {
+  const v = visitsName && src.store ? visFrame().weeksFor(src.store) : null,
+    day = src.sd ? Date.UTC(src.sd.getFullYear(), src.sd.getMonth(), src.sd.getDate()) : null,
+    wk = v && day != null ? visFrame().visitWeek(src.store, day) : null,
+    nowDay = Date.UTC(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()),
+    next = v?.weeks.filter(w => !w.done && w.at && +w.at >= nowDay).sort((a, b) => a.at - b.at)[0]?.at ?? null,
+    dpcis = src.desc.match(/\d{3}-\d{2}-\d{4}/g) ?? [],
+    ans = presenceName && src.store ? (presence.get(src.store) ?? []).find(x => dpcis.some(d => x.display.includes(d))) : null;
+  return { ...src, v, wk, next, ans, code: /DATA_REVIEW/i.test(src.problem) ? 'DATA_REVIEW' : /NO_SHOW/i.test(src.problem) ? 'NO_SHOW' : '' };
+}
+// The likely situation: for a No Show, whether the rep visited the week it was raised; for a Data Review, whether the
+// rep's own answer already shows the display missing or broken.
+function likelyKey(c) {
+  if (c.code === 'NO_SHOW' && c.wk) return c.wk.done ? 'visited' : 'missed';
+  if (c.code === 'DATA_REVIEW' && c.ans) return !c.ans.present || c.ans.working === false ? 'aligns' : 'variance';
+  return '';
+}
+// The Responses sheet's scenarios, keyed like DM_NOTES where one matches a situation the files can tell apart.
+const responseKey = x =>
+  /did not miss visit/i.test(x.scenario) ? 'visited' : /did miss visit/i.test(x.scenario) ? 'missed' : /already aligns/i.test(x.scenario) ? 'aligns' : /does not align/i.test(x.scenario) ? 'variance' : '';
+// The situations for this reply: the problem code's own first, then the ones for any work order; the other code's are left out.
+function replySituations(c, to) {
+  const tagged = (to === 'pml' ? trackerFile?.responses ?? [] : DM_NOTES).map(x => ({ ...x, key: x.key ?? responseKey(x), own: /NO SHOW/i.test(x.cat) ? 'NO_SHOW' : /DATA REVIEW/i.test(x.cat) ? 'DATA_REVIEW' : '' }));
+  return [...tagged.filter(x => c.code && x.own === c.code), ...tagged.filter(x => !x.own)];
+}
+// A situation's text with what the files know filled in. The canned notes use XX/XX/XX for the visit, X:XX for its time
+// and XX/XX for the next visit; the DM's use {braces}.
+function fillNote(x, c) {
+  const visit = c.wk?.done ?? null,
+    w = c.wk ?? c.v?.weeks[0],
+    answer = c.ans ? `${c.ans.display}, ${c.ans.present ? `present, ${c.ans.working === false ? 'not working' : c.ans.working ? 'working' : 'no answer on working'}` : 'not present'}${c.ans.why ? ` (${c.ans.why})` : ''}` : '',
+    gap = '(fill in)';
+  let t = x.note;
+  if (visit) t = t.replace('XX/XX/XX', mdy(visit)).replace(/ at X:XX/, hm(visit) ? ` at ${hm(visit)}` : '');
+  if (c.next) t = t.replace('XX/XX', md(c.next));
+  const vals = { store: c.storeLabel, wo: c.id, week: c.wk?.wave, rep: w?.rep, weekstatus: c.wk?.status, visit: visit && `${mdy(visit)}${hm(visit) ? ` at ${hm(visit)}` : ''}`, desc: c.desc, answer };
+  return t.replace(/\{(\w+)\}/g, (m, k) => vals[k] || gap);
+}
+let replyNow = null;
+// Opens the Reply panel for the open work order (Escalations) or tracker row (No Show).
+function openReply(to) {
+  const onNs = !$('nsView').hidden,
+    e = onNs ? trackerRowsByKey.get(nsSel) : null,
+    src = onNs
+      ? { id: e.id, store: e.store, storeLabel: clean(e.v.site), problem: clean(e.v.problem), desc: clean(e.v.desc), sd: whenOf(e.v.sd)?.at ?? null }
+      : { id: current.id, store: storeKey(current.site), storeLabel: current.site, problem: current.problem, desc: current.desc, sd: current.sd?.at ?? null };
+  if (to === 'pml' && !trackerFile?.responses.length) return toast("The PML's canned replies come from the Responses sheet: import the BDS No Show and Data Review file first.");
+  const c = replyCtx(src),
+    list = replySituations(c, to),
+    like = likelyKey(c),
+    hit = like ? list.findIndex(x => x.key === like) : -1,
+    pick = Math.max(0, hit);
+  replyNow = { to, c, list, facts: onNs ? nsReplyFacts(e, to) : replyFacts(current, to) };
+  $('rtitle').textContent = to === 'pml' ? 'Reply To PML' : onNs ? 'Reply To DM/FOM' : 'Reply To DM';
+  $('r-sub').textContent = `Work Order #${c.id} · Store ${c.storeLabel}${c.problem ? ` · ${c.problem}` : ''}`;
+  $('r-scn').innerHTML = list.map((x, i) => `<option value="${i}">${esc(x.scenario.trim())}${i === hit ? ' (Likely)' : ''}</option>`).join('');
+  $('r-scn').value = String(pick);
+  $('r-why').textContent =
+    hit >= 0
+      ? c.code === 'NO_SHOW'
+        ? `Likely: the data file shows ${c.wk.done ? `a visit on ${mdy(c.wk.done)}` : 'no completed visit'} the week of ${c.wk.wave}.`
+        : `Likely: the rep's last report has ${c.ans.display} ${!c.ans.present ? 'not present' : c.ans.working === false ? 'not working' : 'present and working'}.`
+      : c.code === 'NO_SHOW' && !visitsName
+        ? 'Import the data file to pick the likely situation from the visits.'
+        : c.code === 'DATA_REVIEW' && !presenceName
+          ? 'Import the Presence and Functionality file to pick the likely situation from the rep\'s answers.'
+          : '';
+  document.querySelectorAll('.r-pml').forEach(x => (x.hidden = to !== 'pml'));
+  pickSituation();
+  $('replybox').hidden = false;
+  $('r-scn').focus();
+}
+function pickSituation() {
+  const x = replyNow.list[+$('r-scn').value];
+  $('r-status').textContent = x.status ? x.status.replace(/^BDS will move WO to /i, '').replace(/\s*\n\s*/g, '; ') : '';
+  $('r-text').value = fillNote(x, replyNow.c);
+  showGaps();
+}
+// Names what's still to fill in by hand.
+function showGaps() {
+  const gaps = [...new Set($('r-text').value.match(/X{1,2}\/XX(\/XX)?|X:XX|#X{4,}|\(fill in\)|\(name of display or part\)|\(date\)/g) ?? [])];
+  $('r-fill').textContent = gaps.length ? `Still to fill in: ${gaps.join(', ')}` : '';
+}
+$('r-scn').onchange = pickSituation;
+$('r-text').addEventListener('input', showGaps);
+$('r-copy').onclick = () =>
+  navigator.clipboard.writeText($('r-text').value).then(
+    () => toast('✓ Copied the message.'),
+    () => toast("Couldn't copy it. Select the text and copy it instead.")
+  );
+$('r-cancel').onclick = () => ($('replybox').hidden = true);
+$('replybox').addEventListener('click', e => {
+  if (e.target.id === 'replybox') $('replybox').hidden = true;
+});
+$('replybox').querySelector('form').onsubmit = ev => {
+  ev.preventDefault();
+  const { subject, lines } = replyNow.facts;
+  $('replybox').hidden = true;
+  location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(['Hi,', '', $('r-text').value.trim(), '', ...lines].join('\n') + '\n\n')}`;
+};
 // The Reply button and its menu, on Escalations and No Show. dm is the first item's label.
 const replyMenu = dm =>
   `<div class="reply"><button class="p" aria-haspopup="menu" aria-expanded="false">${ICONS.mail}Reply</button><div role="menu" hidden><button role="menuitem" data-to="dm">${dm}</button><button role="menuitem" data-to="pml">To PML</button></div></div>`;
@@ -4770,7 +5093,7 @@ document.addEventListener('click', e => {
     x.querySelector('[role=menu]').hidden = !(open && x === box);
     x.firstElementChild.setAttribute('aria-expanded', open && x === box);
   });
-  if (b?.dataset.to) location.href = $('nsView').hidden ? replyLink(current, b.dataset.to) : nsReplyLink(trackerRowsByKey.get(nsSel), b.dataset.to);
+  if (b?.dataset.to) openReply(b.dataset.to);
 });
 $('d').addEventListener('click', e => {
   const tr = e.target.closest('tr[data-f]');
