@@ -212,6 +212,11 @@ ns.append(TH); dr.append([h for h in TH if h != None][:15] + ['FOM', 'Date of Up
 rs.append(['Category', 'WO Scenario', 'BDS Status Update, Pending Resolution', 'Log Note Verbiage back to Target'])
 rs.append(['PML Hours\nBDS NO SHOW ', 'Test scenario: visit outside PML hours', 'Test status: pending PML', 'Test log note: the visit was outside PML hours.'])
 rs.append(['Submission Issue', 'Test scenario: duplicate WO', None, 'Test log note: this WO duplicates an earlier one.'])
+# The four scenarios Reply can tell apart from the files, worded like the real Responses sheet.
+rs.append(['Missed Visit\nBDS NO SHOW', 'Missed visit reported, BDS did miss visit', 'BDS will move WO to VINPRG', 'BDS confirmed visit was missed; next rep visit scheduled for XX/XX.'])
+rs.append(['Missed Visit\nBDS NO SHOW', 'Missed visit reported, BDS did not miss visit', 'BDS will move WO to VDECWO', 'BDS rep visited on XX/XX/XX at X:XX; next rep visit scheduled for XX/XX.'])
+rs.append(['Accepted\nDATA REVIEW', 'If the rep reporting does not align with what the PML is stating', 'BDS will move WO to VINPRG', 'Test log note: BDS will notify the rep\'s Field Manager.'])
+rs.append(['MISC\nDATA REVIEW', 'If the rep reporting already aligns with what the PML is stating is present or non functional', 'BDS will move WO to VDECWO', 'Test log note: rep reporting aligns, declining this WO.'])
 def mtext(d): return d.strftime('%m/%d/%Y %I:%M %p') + ' EDT'
 TRK = {}
 REPS_IN_TRACKER = {'T0102': 'Rory Test-Rep1\nNot In Data', 'T0347': 'sky test-rep2, Quinn Test-Rep3'}
